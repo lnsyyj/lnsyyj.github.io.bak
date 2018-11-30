@@ -90,6 +90,12 @@ rpmbuild/RPMS/
     └── rbd-nbd-10.2.11-0.el7.centos.x86_64.rpm
 
 1 directory, 34 files
+
+解压bz2文件
+yum install bzip2 -y
+bzip2 -d ceph-12.2.8.tar.bz2
+tar xvf ceph-12.2.8.tar
+tar zcvf ceph-12.2.8.tar.gz ceph-12.2.8
 ```
 
 

@@ -4,6 +4,8 @@ date: 2018-11-26 18:47:23
 tags: ceph
 ---
 
+手动部署ceph是看懂官方ansible或ceph-deploy的关键，了解部署步骤和相关组件才能更好的理解代码，理解OSD的挂载流程，所以个人认为需要做此实验。
+
 官方文档：http://docs.ceph.com/docs/master/install/manual-deployment/
 
 # MANUAL DEPLOYMENT
@@ -528,4 +530,168 @@ ceph osd tree
 ```
 
 要添加（或删除）其他monitors，请参阅[Add/Remove Monitors](http://docs.ceph.com/docs/master/rados/operations/add-or-rm-mons/)。要添加（或删除）其他Ceph OSD Daemons，请参阅[Add/Remove OSDs](http://docs.ceph.com/docs/master/rados/operations/add-or-rm-osds/)。
+
+
+
+# 部署实验
+
+## monitor部署实验
+
+1、添加ceph源
+
+```
+[root@cephlm ~]# vi /etc/yum.repos.d/ceph.repo 
+[ceph]
+name=Ceph
+baseurl=http://mirrors.163.com/ceph/rpm-luminous/el7/x86_64/
+# baseurl=https://download.ceph.com/rpm-luminous/el7/x86_64/
+enabled=1
+gpgcheck=1
+type=rpm-md
+gpgkey=http://mirrors.163.com/ceph/keys/release.asc
+# gpgkey=https://download.ceph.com/keys/release.asc
+```
+
+2、安装epel与ceph
+
+```
+[1]epel参考：https://blog.csdn.net/yasi_xi/article/details/11746255
+EPEL的全称叫 Extra Packages for Enterprise Linux 。EPEL是由 Fedora 社区打造，为 RHEL 及衍生发行版如 CentOS、Scientific Linux 等提供高质量软件包的项目。装上了 EPEL之后，就相当于添加了一个第三方源。
+
+[root@cephlm ~]# yum install epel-release -y && yum install ceph -y
+```
+
+3、为集群创建keyring并生成monitor secret key。
+
+```
+[root@cephlm ~]# ceph-authtool --create-keyring /tmp/ceph.mon.keyring --gen-key -n mon. --cap mon 'allow *'
+creating /tmp/ceph.mon.keyring
+[root@cephlm ~]# cat /tmp/ceph.mon.keyring
+[mon.]
+	key = AQAgbv1bc62FBBAAvuCz2a5EDtbAmy9ep1Dxxw==
+	caps mon = "allow *"
+```
+
+4、生成administrator keyring，生成client.admin用户并将用户添加到keyring。
+
+```
+[root@cephlm ~]# sudo ceph-authtool --create-keyring /etc/ceph/ceph.client.admin.keyring --gen-key -n client.admin --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow *' --cap mgr 'allow *'
+creating /etc/ceph/ceph.client.admin.keyring
+[root@cephlm ~]# cat /etc/ceph/ceph.client.admin.keyring
+[client.admin]
+	key = AQBFbv1bImaJCxAAYUiUCuia//zZSMIPyOHJuA==
+	caps mds = "allow *"
+	caps mgr = "allow *"
+	caps mon = "allow *"
+	caps osd = "allow *"
+```
+
+5、生成bootstrap-osd keyring，生成client.bootstrap-osd用户并将用户添加到keyring。
+
+```
+[root@cephlm ~]# sudo ceph-authtool --create-keyring /var/lib/ceph/bootstrap-osd/ceph.keyring --gen-key -n client.bootstrap-osd --cap mon 'profile bootstrap-osd'
+creating /var/lib/ceph/bootstrap-osd/ceph.keyring
+[root@cephlm ~]# cat /var/lib/ceph/bootstrap-osd/ceph.keyring
+[client.bootstrap-osd]
+	key = AQBQbv1bXv0WAhAAo/hv7OOaftMHOovHNeyOFg==
+	caps mon = "profile bootstrap-osd"
+```
+
+6、将生成的keys添加到ceph.mon.keyring。
+
+```
+[root@cephlm ~]# sudo ceph-authtool /tmp/ceph.mon.keyring --import-keyring /etc/ceph/ceph.client.admin.keyring
+[root@cephlm ~]# sudo ceph-authtool /tmp/ceph.mon.keyring --import-keyring /var/lib/ceph/bootstrap-osd/ceph.keyring
+
+[root@cephlm ~]# cat /tmp/ceph.mon.keyring
+[mon.]
+	key = AQAgbv1bc62FBBAAvuCz2a5EDtbAmy9ep1Dxxw==
+	caps mon = "allow *"
+[client.admin]
+	key = AQBFbv1bImaJCxAAYUiUCuia//zZSMIPyOHJuA==
+	caps mds = "allow *"
+	caps mgr = "allow *"
+	caps mon = "allow *"
+	caps osd = "allow *"
+[client.bootstrap-osd]
+	key = AQBQbv1bXv0WAhAAo/hv7OOaftMHOovHNeyOFg==
+	caps mon = "profile bootstrap-osd"
+
+```
+
+7、使用主机名，主机IP地址和FSID生成monitor map。将其另存为/tmp/monmap。
+
+```
+[root@cephlm ~]# monmaptool --create --add cephlm 192.168.0.10 --fsid c8b0b137-1ba7-4c1f-a514-281139c35233 /tmp/monmap
+monmaptool: monmap file /tmp/monmap
+monmaptool: set fsid to c8b0b137-1ba7-4c1f-a514-281139c35233
+monmaptool: writing epoch 0 to /tmp/monmap (1 monitors)
+
+更改权限，可是使ceph用户有读该文件的权限
+[root@cephlm ~]# chmod +r /tmp/monmap && chmod +r /tmp/ceph.mon.keyring
+
+[root@cephlm ~]# monmaptool --print /tmp/monmap
+monmaptool: monmap file /tmp/monmap
+epoch 0
+fsid c8b0b137-1ba7-4c1f-a514-281139c35233
+last_changed 2018-11-28 10:55:11.677288
+created 2018-11-28 10:55:11.677288
+0: 192.168.56.205:6789/0 mon.cephlm
+```
+
+8、创建配置文件文件`<集群名>.conf`
+
+```
+[root@cephlm ~]# vi /etc/ceph/ceph.conf 
+[global]
+fsid = c8b0b137-1ba7-4c1f-a514-281139c35233
+mon initial members = cephlm
+mon host = 192.168.0.10
+public network = 192.168.0.0/24
+cluster network = 192.168.0.0/24
+auth cluster required = cephx
+auth service required = cephx
+auth client required = cephx
+osd pool default size = 1
+osd pool default min size = 1
+osd pool default pg num = 16
+osd pool default pgp num = 16
+```
+
+9、使用monitor map和keyring填充monitor daemon(s)。
+
+```
+[root@cephlm ~]# sudo -u ceph ceph-mon --cluster ceph --mkfs -i cephlm --monmap /tmp/monmap --keyring /tmp/ceph.mon.keyring
+```
+
+10、启动ceph-mon服务
+
+```
+[root@cephlm ~]# systemctl enable ceph-mon@cephlm
+[root@cephlm ~]# systemctl start ceph-mon@cephlm
+
+[root@cephlm ~]# ceph -s
+  cluster:
+    id:     c8b0b137-1ba7-4c1f-a514-281139c35233
+    health: HEALTH_OK
+ 
+  services:
+    mon: 1 daemons, quorum cephlm
+    mgr: no daemons active
+    osd: 0 osds: 0 up, 0 in
+ 
+  data:
+    pools:   0 pools, 0 pgs
+    objects: 0 objects, 0B
+    usage:   0B used, 0B / 0B avail
+    pgs:     
+```
+
+## osd部署实验
+
+
+
+
+
+
 

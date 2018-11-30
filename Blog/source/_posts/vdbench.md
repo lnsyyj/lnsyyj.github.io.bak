@@ -169,7 +169,7 @@ replay=(filename,split=split_dir,repeat=nn)
 startcmd=cmd Execute command or script at the beginning of the first run
 warmup=nn Override warmup period.
 
- 
+
 1、多slave host不同块设备
 For instance if a lun is /dev/rdsk/a on hosta but it is named /dev/rdsk/b on hostb then you’ll have to tell Vdbench about it.
 sd=sd1,lun=/dev/rdsk/a,host=hosta,lun=/dev/rdsk/b,host=hostb
@@ -197,6 +197,110 @@ system=plana003.test.com ip地址或者配置hosts文件，用来ssh连接slave�
 
 
 
+
+```
+root@node1:/home/simth/config# cat vdbenchcase1.config
+hd=default,vdbench=/home/simth,user=root,shell=ssh
+hd=hd1,system=node1
+hd=hd2,system=node2
+hd=hd3,system=node3
+
+fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+
+fwd=wd1,fsd=sd*,hd=hd1,operation=write,threads=1,fileio=sequential,fileselect=random,xfersize=16k
+fwd=wd2,fsd=sd*,hd=hd2,operation=write,threads=1,fileio=sequential,fileselect=random,xfersize=16k
+fwd=wd3,fsd=sd*,hd=hd3,operation=write,threads=1,fileio=sequential,fileselect=random,xfersize=16k
+
+rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1
+rd=rd2,fwd=wd*,fwdrate=122,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30
+
+
+
+
+hd=default,vdbench=/home/simth,user=root,shell=ssh
+hd=hd1,system=node1
+hd=hd2,system=node2
+hd=hd3,system=node3
+
+fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+
+fwd=wd1,fsd=sd*,hd=hd1,operation=read,threads=1,fileio=sequential,fileselect=random,xfersize=1024k
+fwd=wd2,fsd=sd*,hd=hd2,operation=read,threads=1,fileio=sequential,fileselect=random,xfersize=1024k
+fwd=wd3,fsd=sd*,hd=hd3,operation=read,threads=1,fileio=sequential,fileselect=random,xfersize=1024k
+
+*rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1
+rd=rd2,fwd=wd*,fwdrate=690,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30
+
+
+
+
+hd=default,vdbench=/home/simth,user=root,shell=ssh
+hd=hd1,system=node1
+hd=hd2,system=node2
+hd=hd3,system=node3
+
+fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+
+fwd=wd1,fsd=sd*,hd=hd1,operation=write,fileio=random,threads=8,fileselect=random,xfersize=8k
+fwd=wd2,fsd=sd*,hd=hd2,operation=write,fileio=random,threads=8,fileselect=random,xfersize=8k
+fwd=wd3,fsd=sd*,hd=hd3,operation=write,fileio=random,threads=8,fileselect=random,xfersize=8k
+
+*rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1
+rd=rd2,fwd=wd*,fwdrate=1014,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30
+
+
+
+
+hd=default,vdbench=/home/simth,user=root,shell=ssh
+hd=hd1,system=node1
+hd=hd2,system=node2
+hd=hd3,system=node3
+
+fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes
+
+fwd=wd1,fsd=sd*,hd=hd1,operation=read,fileio=random,threads=8,fileselect=random,xfersize=8k
+fwd=wd2,fsd=sd*,hd=hd2,operation=read,fileio=random,threads=8,fileselect=random,xfersize=8k
+fwd=wd3,fsd=sd*,hd=hd3,operation=read,fileio=random,threads=8,fileselect=random,xfersize=8k
+
+*rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1
+rd=rd2,fwd=wd*,fwdrate=11826,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30
+```
 
 
 
