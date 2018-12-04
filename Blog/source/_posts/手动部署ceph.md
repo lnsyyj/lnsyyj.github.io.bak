@@ -691,6 +691,25 @@ osd pool default pgp num = 16
 
 
 
+```
+1、为OSD生成UUID。
+[root@cephlm ~]# UUID=$(uuidgen)
+[root@cephlm ~]# echo ${UUID}
+f288f7fb-456e-490c-8aa3-827da2804a22
+
+2、为OSD生成cephx key。
+[root@cephlm ~]# OSD_SECRET=$(ceph-authtool --gen-print-key)
+[root@cephlm ~]# echo ${OSD_SECRET}
+AQAfEQFcrPcrAxAAvOx4fVITj9gfpOEkTEHJ3g==
+
+3、
+[root@cephlm ~]# ID=$(echo "{\"cephx_secret\": \"$OSD_SECRET\"}" | \
+>    ceph osd new $UUID -i - \
+>    -n client.bootstrap-osd -k /var/lib/ceph/bootstrap-osd/ceph.keyring)
+[root@cephlm ~]# echo ${ID}
+0
+```
+
 
 
 
