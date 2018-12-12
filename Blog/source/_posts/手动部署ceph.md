@@ -695,19 +695,69 @@ osd pool default pgp num = 16
 1、为OSD生成UUID。
 [root@cephlm ~]# UUID=$(uuidgen)
 [root@cephlm ~]# echo ${UUID}
-f288f7fb-456e-490c-8aa3-827da2804a22
+265b6807-fa12-46f7-8e25-ce8b03dc2a2d
 
 2、为OSD生成cephx key。
 [root@cephlm ~]# OSD_SECRET=$(ceph-authtool --gen-print-key)
 [root@cephlm ~]# echo ${OSD_SECRET}
-AQAfEQFcrPcrAxAAvOx4fVITj9gfpOEkTEHJ3g==
+AQDljwhcB8MxBxAATx/pqYOv0uRhQI9Tey5UeQ==
 
 3、
 [root@cephlm ~]# ID=$(echo "{\"cephx_secret\": \"$OSD_SECRET\"}" | \
->    ceph osd new $UUID -i - \
->    -n client.bootstrap-osd -k /var/lib/ceph/bootstrap-osd/ceph.keyring)
+     ceph osd new $UUID -i - \
+     -n client.bootstrap-osd -k /var/lib/ceph/bootstrap-osd/ceph.keyring)
 [root@cephlm ~]# echo ${ID}
 0
+
+4、
+[root@cephlm ~]# mkdir /var/lib/ceph/osd/ceph-$ID
+
+5、
+[root@cephlm ~]# lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    253:0    0  20G  0 disk 
+├─vda1 253:1    0   1G  0 part /boot
+├─vda2 253:2    0   4G  0 part [SWAP]
+└─vda3 253:3    0  15G  0 part /
+vdb    253:16   0  50G  0 disk 
+vdc    253:32   0  50G  0 disk 
+vdd    253:48   0  50G  0 disk 
+
+[root@cephlm ~]# ll /var/lib/ceph/osd/
+总用量 0
+drwxr-xr-x 2 root root 6 12月  6 11:03 ceph-0
+
+[root@cephlm ~]# mkfs.xfs /dev/vdb -f
+meta-data=/dev/vdb               isize=512    agcount=4, agsize=3276800 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=0, sparse=0
+data     =                       bsize=4096   blocks=13107200, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0 ftype=1
+log      =internal log           bsize=4096   blocks=6400, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+[root@cephlm ~]# mount /dev/vdb /var/lib/ceph/osd/ceph-$ID/
+[root@cephlm ~]# df -Th
+文件系统       类型      容量  已用  可用 已用% 挂载点
+/dev/vda3      xfs        15G  1.6G   14G   11% /
+devtmpfs       devtmpfs  1.9G     0  1.9G    0% /dev
+tmpfs          tmpfs     1.9G     0  1.9G    0% /dev/shm
+tmpfs          tmpfs     1.9G  8.6M  1.9G    1% /run
+tmpfs          tmpfs     1.9G     0  1.9G    0% /sys/fs/cgroup
+/dev/vda1      xfs      1014M  172M  843M   17% /boot
+tmpfs          tmpfs     379M     0  379M    0% /run/user/0
+/dev/vdb       xfs        50G   33M   50G    1% /var/lib/ceph/osd/ceph-0
+
+6、
+[root@cephlm ~]# ceph-authtool --create-keyring /var/lib/ceph/osd/ceph-$ID/keyring \
+>      --name osd.$ID --add-key $OSD_SECRET
+creating /var/lib/ceph/osd/ceph-0/keyring
+added entity osd.0 auth auth(auid = 18446744073709551615 key=AQDljwhcB8MxBxAATx/pqYOv0uRhQI9Tey5UeQ== with 0 caps)
+
+
+
 ```
 
 
