@@ -113,6 +113,8 @@ Vagrant.configure("2") do |config|
   sudo yum install docker-ce -y
   sudo systemctl start docker
   sudo systemctl enable docker
+  sudo groupadd docker
+  sudo gpasswd -a vagrant docker
   SHELL
 end
 
