@@ -486,4 +486,3 @@ stress: FAIL: [1] (451) failed run completed in 1s
 - control groups：做资源限制
 
 - union file systems：container和image的分层
-
