@@ -93,3 +93,4 @@ mysql> show databases;
 # Bind Mouting
 
 data volume方式需要在Dockerfile中定义VOLUME，bind mouting方式则不需要。在docker run时，指定宿主机目录与Container内目录的对应关系即可（`docker run -v /home/aaa:/root/aaa`）。
+
