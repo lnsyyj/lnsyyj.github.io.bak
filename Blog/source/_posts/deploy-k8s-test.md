@@ -4,7 +4,99 @@ date: 2018-11-24 17:09:30
 tags: k8s
 ---
 
+部署kubernetes有多种方式：
 
+```
+1、不借助任何工具，从基本的CLI操作开始部署k8s集群，可以学习k8s各个组件
+	https://github.com/kelseyhightower/kubernetes-the-hard-way
+2、部署单节点k8s集群，适合快速学习
+	https://github.com/kubernetes/minikube
+3、部署多节点k8s集群
+	https://github.com/kubernetes/kubeadm
+4、在cloud上部署k8s集群
+	https://github.com/kubernetes/kops
+5、coreos的工具，大于十个节点收费，小于等于十个节点免费
+	https://coreos.com/tectonic/
+6、实验环境
+	https://labs.play-with-k8s.com/
+```
+
+# 安装minikube
+
+mac
+
+```
+1、安装kubectl，文档https://kubernetes.io/docs/tasks/tools/install-kubectl/
+yujiangdeMBP-13:~ yujiang$ brew install kubernetes-cli
+
+2、安装minikube，文档https://github.com/kubernetes/minikube/releases
+0.32.0版本在minikube start时遇到了Starting cluster components失败，在网上查找资料需要降级0.25.2。如果想使用新版本，还是找台虚拟机试一下。
+yujiangdeMBP-13:~ yujiang$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.25.2/minikube-darwin-amd64 && chmod +x minikube && sudo cp minikube /usr/local/bin/ && rm minikube
+
+如果已经安装了0.32.0版本的minikube，降级方法请看链接：https://coding.m.imooc.com/questiondetail.html?qid=57784
+
+3、安装virtualbox
+
+4、启动minikube单节点k8s(https://www.jianshu.com/p/a7620f73c7f3)
+yujiangdeMBP-13:~ yujiang$ minikube start 
+Starting local Kubernetes v1.9.4 cluster...
+Starting VM...
+Getting VM IP address...
+Moving files into cluster...
+Setting up certs...
+Connecting to cluster...
+Setting up kubeconfig...
+Starting cluster components...
+Kubectl is now configured to use the cluster.
+Loading cached images from config file.
+
+=====================================以下为测试，有坑，不需要执行。
+yujiangdeMBP-13:~ yujiang$ rm -rf ~/.minikube/machines/minikube/
+yujiangdeMBP-13:~ yujiang$ minikube start
+yujiangdeMBP-13:~ yujiang$ minikube start --kubernetes-version v1.8.0 --bootstrapper kubeadm
+=====================================以上为测试，有坑，不需要执行。
+
+minikube start命令创建一个名为“minikube”的“kubectl context”。这个context包含与Minikube群集通信的配置。Minikube会自动将此context设置为默认值，但如果您以后需要切换回它，请运行：kubectl config use-context minikube,或者传递每个命令的context，如下所示：kubectl get pods --context=minikube。可以使用不同的context连接不同的k8s集群。
+
+查看当前config清空
+yujiangdeMBP-13:~ yujiang$ kubectl config view
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: /Users/yujiang/.minikube/ca.crt
+    server: https://192.168.99.101:8443
+  name: minikube
+contexts:
+- context:
+    cluster: minikube
+    user: minikube
+  name: minikube
+current-context: minikube
+kind: Config
+preferences: {}
+users:
+- name: minikube
+  user:
+    client-certificate: /Users/yujiang/.minikube/client.crt
+    client-key: /Users/yujiang/.minikube/client.key
+
+查看当前contexts
+yujiangdeMBP-13:~ yujiang$ kubectl config get-contexts
+CURRENT   NAME       CLUSTER    AUTHINFO   NAMESPACE
+*         minikube   minikube   minikube   
+
+查看当前k8s集群
+yujiangdeMBP-13:~ yujiang$ kubectl cluster-info
+
+进入minikube虚拟机
+yujiangdeMBP-13:~ yujiang$ minikube ssh
+```
+
+
+
+
+
+# kubeadm
 
 ```
 
