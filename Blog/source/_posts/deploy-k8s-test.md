@@ -23,7 +23,7 @@ tags: k8s
 
 # 安装minikube
 
-mac
+## mac
 
 ```
 1、安装kubectl，文档https://kubernetes.io/docs/tasks/tools/install-kubectl/
@@ -58,7 +58,7 @@ yujiangdeMBP-13:~ yujiang$ minikube start --kubernetes-version v1.8.0 --bootstra
 
 minikube start命令创建一个名为“minikube”的“kubectl context”。这个context包含与Minikube群集通信的配置。Minikube会自动将此context设置为默认值，但如果您以后需要切换回它，请运行：kubectl config use-context minikube,或者传递每个命令的context，如下所示：kubectl get pods --context=minikube。可以使用不同的context连接不同的k8s集群。
 
-查看当前config清空
+查看当前config
 yujiangdeMBP-13:~ yujiang$ kubectl config view
 apiVersion: v1
 clusters:
@@ -80,19 +80,60 @@ users:
     client-certificate: /Users/yujiang/.minikube/client.crt
     client-key: /Users/yujiang/.minikube/client.key
 
-查看当前contexts
+查看当前context
 yujiangdeMBP-13:~ yujiang$ kubectl config get-contexts
 CURRENT   NAME       CLUSTER    AUTHINFO   NAMESPACE
 *         minikube   minikube   minikube   
 
-查看当前k8s集群
+查看当前k8s集群情况
 yujiangdeMBP-13:~ yujiang$ kubectl cluster-info
+Kubernetes master is running at https://192.168.99.100:8443
 
 进入minikube虚拟机
 yujiangdeMBP-13:~ yujiang$ minikube ssh
+
+设置代理（ss-ng），否则无法pull docker镜像(https://blog.zhesih.com/2018/06/24/k8s-minikube-setup/)
+$ sudo vi /etc/systemd/system/docker.service.d/http-proxy.conf
+$ sudo systemctl daemon-reload
+$ sudo systemctl restart docker
+$ systemctl show --property=Environment docker
+Environment=DOCKER_RAMDISK=yes HTTP_PROXY=http://192.168.199.165:1087 HTTPS_PROXY=https://192.168.199.165:1087
 ```
 
+### 测试
 
+```
+Pod是k8s调度的最小单位，一个Pod中可以有多个Container，
+1、创建一个Pod
+yujiangdeMBP-13:k8s_yaml yujiang$ cat pod_nginx.yml 
+apiVersion: v1
+kind: Pod
+metadata:
+        name: nginx
+        labels:
+                app: nginx
+spec:
+        containers:
+        - name: nginx
+          image: nginx
+          ports:
+          - containerPort: 80
+
+yujiangdeMBP-13:k8s_yaml yujiang$ kubectl create -f pod_nginx.yml 
+pod/nginx created
+
+2、查看Pod
+yujiangdeMBP-13:k8s_yaml yujiang$ kubectl get pod --all-namespaces
+NAMESPACE     NAME                                    READY   STATUS    RESTARTS   AGE
+default       nginx                                   1/1     Running   0          20m
+kube-system   kube-addon-manager-minikube             1/1     Running   8          60m
+kube-system   kube-dns-54cccfbdf8-kr847               3/3     Running   12         57m
+kube-system   kubernetes-dashboard-77d8b98585-vq77b   1/1     Running   4          57m
+kube-system   storage-provisioner                     1/1     Running   5          57m
+
+3、打开dashboard
+yujiangdeMBP-13:k8s_yaml yujiang$ minikube dashboard
+```
 
 
 
