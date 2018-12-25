@@ -25,11 +25,11 @@ Go并发编程案例解析学习笔记
 - 了解Golang基本语法
 - 有并发编程经验就更好了
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-143535%402x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-143535%402x.png)
 
 ## 常见并发模型讲解
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-144809@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-144809@2x.png)
 
 ### Golang并发实现
 
@@ -77,27 +77,27 @@ select {
 - 并发：指同一时刻，系统通过调度，来回切换交替的运行多个任务，“看起来”是同时进行
 - 并行：指同一时刻，两个任务“真正的”同时进行
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-151148@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-151148@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-151435@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-151435@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152335@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152335@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152356@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152356@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152503@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152503@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152603@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152603@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152657@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152657@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152740@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152740@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152814@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152814@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-152904@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-152904@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180501-143535@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180501-143535@2x.png)
 
 可以把《实时读取》《解析》《写入》拆成多个模块，使用多个goroutine。那么这么多个goroutine是并行执行还是并发执行呢？换句话说，多个goroutine执行，是一个CPU核心通过不断的切换时间片，并发的执行？还是将goroutine分散到多核的CPU并行的执行？这个问题Golang为我们屏蔽掉了，编程人员不需要考虑这个问题。
 
@@ -580,15 +580,15 @@ func main() {
 
 ### 写入模块流程讲解
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180504-145716@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180504-145716@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180504-145859@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180504-145859@2x.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180504-150125@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180504-150125@2x.png)
 
 在URL中，`db=mydb`指定database。使用逗号做分隔','，`cpu_usage`表示measurement。`host=server01,region=us-west value=0.64 1434055562000000000`表示points。`host=server01,region=us-west`表示points中的tags，`value=0.64`表示points中的fields，`1434055562000000000`表示points中的time。
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/Go并发编程案例解析/WX20180504-160707@2x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Go并发编程案例解析/WX20180504-160707@2x.png)
 
 influxDB提供了Golang的客户端，可以使用这个客户端很方便的写入数据`https://github.com/influxdata/influxdb/tree/master/client`，首先先引入包`"github.com/influxdata/influxdb/client/v2"`
 

@@ -50,7 +50,7 @@ Read-proxy Mode:
 
 cache tier所有迁移模式：
 
-![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/source/_posts/Ceph%E7%BA%A0%E5%88%A0%E7%A0%81bluestore%E4%B8%8Efilestore%E5%AF%B9%E6%AF%94%E8%B0%83%E7%A0%94/AAA30A7C3BB8C148411DB8D2C01C175D.jpg?raw=true)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/Ceph%E7%BA%A0%E5%88%A0%E7%A0%81bluestore%E4%B8%8Efilestore%E5%AF%B9%E6%AF%94%E8%B0%83%E7%A0%94/AAA30A7C3BB8C148411DB8D2C01C175D.jpg)
 
 **官方文档明确指出：**
 

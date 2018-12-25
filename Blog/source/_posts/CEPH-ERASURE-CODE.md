@@ -114,7 +114,7 @@ coding chunks的数量，即由encoding functions计算的附加chunks的数量�
 
 ##  附录
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/CEPH-ERASURE-CODE/ec.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/CEPH-ERASURE-CODE/ec.png)
 
 
 

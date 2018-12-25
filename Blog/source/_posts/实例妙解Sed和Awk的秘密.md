@@ -206,7 +206,7 @@ grep 'bin/\(bash\|nologin\)' passwd    (或者包含bash，或者包含nologin)
 
 ## 正则总结
 
-![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/p1.png?raw=true)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/实例妙解Sed和Awk的秘密/p1.png?raw=true)
 
 # 巧妙破解sed
 
@@ -223,7 +223,7 @@ sed工具用途
 
 我们称sed是一个流处理编辑器
 
-![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180523-153042@2x.png?raw=true)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/实例妙解Sed和Awk的秘密/QQ20180523-153042@2x.png?raw=true)
 
 实际的处理流程是行处理
 
@@ -401,7 +401,7 @@ nl passwd | sed '10q'   (执行到第10行就结束)
 nl passwd | sed '/false/q'   (找到第一个false就结束)
 ```
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180531-102131%402x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/实例妙解Sed和Awk的秘密/QQ20180531-102131%402x.png)
 
 ## awk
 
@@ -524,7 +524,7 @@ sed侧重于正则处理
 awk和sed可以共同使用
 ```
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/source/_posts/%E5%AE%9E%E4%BE%8B%E5%A6%99%E8%A7%A3Sed%E5%92%8CAwk%E7%9A%84%E7%A7%98%E5%AF%86/QQ20180530-000840%402x.png)
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/实例妙解Sed和Awk的秘密/QQ20180530-000840%402x.png)
 
 
 
