@@ -439,13 +439,10 @@ https://kubernetes.io/docs/tasks/tools/install-kubectl/
 # kubeadm
 
 ```
-
-  kubeadm join 192.168.56.201:6443 --token mzbbw0.5z6zpgauylva58na --discovery-token-ca-cert-hash sha256:932a24f271bd2c14cb41d6698e9781c1fcede848b7b9fe4a0731b9c54f275df2
-
-systemctl disable firewalld.service
-systemctl stop firewalld.service
+# 1、创建kubernetes虚拟机，并关闭防火墙，关闭SELinux(所有节点执行)
+systemctl disable firewalld.service && systemctl stop firewalld.service
 setenforce 0
-
+# 2、
 cat <<EOF >  /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -455,7 +452,7 @@ sysctl --system
 
 yum install -y yum-utils device-mapper-persistent-data lvm2
 yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
-yum makecache fast
+yum makecache
 
 yum install -y https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-selinux-17.03.1.ce-1.el7.centos.noarch.rpm
 
@@ -485,6 +482,10 @@ KUBELET_EXTRA_ARGS="--cgroup-driver=cgroupfs --pod-infra-container-image=registr
 systemctl daemon-reload
 systemctl restart kubelet.service
 
+docker pull quay.io/calico/typha:v0.7.4
+docker pull quay.io/calico/node:v3.1.3
+docker pull quay.io/calico/cni:v3.1.3
+
 vi kubeadm-master.config
 apiVersion: kubeadm.k8s.io/v1alpha2
 kind: MasterConfiguration
@@ -504,17 +505,103 @@ kubeProxy:
 
 kubeadm config images pull --config kubeadm-master.config
 
-docker pull quay.io/calico/typha:v0.7.4
-docker pull quay.io/calico/node:v3.1.3
-docker pull quay.io/calico/cni:v3.1.3
-
+# 执行此CLI会输出token，需要保存该token
 kubeadm init --config kubeadm-master.config
 kubeadm reset
 swapoff -a
+sudo systemctl status kubelet.service
+
 kubectl get pod --all-namespaces -o wide
+
+添加node
+kubeadm join 192.168.56.201:6443 --token mzbbw0.5z6zpgauylva58na --discovery-token-ca-cert-hash sha256:932a24f271bd2c14cb41d6698e9781c1fcede848b7b9fe4a0731b9c54f275df2
+
 ```
 
+## Vagrantfile
 
+```
+yujiangdeMacBook-Pro-13:docker-k8s yujiang$ cat Vagrantfile 
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.require_version ">= 1.6.0"
+boxes = [
+    {
+        :name => "k8s-node-1",
+        :eth1 => "192.168.56.61",
+        :mem => "2048",
+        :cpu => "2"
+    },
+    {
+        :name => "k8s-node-2",
+        :eth1 => "192.168.56.62",
+        :mem => "2048",
+        :cpu => "2"
+    },
+]
+
+Vagrant.configure(2) do |config|
+    config.vm.box = "centos/centos7"
+    boxes.each do |opts|
+        config.vm.define opts[:name] do |config|
+            config.vm.hostname = opts[:name]
+            config.vm.provider "vmware_fusion" do |v|
+                v.vmx["memsize"] = opts[:mem]
+                v.vmx["numvcpus"] = opts[:cpu]
+            end
+    
+            config.vm.provider "virtualbox" do |v|
+                v.customize ["modifyvm", :id, "--memory", opts[:mem]]
+                v.customize ["modifyvm", :id, "--cpus", opts[:cpu]]
+            end
+            config.vm.network :private_network, ip:opts[:eth1]
+        end
+    end
+
+    config.vm.provision "shell", inline: <<-SHELL
+	# install dependent
+	systemctl disable firewalld.service && systemctl stop firewalld.service && setenforce 0
+	sed -i "s/\(SELINUX=\).*/\1disabled/g" /etc/selinux/config
+	# close swapoff
+ 	swapoff -a
+
+	# install docker
+	cat <<-'EOF' >  /etc/sysctl.d/k8s.conf
+	net.bridge.bridge-nf-call-ip6tables = 1
+	net.bridge.bridge-nf-call-iptables = 1
+	EOF
+
+	yum install -y yum-utils device-mapper-persistent-data lvm2 && yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && yum makecache && yum install -y https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-selinux-17.03.1.ce-1.el7.centos.noarch.rpm && yum install -y docker-ce-17.03.1.ce-1.el7.centos
+	systemctl enable docker.service && systemctl start docker.service
+	
+	# install k8s
+	cat <<-'EOF' > /etc/yum.repos.d/kubernetes.repo
+	[kubernetes]
+	name=Kubernetes
+	baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64
+	enabled=1
+	gpgcheck=0
+	repo_gpgcheck=0
+	gpgkey=http://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg
+	http://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+	EOF
+
+	yum install -y kubelet-1.11.0-0 kubeadm-1.11.0-0 kubectl-1.11.0-0
+	
+	cat <<-'EOF' > /etc/sysconfig/kubelet
+	KUBELET_EXTRA_ARGS="--cgroup-driver=cgroupfs --pod-infra-container-image=registry.cn-hangzhou.aliyuncs.com/google_containers/pause-amd64:3.1"
+	EOF
+	
+	systemctl enable kubelet.service && systemctl start kubelet.service
+
+	docker pull quay.io/calico/typha:v0.7.4
+	docker pull quay.io/calico/node:v3.1.3
+	docker pull quay.io/calico/cni:v3.1.3
+
+    SHELL
+end
+```
 
 
 
