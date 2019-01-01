@@ -570,7 +570,22 @@ Vagrant.configure(2) do |config|
 	cat <<-'EOF' >  /etc/sysctl.d/k8s.conf
 	net.bridge.bridge-nf-call-ip6tables = 1
 	net.bridge.bridge-nf-call-iptables = 1
+	net.ipv4.ip_forward = 1
 	EOF
+
+	modprobe br_netfilter
+	sysctl -p /etc/sysctl.d/k8s.conf
+
+	yum install -y ipset ipvsadm
+	cat <<-'EOF' > /etc/sysconfig/modules/ipvs.modules
+	\#!/bin/bash
+	modprobe -- ip_vs
+	modprobe -- ip_vs_rr
+	modprobe -- ip_vs_wrr
+	modprobe -- ip_vs_sh
+	modprobe -- nf_conntrack_ipv4
+	EOF
+	chmod 755 /etc/sysconfig/modules/ipvs.modules && bash /etc/sysconfig/modules/ipvs.modules && lsmod | grep -e ip_vs -e nf_conntrack_ipv4
 
 	yum install -y yum-utils device-mapper-persistent-data lvm2 && yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && yum makecache && yum install -y https://download.docker.com/linux/centos/7/x86_64/stable/Packages/docker-ce-selinux-17.03.1.ce-1.el7.centos.noarch.rpm && yum install -y docker-ce-17.03.1.ce-1.el7.centos
 	systemctl enable docker.service && systemctl start docker.service

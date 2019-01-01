@@ -48,3 +48,109 @@ https://github.com/ceph/ceph-ansible
 stable-3.0支持ceph版本jewel和luminous。该branch支持ansible版本2.3.1,2.3.2和2.4.2。
 ```
 
+# 安装ansible 2.4.2
+
+使用yum安装指定版本的ansible
+
+```
+[root@cephJ ~]# yum -h | grep show
+  --showduplicates      在 list/search 命令下，显示源里重复的条目
+
+[root@cephJ ~]# yum --showduplicates list ansible
+已加载插件：fastestmirror, priorities
+Loading mirror speeds from cached hostfile
+ * base: mirrors.cn99.com
+ * epel: www.ftp.ne.jp
+ * extras: mirrors.nwsuaf.edu.cn
+ * nux-dextop: li.nux.ro
+ * updates: mirrors.nwsuaf.edu.cn
+12 packages excluded due to repository priority protections
+可安装的软件包
+ansible.noarch                                                                          2.4.2.0-2.el7                                                                          extras
+ansible.noarch                                                                          2.7.5-1.el7                                                                            epel  
+
+### sudo yum install <package name>-<version info>
+[root@cephJ ~]# sudo yum install -y ansible-2.4.2.0
+
+[root@cephJ ~]# ansible --version
+ansible 2.4.2.0
+  config file = /etc/ansible/ansible.cfg
+  configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+  ansible python module location = /usr/lib/python2.7/site-packages/ansible
+  executable location = /usr/bin/ansible
+  python version = 2.7.5 (default, Apr 11 2018, 07:36:10) [GCC 4.8.5 20150623 (Red Hat 4.8.5-28)]
+```
+
+# 配置ceph-ansible
+
+准备四台机器
+
+```
+ansible节点
+	ansible-master
+
+ceph节点
+	ansible-ceph-1
+	ansible-ceph-2
+	ansible-ceph-3
+```
+
+配置ansible
+
+```
+ansible节点执行
+
+1、首先clone代码
+[root@ansible-master ~]# git clone https://github.com/ceph/ceph-ansible.git && cd ceph-ansible/
+
+2、创建本地分支并切换分支
+[root@ansible-master ceph-ansible]# git checkout -b myv3.2.0 v3.2.0 
+
+3、copy模板文件
+[root@ansible-master ceph-ansible]# cp site.yml.sample site.yml && cd group_vars/ && cp all.yml.sample all.yml && cp osds.yml.sample osds.yml
+
+4、修改ansible机器清单(inventory)
+[root@ansible-master ~]# vim /etc/ansible/hosts
+[mons]
+ansible-ceph-[1:3]	ansible_ssh_pass=yujiang2
+[osds]
+ansible-ceph-[1:3]	ansible_ssh_pass=yujiang2
+[rgws]
+ansible-ceph-[1:3]	ansible_ssh_pass=yujiang2
+
+5、批量推送sshkey
+[root@ansible-master ~]# ssh-keygen -t rsa
+[root@ansible-master ~]# cat push-ssh.yaml 
+- hosts: all
+  user: root
+  tasks:
+    - name: ssh-key-copy
+      authorized_key: user=root key="{{ lookup('file','/root/.ssh/id_rsa.pub')}}"
+      tags:
+        - sshkey
+[root@ansible-master ~]# ansible-playbook push-ssh.yaml
+
+PLAY [all] *******************************************************************************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] *******************************************************************************************************************************************************************************************************************************************************
+ok: [ansible-ceph-1]
+ok: [ansible-ceph-2]
+ok: [ansible-ceph-3]
+
+TASK [ssh-key-copy] **********************************************************************************************************************************************************************************************************************************************************
+changed: [ansible-ceph-3]
+changed: [ansible-ceph-1]
+changed: [ansible-ceph-2]
+
+PLAY RECAP *******************************************************************************************************************************************************************************************************************************************************************
+ansible-ceph-1             : ok=2    changed=1    unreachable=0    failed=0   
+ansible-ceph-2             : ok=2    changed=1    unreachable=0    failed=0   
+ansible-ceph-3             : ok=2    changed=1    unreachable=0    failed=0 
+
+6、安装pip并安装ceph-ansible依赖
+[root@ansible-master ~]# curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" && python get-pip.py && pip install --upgrade setuptools
+[root@ansible-master ceph-ansible]# pip install -r requirements.txt
+
+
+```
+
