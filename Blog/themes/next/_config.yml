@@ -93,8 +93,8 @@ index_with_subtitle: false
 # Value after `||` delimeter is the name of FontAwesome icon. If icon (with or without delimeter) is not specified, question icon will be loaded.
 menu:
   home: / || home
-  #about: /about/ || user
-  #tags: /tags/ || tags
+  about: /about/ || user
+  tags: /tags/ || tags
   #categories: /categories/ || th
   archives: /archives/ || archive
   #schedule: /schedule/ || calendar
@@ -242,7 +242,7 @@ post_wordcount:
   #description: ex. subscribe to my blog by scanning my public wechat account
 
 # Reward
-reward_comment: 谢谢打赏￥0.5
+reward_comment: 感谢支持，打赏￥0.5
 wechatpay: /images/wechatpay.jpg
 alipay: /images/alipay.jpg
 #bitcoin: /images/bitcoin.png
