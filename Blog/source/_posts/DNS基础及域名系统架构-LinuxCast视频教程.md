@@ -26,15 +26,35 @@ DNS服务
 
 
 
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-6.jpg)
+
+
+
 ![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-6.jpg?raw=true)
 
 
 
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-8.jpg)
 
 
 
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-9.jpg)
 
 
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-10.jpg)
+
+
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-11.jpg)
+
+
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-12.jpg)
+
+
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-13.jpg)
 
 
 
