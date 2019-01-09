@@ -620,3 +620,60 @@ sudo systemctl reload named
 
 设置内部DNS并且配置文件使用private FQDN指定网络连接后，维护DNS服务器至关重要。如果它们都不可用，那么依赖它们的服务和应用程序将无法正常运行。这就是为什么建议使用至少一个secondary服务器设置DNS，并维护所有这些服务器的工作备份原因。
 
+# 验证
+
+| Host       | Role                 | Private FQDN         | Private IP Address |
+| ---------- | -------------------- | -------------------- | ------------------ |
+| ns1        | Primary DNS Server   | ns1.nyc3.example.com | 192.168.0.22       |
+| ns2        | Secondary DNS Server | ns2.nyc3.example.com | 192.168.0.23       |
+| dns-client | DNS client           |                      | 192.168.0.24       |
+
+1、安装BIND在Primary DNS Server
+
+```
+sudo yum install -y bind bind-utils
+```
+
+2、修改/etc/named.conf
+
+```
+sudo vi /etc/named.conf
+
+acl "trusted" {
+        192.168.0.22;    # ns1 - can be set to localhost
+        192.168.0.23;    # ns2
+        192.168.0.24;    # dns-client
+};
+
+options { # options start
+		# ... ...
+     	listen-on port 53 { 127.0.0.1; 192.168.0.22; };
+        # listen-on-v6 port 53 { ::1; };
+        # ... ...
+        allow-transfer { 192.168.0.23; };      # disable zone transfers by default
+        allow-query     { trusted; };
+} # options end
+
+include "/etc/named/named.conf.local";
+```
+
+
+
+
+
+```
+
+
+
+sudo vi /etc/named/named.conf.local
+sudo chmod 755 /etc/named
+sudo mkdir /etc/named/zones
+sudo vi /etc/named/zones/db.nyc3.example.com
+sudo vi /etc/named/zones/db.192.168
+sudo named-checkconf
+sudo named-checkzone nyc3.example.com /etc/named/zones/db.nyc3.example.com
+sudo named-checkzone 192.168.in-addr.arpa /etc/named/zones/db.192.168
+sudo systemctl start named
+sudo systemctl enable named
+```
+
