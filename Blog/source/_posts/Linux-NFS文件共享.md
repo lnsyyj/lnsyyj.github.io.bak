@@ -70,7 +70,7 @@ NFS客户端IP地址为：192.168.56.240
 1、在Centos7上安装软件包
 
 ```
-[root@centos ~]# yum install -y nfs-utils
+[root@centos ~]# yum install -y nfs-utils rpcbind
 ```
 
 2、创建共享目录并更改权限
@@ -99,6 +99,11 @@ drwxr-xr-x.  2 nfsnobody nfsnobody    6 1月   9 10:41 nfsshare
 [root@centos ~]# vi /etc/exports
 /var/nfsshare    192.168.56.240(rw,sync,no_root_squash,no_all_squash)
 /home            192.168.56.240(rw,sync,no_root_squash,no_all_squash)
+
+# 配置文件分三段
+# 第一段是将要共享出去的本地目录
+# 第二段是允许访问的主机(可以是一个IP也可以是一个IP段192.168.56.0/24)
+# 第三段是权限
 ```
 
 ```

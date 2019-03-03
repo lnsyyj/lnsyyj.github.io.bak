@@ -100,7 +100,7 @@ ansible-ceph-3             : ok=2    changed=1    unreachable=0    failed=0
 [root@ansible-master group_vars]# pwd
 /root/ceph-ansible/group_vars
 
-[root@ansible-master group_vars]# cp all.yml.sample all.yml && cp osds.yml.sample osds.yml
+[root@ansible-master group_vars]# cp all.yml.sample all.yml && cp osds.yml.sample osds.yml && cp mgrs.yml.sample mgrs.yml
 
 all.yml修改如下：
 mon_group_name: mons
@@ -124,6 +124,9 @@ devices:
  - /dev/vdb
 osd_scenario: collocated
 
+mgrs.yml修改如下：
+ceph_mgr_modules: [status,dashboard]
+
 8、执行ansible开始部署ceph，部署哪些模块会在/etc/ansible/hosts中定义（下面是我们之前定义的），如果在该文件中没有对应模块定义，ansible会忽略该模块的部署。
 [mons]
 ansible-ceph-[1:3]	ansible_ssh_pass=yujiang2
@@ -133,6 +136,11 @@ ansible-ceph-[1:3]	ansible_ssh_pass=yujiang2
 ansible-ceph-[1:3]	ansible_ssh_pass=yujiang2
 [mgrs]
 ansible-ceph-[1:3]  ansible_ssh_pass=yujiang2
+
+9、修改ansible host_key_checking
+[root@ansible-master ~]# vim /etc/ansible/ansible.cfg
+[defaults]
+host_key_checking = False
 
 [root@ansible-master ceph-ansible]# pwd
 /root/ceph-ansible
