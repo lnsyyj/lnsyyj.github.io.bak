@@ -87,6 +87,12 @@ drwxr-xr-x.  2 nfsnobody nfsnobody    6 1月   9 10:41 nfsshare
 
 ```
 [root@centos ~]# systemctl enable rpcbind && systemctl enable nfs-server && systemctl enable nfs-lock && systemctl enable nfs-idmap && systemctl start rpcbind && systemctl start nfs-server && systemctl start nfs-lock && systemctl start nfs-idmap
+
+重启所有服务命令
+[root@centos ~]# systemctl enable rpcbind && systemctl enable nfs-server && systemctl enable nfs-lock && systemctl enable nfs-idmap && systemctl restart rpcbind && systemctl restart nfs-server && systemctl restart nfs-lock && systemctl restart nfs-idmap
+
+无需重启NFS服务，使exports文件生效
+[root@centos ~]# exportfs -ra
 ```
 
 4、编辑/etc/exports文件，通过网络共享NFS目录
@@ -104,6 +110,25 @@ drwxr-xr-x.  2 nfsnobody nfsnobody    6 1月   9 10:41 nfsshare
 # 第一段是将要共享出去的本地目录
 # 第二段是允许访问的主机(可以是一个IP也可以是一个IP段192.168.56.0/24)
 # 第三段是权限
+
+客户端							示例
+使用IP地址指定单一主机		10.20.30.40
+使用IP地址指定范围主机		172.16.0.0/16
+使用IP地址指定范围主机		192.168.1.*
+使用域名指定单一主机			Test.ice.apple
+使用域名指定范围主机			*.ice.apple
+使用通配符指定所有主机			*
+
+参数						说明
+ro						设置共享权限为只读
+rw						设置共享权限为读写
+root_squash				共享目录的使用者是root时，将被映射为匿名账号（nobody）
+no_root_squash			当使用NFS服务器共享目录的使用者是root时，将不被映射为匿名账号
+all_squash				将所有使用NFS服务器共享目录的使用者都映射为匿名账号
+anonuid					设置匿名账号的UID
+anongid					设置匿名账号的GID
+sync					将数据同步写入内存和硬盘。这可能导致效率降低
+async					先将数据保存在内存中，而不是直接保存在硬盘
 ```
 
 ```
@@ -199,3 +224,14 @@ drwxr-xr-x.  2 nfsnobody nfsnobody    6 1月   9 10:41 nfsshare
 总用量 0
 -rw-r--r--. 1 root root 0 1月   9 11:01 test_nfs
 ```
+
+
+
+
+
+# 参考文章
+
+```
+【1】https://www.linuxidc.com/Linux/2013-10/91137.htm
+```
+
