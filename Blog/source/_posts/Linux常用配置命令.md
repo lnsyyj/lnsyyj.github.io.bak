@@ -239,6 +239,18 @@ BOOL := [1|0]
 FEATURES := ecn
 ```
 
+yum常用列表
+
+```
+yum provides  找到缺少的RPM依赖包，例如yum provides '*/dirent.h'
+```
+
+查看ssh登录信息
+
+```
+utmpdump /var/log/wtmp | cat
+```
+
 
 
 
