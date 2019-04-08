@@ -16,7 +16,17 @@ LVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象�
 
 作为一种动态磁盘管理机制，逻辑卷技术大大提高了磁盘管理的灵活性。
 
+![](<https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-1.png>)
+
+上图黄色为：VG    橙色为：LV
+
 （1）首先把物理硬盘格式化（存储里面叫条带化）为物理卷（PV），格式化为物理卷的过程实际上是把硬盘空间化成一个一个的PE（PE是逻辑卷空间管理的最基本单位，默认4M）
 
-（2）第二步我们要创建一个VG，VG的作用是用来装PE的，就像一个空间池。我们可以把一个或者多个PV加到VG当中。加入多少个PV，我们的VG容量就是这些PV大小之和。
+（2）第二步我们要创建一个VG，VG的作用是用来装PE的，就像一个空间池。我们可以把一个或者多个PV加到VG当中。加入多少个PV，我们的VG容量就是这些PV大小之和。（当创建VG以后，在/dev目录下会多出一个目录）
+
+（3）最后创建LV（每个LV的空间可能来自不同的物理硬盘）
+
+![](<https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-2.png?raw=true>)
+
+# 创建LVM
 
