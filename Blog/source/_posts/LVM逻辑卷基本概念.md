@@ -282,9 +282,7 @@ Do you really want to reduce linuxcast/mylv? [y/n]: y
   mylv linuxcast -wi-a----- 2.00g
 ```
 
-
-
-
+![](<https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-9.png>)
 
 ```
 [root@teuthology ~]# vgs
@@ -307,18 +305,4 @@ Do you really want to reduce linuxcast/mylv? [y/n]: y
   /dev/vdb   linuxcast lvm2 a--  <100.00g  <98.00g
   /dev/vdc   linuxcast lvm2 a--  <100.00g <100.00g
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
