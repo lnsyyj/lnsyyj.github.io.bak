@@ -106,7 +106,7 @@ Do you really want to remove active logical volume linuxcast/mynewlv? [y/n]: y
 
 # LVM逻辑卷的拉伸与缩小
 
-
+![](<https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-6.png>)
 
 ```
 [root@teuthology ~]# lsblk
@@ -211,7 +211,7 @@ tmpfs                      tmpfs     783M     0  783M    0% /run/user/0
 
 ```
 
-
+![](<https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-7.png>)
 
 ```
 [root@teuthology ~]# lsblk
@@ -238,15 +238,75 @@ vda   vda1  vda2  vda3  vdb   vdc   vdd
   linuxcast   3   1   0 wz--n- <299.99g <296.99g
 ```
 
+![](<https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-8.png>)
+
+```
+[root@teuthology ~]# umount /mnt/
+[root@teuthology ~]# df -Th
+文件系统       类型      容量  已用  可用 已用% 挂载点
+/dev/vda3      xfs       195G  2.6G  193G    2% /
+devtmpfs       devtmpfs  3.9G     0  3.9G    0% /dev
+tmpfs          tmpfs     3.9G     0  3.9G    0% /dev/shm
+tmpfs          tmpfs     3.9G  8.6M  3.9G    1% /run
+tmpfs          tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup
+/dev/vda1      xfs      1014M  172M  843M   17% /boot
+tmpfs          tmpfs     783M     0  783M    0% /run/user/0
+[root@teuthology ~]# lvs
+  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  mylv linuxcast -wi-a----- 3.00g                                                    
+[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G
+resize2fs 1.42.9 (28-Dec-2013)
+请先运行 'e2fsck -f /dev/linuxcast/mylv'.
+
+[root@teuthology ~]# e2fsck -f /dev/linuxcast/mylv
+e2fsck 1.42.9 (28-Dec-2013)
+第一步: 检查inode,块,和大小
+第二步: 检查目录结构
+第3步: 检查目录连接性
+Pass 4: Checking reference counts
+第5步: 检查簇概要信息
+/dev/linuxcast/mylv: 11/196608 files (0.0% non-contiguous), 30268/786432 blocks
+[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G
+resize2fs 1.42.9 (28-Dec-2013)
+Resizing the filesystem on /dev/linuxcast/mylv to 524288 (4k) blocks.
+The filesystem on /dev/linuxcast/mylv is now 524288 blocks long.
+
+[root@teuthology ~]# lvreduce -L -1G /dev/linuxcast/mylv 
+  WARNING: Reducing active logical volume to 2.00 GiB.
+  THIS MAY DESTROY YOUR DATA (filesystem etc.)
+Do you really want to reduce linuxcast/mylv? [y/n]: y
+  Size of logical volume linuxcast/mylv changed from 3.00 GiB (768 extents) to 2.00 GiB (512 extents).
+  Logical volume linuxcast/mylv successfully resized.
+[root@teuthology ~]# lvs
+  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  mylv linuxcast -wi-a----- 2.00g
+```
+
+
+
 
 
 ```
-
+[root@teuthology ~]# vgs
+  VG        #PV #LV #SN Attr   VSize    VFree   
+  linuxcast   3   1   0 wz--n- <299.99g <296.99g
+[root@teuthology ~]# vgreduce linuxcast /dev/vdd 
+  Removed "/dev/vdd" from volume group "linuxcast"
+[root@teuthology ~]# vgs
+  VG        #PV #LV #SN Attr   VSize   VFree  
+  linuxcast   2   1   0 wz--n- 199.99g 197.99g
+[root@teuthology ~]# pvs
+  PV         VG        Fmt  Attr PSize    PFree   
+  /dev/vdb   linuxcast lvm2 a--  <100.00g  <98.00g
+  /dev/vdc   linuxcast lvm2 a--  <100.00g <100.00g
+  /dev/vdd             lvm2 ---   100.00g  100.00g
+[root@teuthology ~]# pvremove /dev/vdd 
+  Labels on physical volume "/dev/vdd" successfully wiped.
+[root@teuthology ~]# pvs
+  PV         VG        Fmt  Attr PSize    PFree   
+  /dev/vdb   linuxcast lvm2 a--  <100.00g  <98.00g
+  /dev/vdc   linuxcast lvm2 a--  <100.00g <100.00g
 ```
-
-
-
-
 
 
 
