@@ -336,6 +336,34 @@ kube-dns   ClusterIP   10.96.0.10   <none>        53/UDP,53/TCP   2d
 
 
 
+极客时间部署方式
+
+master节点
+
+```
+# 添加kubernetes源
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo 
+[kubernetes] 
+name=Kubernetes 
+baseurl=http://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/ 
+enabled=1 
+gpgcheck=0 
+EOF
+
+# 安装kubelet、kubeadm、kubectl、kubernetes-cni
+sudo yum -y install epel-release && yum clean all && yum makecache
+sudo yum -y install kubelet-1.11.1 kubeadm-1.11.1 kubectl-1.11.1 kubernetes-cni
+
+# 安装docker
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install docker-ce -y && sudo systemctl start docker && sudo systemctl enable docker
+
+
+```
+
 
 
 
