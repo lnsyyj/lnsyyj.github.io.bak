@@ -155,3 +155,41 @@ node-1/
 
 6 directories, 10 files
 ```
+
+# 多机测试
+
+应用场景为多个NFS Client挂在相同NFS Server的读写。
+
+```
+hd=default,vdbench=/home/vdbench,user=root,shell=ssh
+hd=hd1,system=node1
+hd=hd2,system=node2
+hd=hd3,system=node3
+
+fsd=fsd1,anchor=/mnt/test863,depth=1,width=10,files=10000,size=20m,shared=yes
+fwd=format,threads=6,xfersize=1m
+fwd=default,xfersize=1m,fileio=random,fileselect=random,rdpct=100,threads=6
+fwd=fwd1,fsd=fsd1,host=hd1
+fwd=fwd2,fsd=fsd1,host=hd2
+fwd=fwd3,fsd=fsd1,host=hd3
+
+rd=rd1,fwd=fwd*,fwdrate=max,format=(restart,only),elapsed=600,interval=1
+```
+
+参数解析：
+
+有3台测试节点node1、node2、node3。每台测试节点的/home/vdbench/目录都存在可执行vdbench二进制文件（位置必须相同），使用root用户通过ssh方式连接（节点间需要做ssh免密），每台测试节点的测试目录为/mnt/test863，目录深度为1，最深层目录中的目录宽度为10，最深层每个目录中有10000个文件，每个文件大小20mb
+
+`关于shared=yes`
+
+随着Vdbench运行多个slaves和可选的多个hosts，slaves和hosts之间关于文件状态的通信变得困难。使所有这些slaves设备相互通信所涉及的开销变得过于昂贵。您不希望一个slave删除另一个slave当前正在读取或写入的文件。因此，Vdbench不允许您跨slaves和hosts共享FSD。
+
+当然，在你开始使用庞大的文件系统之前，这一切听起来都很棒。 您刚刚填满了500 TB的磁盘文件，然后您决定要与一个或多个远程主机共享该数据。 从头开始重新创建整个文件结构需要很长时间。 该怎么办？
+
+指定'shared = yes'时，Vdbench将允许您共享文件系统定义（FSD）。 它通过允许每个slave设备仅使用FSD文件结构中定义的每个“第n”文件来实现这一点，其中“n”等于slave数量。（It does this by allowing each slave to use only every ‘nth’ file as is defined in the FSD file structure, where ‘n’ equals the amount of slaves.）
+
+这意味着不同的host不会互相踩到脚趾，但有一个例外：当您指定'format = yes'时，Vdbench首先删除已存在的文件结构。由于这可能是一个旧的文件结构，Vdbench无法传播文件删除周围，让每个slave删除他的'第n'文件。因此，每个slave设备都会尝试删除所有文件，但如果删除失败则不会生成错误消息（因为不同的slave设备只是删除了它）。这些失败的删除将被计算并报告在“Miscellaneous statistics”中的“FILE_DELETE_SHARED”计数器下。但是，“FILE_DELETES”计数器可以包含高于存在的文件数量的计数。我已经看到多个slaves设备能够同时删除同一个文件而没有操作系统将任何错误传递给Java的情况。
+
+`关于rdpct（Read Percentage）`
+
+此参数允许您混合读取和写入。 使用operation=read只允许你做read，operation=write只允许你做write。 但是，指定rdpct=，您将能够在同一个选定文件中混合读取和写入。请注意，对于sequential（顺序），这没有多大意义。您可以以读取块1，写入块2，读取块3等。对于随机I/O，这非常有意义。
