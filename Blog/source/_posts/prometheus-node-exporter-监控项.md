@@ -6,42 +6,123 @@ tags: prometheus
 
 截止2019-05-24 node_exporter监控项整理。
 
-node_exporter具体实现细节与内部含义还需要查看node_exporter代码，和Linux系统文档，如：<https://www.kernel.org/doc/Documentation/iostats.txt>
+## Collectors
 
-- arp
-- bcache
-- bonding
-- conntrack
-- cpu
-- cpufreq
-- diskstats   https://www.kernel.org/doc/Documentation/iostats.txt
-- edac
-- entropy
-- filefd
-- filesystem
-- hwmon
-- infiniband
-- ipvs
-- loadavg
-- mdadm
-- meminfo
-- netclass
-- netdev
-- netstat
-- nfs
-- nfsd
-- pressure
-- sockstat
-- stat
-- textfile
-- time
-- timex
-- uname
-- vmstat
-- xfs
-- zfs
+每个操作系统对collector的支持各不相同。 下表列出了所有现有collector和支持的系统。通过`--collector.<name>`标志来启用collector。默认情况下启用的collector可以通过`--no-collector.<name>`标志来禁用。
 
-部分监控项见下表：
+### 默认情况下启用
+
+| Name       | Description                                                  | OS                                                           |
+| ---------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| arp        | 来自`/proc/net/arp`的ARP统计信息                             | Linux                                                        |
+| bcache     | 来自`/sys/fs/bcache/`的bcache统计信息                        | Linux                                                        |
+| bonding    | Linux bonding interfaces已配置active slave的数量             | Linux                                                        |
+| boottime   | 从`kern.boottime` sysctl派生的系统启动时间                   | Darwin, Dragonfly, FreeBSD, NetBSD, OpenBSD, Solaris         |
+| conntrack  | 显示conntrack统计信息（如果没有`/proc/sys/net/netfilter/`，则不执行任何操作） | Linux                                                        |
+| cpu        | CPU统计信息                                                  | Darwin, Dragonfly, FreeBSD, Linux, Solaris                   |
+| cpufreq    | CPU频率统计信息                                              | Linux, Solaris                                               |
+| diskstats  | 磁盘I/O统计信息                                              | Darwin, Linux, OpenBSD                                       |
+| edac       | 检错和纠错的统计数据                                         | Linux                                                        |
+| entropy    | 可用的熵（entropy）                                          | Linux                                                        |
+| exec       | execution统计信息                                            | Dragonfly, FreeBSD                                           |
+| filefd     | 来自`/proc/sys/fs/file-nr`的文件描述符统计信息               | Linux                                                        |
+| filesystem | 文件系统统计信息，例如使用的磁盘空间                         | Darwin, Dragonfly, FreeBSD, Linux, OpenBSD                   |
+| hwmon      | 来自`/sys/class/hwmon/`的硬件监控和传感器数据                | Linux                                                        |
+| infiniband | 特定于InfiniBand和Intel OmniPath配置的网络统计信息           | Linux                                                        |
+| ipvs       | 来自`/proc/net/ip_vs`的IPVS状态和来自`/proc/net/ip_vs_stats`的统计数据 | Linux                                                        |
+| loadavg    | 负载平均值                                                   | Darwin, Dragonfly, FreeBSD, Linux, NetBSD, OpenBSD, Solaris  |
+| mdadm      | 有关`/proc/mdstat`中设备的统计信息（如果没有`/proc/mdstat`，则不执行任何操作） | Linux                                                        |
+| meminfo    | 内存统计信息                                                 | Darwin, Dragonfly, FreeBSD, Linux, OpenBSD                   |
+| netclass   | 来自`/sys/class/net/`的网络接口信息                          | Linux                                                        |
+| netdev     | 网络接口统计信息，如字节传输                                 | Darwin, Dragonfly, FreeBSD, Linux, OpenBSD                   |
+| netstat    | 来自`/proc/net/netstat`的网络统计信息。 这与`netstat -s`的信息相同 | Linux                                                        |
+| nfs        | 从`/proc/net/rpc/nfs`公开NFS客户端统计信息。 这与`nfsstat -c`的信息相同 | Linux                                                        |
+| nfsd       | 从`/proc/net/rpc/nfsd`公开NFS内核服务器统计信息。 这与`nfsstat -s`的信息相同 | Linux                                                        |
+| pressure   | 来自`/proc/pressure/`的压力失速统计                          | Linux (kernel 4.20+ and/or [CONFIG_PSI](https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/accounting/psi.txt)) |
+| sockstat   | 公开来自`/proc/net/sockstat`的各种统计信息                   | Linux                                                        |
+| stat       | 来自`/proc/stat`的各种统计信息。这包括启动时间，forks和interrupts。 | Linux                                                        |
+| textfile   | 从本地磁盘读取的统计信息。必须设置`--collector.textfile.directory`标志 | *any*                                                        |
+| time       | 当前的系统时间                                               | *any*                                                        |
+| timex      | selected adjtimex(2) system call统计信息                     | Linux                                                        |
+| uname      | uname系统调用提供的系统信息                                  | FreeBSD, Linux                                               |
+| vmstat     | 来自`/proc/vmstat`的统计信息                                 | Linux                                                        |
+| xfs        | XFS运行时统计信息                                            | Linux (kernel 4.4+)                                          |
+| zfs        | [ZFS](http://open-zfs.org/)性能统计数据                      | [Linux](http://zfsonlinux.org/), Solaris                     |
+
+### 默认情况下禁用
+
+由于内核配置和安全设置，默认情况下，所有Linux系统上的perf收集器可能无法正常工作。 要允许访问，请设置以下sysctl参数：
+
+```
+sysctl -w kernel.perf_event_paranoid=X
+```
+
+2 仅允许用户空间度量（自Linux 4.6起默认）。
+
+1 允许内核和用户度量（在Linux 4.6之前默认）。
+
+0 允许访问特定CPU的数据，但不允许访问raw tracepoint samples。
+
+-1 没有限制。
+
+根据配置的值，将提供不同的度量标准，对于大多数情况，`0`将提供最完整的设置。 有关更多信息，请参阅`man 2 perf_event_open`。
+
+| Name         | Description                                                  | OS                 |
+| ------------ | ------------------------------------------------------------ | ------------------ |
+| buddyinfo    | /proc/buddyinfo报告的内存碎片统计信息                        | Linux              |
+| devstat      | 设备统计信息                                                 | Dragonfly, FreeBSD |
+| drbd         | 分布式副本（Replicated）块设备统计信息（到版本8.4）          | Linux              |
+| interrupts   | 详细的中断统计                                               | Linux, OpenBSD     |
+| ksmd         | 来自`/sys/kernel/mm/ksm`的内核和系统统计信息                 | Linux              |
+| logind       | 会话计数来自[logind](http://www.freedesktop.org/wiki/Software/systemd/logind/) | Linux              |
+| meminfo_numa | 来自`/proc/meminfo_numa`的内存统计信息                       | Linux              |
+| mountstats   | 来自`/proc/self/mountstats`的文件系统统计信息。详细的NFS客户端统计信息。 | Linux              |
+| ntp          | 本地NTP守护程序运行状况检查[时间](https://github.com/prometheus/node_exporter/blob/master/docs/TIME.md) | *any*              |
+| processes    | 来自`/proc`的聚合进程统计信息                                | Linux              |
+| qdisc        | [queuing discipline](https://en.wikipedia.org/wiki/Network_scheduler#Linux_kernel) 统计 | Linux              |
+| runit        | 来自[runit](http://smarden.org/runit/)的服务状态统计         | *any*              |
+| supervisord  | 来自[supervisord](http://supervisord.org/)的服务状态统计     | *any*              |
+| systemd      | 来自[systemd](http://www.freedesktop.org/wiki/Software/systemd/)的服务和系统状态统计 | Linux              |
+| tcpstat      | 来自`/proc/net/tcp`和`/proc/net/tcp6`的TCP连接状态信息。（警告：当前版本在高负载情况下存在潜在的性能问题。） | Linux              |
+| wifi         | WiFi设备和station统计                                        | Linux              |
+| perf         | 基于perf的指标（警告：指标取决于内核配置和设置）             | Linux              |
+
+### Textfile Collector
+
+textfile collector类似于[Pushgateway](https://github.com/prometheus/pushgateway)因为它允许从批处理job导出统计信息。它还可用于导出静态指标，例如计算机具有的role。Pushgateway应该用于服务级别指标。textfile模式用于绑定计算机的度量标准。
+
+要使用它，请在Node exporter上设置`--collector.textfile.directory`标志。collector将使用文本格式解析该目录中与glob `*.prom`匹配的所有文件。 注意：不支持时间戳。
+
+以原子方式推送cron job的完成时间：
+
+```
+echo my_batch_job_completion_time $(date +%s) > /path/to/directory/my_batch_job.prom.$$
+mv /path/to/directory/my_batch_job.prom.$$ /path/to/directory/my_batch_job.prom
+```
+
+使用标签静态设置计算机的roles：
+
+```
+echo 'role{role="application_server"} 1' > /path/to/directory/role.prom.$$
+mv /path/to/directory/role.prom.$$ /path/to/directory/role.prom
+```
+
+### Filtering enabled collectors
+
+默认情况下，`node_exporter`将从启用的collector中公开所有指标。 这是收集指标以避免在比较不同系列的指标时出错的建议方法。
+
+高级使用`node_exporter`可以传递一个可选的收集器列表来过滤指标。 `collect[]`参数可以多次使用。 在Prometheus配置中，您可以在[scrape config](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cscrape_config%3E)
+
+```
+  params:
+    collect[]:
+      - foo
+      - bar
+```
+
+这对于让不同的Prometheus服务器从节点收集特定指标非常有用。
+
+## 部分监控项见下表
 
 | Metrics                                             | Chinese   explanation                                        | English   explanation                                        |
 | --------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -197,8 +278,8 @@ node_exporter具体实现细节与内部含义还需要查看node_exporter代码
 | node_network_up                                     | 如果operstate为'up'，则值为1，否则为0                        | #   HELP node_network_up Value is 1 if operstate is 'up', 0 otherwise. |
 | node_procs_blocked                                  | 阻塞等待I/O完成的进程数                                      | #   HELP node_procs_blocked Number of processes blocked waiting for I/O to   complete. |
 | node_procs_running                                  | 处于可运行状态的进程数                                       | #   HELP node_procs_running Number of processes in runnable state. |
-| node_scrape_collector_duration_seconds              | node_exporter：采集器scrape持续时间                          | #   HELP node_scrape_collector_duration_seconds node_exporter: Duration of a   collector scrape. |
-| node_scrape_collector_success                       | node_exporter：采集器是否成功                                | #   HELP node_scrape_collector_success node_exporter: Whether a collector   succeeded. |
+| node_scrape_collector_duration_seconds              | node_exporter：collector scrape持续时间                      | #   HELP node_scrape_collector_duration_seconds node_exporter: Duration of a   collector scrape. |
+| node_scrape_collector_success                       | node_exporter：collector 是否成功                            | #   HELP node_scrape_collector_success node_exporter: Whether a collector   succeeded. |
 | node_sockstat_FRAG_inuse                            | state   inuse中的FRAG sockets数量                            | #   HELP node_sockstat_FRAG_inuse Number of FRAG sockets in state inuse. |
 | node_sockstat_FRAG_memory                           | state   memory（状态存储器）中的FRAG sockets数量             | #   HELP node_sockstat_FRAG_memory Number of FRAG sockets in state memory. |
 | node_sockstat_RAW_inuse                             | state   inuse中的RAW sockets数                               | #   HELP node_sockstat_RAW_inuse Number of RAW sockets in state inuse. |
