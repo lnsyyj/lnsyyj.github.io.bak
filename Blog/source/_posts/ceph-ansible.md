@@ -220,6 +220,33 @@ osd 配置是通过选择 osd 方案并提供该方案所需的配置来设置�
 
 
 
+# ansible不配置ssh免密钥,使用密码登录
+
+```
+1、编辑/etc/ansible/ansible.cfg
+取消注释：#host_key_checking = False
+
+2、编辑/etc/ansible/hosts
+[ceph_exporter]
+10.121.136.110	ansible_user=root	ansible_ssh_pass=root
+10.121.136.111	ansible_user=root       ansible_ssh_pass=root
+10.121.136.112	ansible_user=root       ansible_ssh_pass=root
+10.121.136.113	ansible_user=root       ansible_ssh_pass=root
+10.121.136.114	ansible_user=root       ansible_ssh_pass=root
+10.121.136.115	ansible_user=root       ansible_ssh_pass=root
+
+[node_exporter]
+10.121.136.110	ansible_user=root       ansible_ssh_pass=root
+10.121.136.111	ansible_user=root       ansible_ssh_pass=root
+10.121.136.112	ansible_user=root       ansible_ssh_pass=root
+10.121.136.113	ansible_user=root       ansible_ssh_pass=root
+10.121.136.114	ansible_user=root       ansible_ssh_pass=root
+10.121.136.115	ansible_user=root       ansible_ssh_pass=root
+
+3、测试
+ansible all -m ping
+```
+
 
 
 
