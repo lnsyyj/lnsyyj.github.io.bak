@@ -193,3 +193,42 @@ rd=rd1,fwd=fwd*,fwdrate=max,format=(restart,only),elapsed=600,interval=1
 `关于rdpct（Read Percentage）`
 
 此参数允许您混合读取和写入。 使用operation=read只允许你做read，operation=write只允许你做write。 但是，指定rdpct=，您将能够在同一个选定文件中混合读取和写入。请注意，对于sequential（顺序），这没有多大意义。您可以以读取块1，写入块2，读取块3等。对于随机I/O，这非常有意义。
+
+`关于format=`
+
+- no
+
+  不需要任何格式,但现有文件结构必须与 FSD 定义的结构相匹配。
+
+- yes
+
+  Vdbench 将首先删除当前文件结构,然后再次创建文件结构。然后,它将执行您在 RD 中的请求。
+
+- restart
+
+  Vdbench将仅创建尚未创建的文件，并且还将扩展未达到其正确大小的文件。 （这是totalsize和workingsetsize可以发挥作用的地方）。
+
+- only
+
+  与'yes'相同，但Vdbench不会执行当前的RD。
+
+- dir(ectories)
+
+  与‘yes’相同，但它只会创建目录。
+
+- clean
+
+  Vdbench只会删除当前的文件结构，而不会执行当前的RD。
+
+- once
+
+  这将覆盖每个forxxx参数循环完成format的默认行为。
+
+- limited
+
+  format将在elapsed=seconds之后终止，而不是所有文件或为totalsize=选择的文件已格式化之后终止。
+
+- complete
+
+  只能与'format=no'一起使用，并且会告诉Vdbench format已经完成，但是Vdbench不应该尝试通过目录搜索来验证每个目录和文件的状态。 当然，如果一个或多个目录或文件丢失或文件未达到其预期大小，结果不可预测。在测试期间删除或创建目录或文件时非常危险。
+
