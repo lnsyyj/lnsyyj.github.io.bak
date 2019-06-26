@@ -231,4 +231,3 @@ rd=rd1,fwd=fwd*,fwdrate=max,format=(restart,only),elapsed=600,interval=1
 - complete
 
   只能与'format=no'一起使用，并且会告诉Vdbench format已经完成，但是Vdbench不应该尝试通过目录搜索来验证每个目录和文件的状态。 当然，如果一个或多个目录或文件丢失或文件未达到其预期大小，结果不可预测。在测试期间删除或创建目录或文件时非常危险。
-
