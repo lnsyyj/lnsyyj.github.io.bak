@@ -225,6 +225,198 @@ ceph_conf_overrides:
 
 - [OSD Scenarios](http://docs.ceph.com/ceph-ansible/master/osds/scenarios.html)
 
+从`stable-4.0`开始，不再支持下列场景，因为他们与`ceph-disk`相关联：
+
+- collocated
+- non-collocated
+
+自Ceph luminous发布以来，首选使用`ceph-volume`工具的lvm场景。任何其他方案都将导致弃用警告。
+
+`ceph-disk`在ceph-ansible 3.2中被弃用，并且已经在Nautilus版本完全从Ceph本身中删除。 目前（从稳定版4.0开始），只有一个场景，默认为`lvm`，参见：
+
+- lvm
+
+因此不再需要配置`osd_scenario`，它默认为`lvm`。
+
+上面提到的`lvm`场景支持containerized和non-containerized集群。提醒一下，可以通过将`containerized_deployment`设置为`True`来完成部署容器化集群。
+
+### lvm
+
+此场景使用`ceph-volume`来创建LVM的OSD，并且仅在Ceph luminous或更新的版本才可用。它会自动启用。
+
+其他（可选）支持的设置：
+
+- `osd_objectstore`：为OSD设置Ceph objectstore。可用选项是`filestore`或`bluestore`。你只能选择luminous或更高Ceph版本的`bluestore`。如果未设置，则默认为`bluestore`。
+
+- `dmcrypt`：使用dmcrypt在OSD上启用Ceph加密。如果未设置，则默认为false。
+- `osds_per_device`：为每个设备提供多个OSD（如果未设置，默认为1，也就是说1个设备1个OSD）。
+
+### Simple configuration
+
+使用这种方法，有关设备如何配置为预配 OSD 的决策都由 Ceph 工具完成的（本例中为ceph-volume lvm批处理）。在给定输入设备的情况下，几乎无法修改OSD的组合方式。
+
+要使用此配置，必须配置使用OSD的原始设备路径填充devices选项。
+
+```
+注意
+原始设备必须“干净”，没有gpt分区表或逻辑卷存在。
+```
+
+例如，对于具有`/dev/sda`和`/dev/sdb`的节点，配置将是：
+
+```
+devices:
+  - /dev/sda
+  - /dev/sdb
+```
+
+在上述情况下，如果两个设备都是spinning（旋转）设备（HDD），则会创建2个OSD，每个OSD都有自己的collocated journal（journal与data同盘）。
+
+其他方式可能是spinning设备与solid state设备混合部署（HDD+SSD），例如：
+
+```
+devices:
+  - /dev/sda
+  - /dev/sdb
+  - /dev/nvme0n1
+```
+
+与最初的示例类似，最终会生成2个OSD，但数据将放在较慢的spinning设备（`/dev/sda`, 和`/dev/sdb`）上，而journals将放在速度更快的solid state设备`/dev/nvme0n1`上。 `ceph-volume`工具在[“batch”子命令部分](http://docs.ceph.com/docs/master/ceph-volume/lvm/batch/)详细描述了这一点
+
+此选项也可以与`osd_auto_discovery`一起使用，这意味着您不需要直接填充`devices` ，而是使用ansible找到的任何适当的设备。
+
+```
+osd_auto_discovery: true
+```
+
+其他（可选）支持的设置：
+
+- `crush_device_class`：为使用此方法创建的所有OSD设置CRUSH device class（使用simple configuration方法不可能每个OSD都有CRUSH device class）。 值必须是字符串，如`crush_device_class："ssd"`
+
+### Advanced configuration
+
+当在设置devices需要更精细的控制OSD时，非常有用。它需要已存在的volume groups和logical volumes设置（`ceph-volume`不会创建这些卷）。
+
+要使用此配置，必须使用logical volumes和volume groups填充`lvm_volumes`选项。此外，分区的绝对路径可用于`journal`，`block.db`和`block.wal`。
+
+```
+注意
+此配置使用ceph-volume lvm create来设置OSD
+```
+
+支持的`lvm_volumes`配置设置：
+
+- `data`：logical volume名称或raw device（原始设备）的绝对路径（使用 100% 的原始设备创建 LV）
+
+- `data_vg`：volume group名称，如果`data`是logical volume，则为必需。
+- `crush_device_class`：生成OSD的CRUSH device class名，允许为每个OSD设置device class，而不像全局`crush_device_class`那样为所有OSD设置它们。
+
+```
+注意
+如果在使用devices时为OSD设置crush_device_class，则必须使用全局crush_device_class选项设置它，如上所示。 当使用像lvm_volumes这样的devices时，无法为每个OSD定义特定的CRUSH device class。
+```
+
+`filestore` objectstore变量：
+
+- `journal`：logical volume名称或分区的绝对路径。
+- `journal_vg`：volume group名称，如果journal是logical volume，则是必选。
+
+```
+警告
+每个entry（条目）必须是唯一的，不允许重复的值
+```
+
+`bluestore`  objectstore变量：
+
+- `db`： logical volume名称或分区的绝对路径。
+- `db_vg`： volume group名称，如果`db`是logical volume，则是必选。
+- `wal`： logical volume名称或分区的绝对路径。
+- `wal_vg`： volume group名称，如果`wal`是logical volume，则是必选。
+
+```
+注意
+这些bluestore变量是可选的优化选项。 Bluestore的db和wal只会从更快的设备中受益。可以使用单个raw device（原始设备）创建bluestore OSD。
+```
+
+```
+警告
+每个entry（条目）必须是唯一的，不允许重复的值
+```
+
+使用 raw devices（原始设备）的`bluestore`示例：
+
+```
+osd_objectstore: bluestore
+lvm_volumes:
+  - data: /dev/sda
+  - data: /dev/sdb
+```
+
+```
+注意
+在这种情况下，将使用100％的devices创建volume groups和logical volumes。
+```
+
+具有logical volumes的`bluestore`示例：
+
+```
+osd_objectstore: bluestore
+lvm_volumes:
+  - data: data-lv1
+    data_vg: data-vg1
+  - data: data-lv2
+    data_vg: data-vg2
+```
+
+```
+注意
+必须存在Volume groups和logical volumes。
+```
+
+定义`wal`和`db`logical volumes的bluestore示例：
+
+```
+osd_objectstore: bluestore
+lvm_volumes:
+  - data: data-lv1
+    data_vg: data-vg1
+    db: db-lv1
+    db_vg: db-vg1
+    wal: wal-lv1
+    wal_vg: wal-vg1
+  - data: data-lv2
+    data_vg: data-vg2
+    db: db-lv2
+    db_vg: db-vg2
+    wal: wal-lv2
+    wal_vg: wal-vg2
+```
+
+```
+注意
+必须存在volume groups和logical volumes。
+```
+
+具有logical volumes的`filestore`示例：
+
+```
+osd_objectstore: filestore
+lvm_volumes:
+  - data: data-lv1
+    data_vg: data-vg1
+    journal: journal-lv1
+    journal_vg: journal-vg1
+  - data: data-lv2
+    data_vg: data-vg2
+    journal: journal-lv2
+    journal_vg: journal-vg2
+```
+
+```
+注意
+必须存在volume groups和logical volumes。
+```
+
 # Contribution
 
 有关如何为ceph-ansible做出贡献的指导，请参阅以下部分。
