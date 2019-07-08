@@ -353,6 +353,22 @@
     {% endif %}
 
     <footer class="post-footer">
+
+      {% if theme.post_tag_show.enabled and post.tags and post.tags.length and not is_index %}
+        <div class="post-tags">
+          {% for tag in post.tags %}
+            <a href="{{ url_for(tag.path) }}" rel="tag"><i class="fa fa-tag"></i> {{ tag.name }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if theme.recommended_posts.enabled and not is_index %}
+      <div>
+        <br />
+        {% include 'recommended_posts.swig' with {post: post, site: site} %}
+      </div>
+      {% endif %}
+      {% include 'google_adsense.swig' %}
+
       {% if post.tags and post.tags.length and not is_index %}
         <div class="post-tags">
           {% for tag in post.tags %}
