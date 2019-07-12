@@ -374,17 +374,52 @@ runner = ansible.runner.Runner(
 datastructrue = runner.run()
 ```
 
-如何调用Ansible2.0 API？
+# Directory Layout 目录布局
 
 ```
-1、定义一个结果对象
-2、初始化Ansible节点对象
-3、初始化结果对象
-4、创建一个任务
-5、运行ansible节点
 
-实例代码：
+production                # inventory file for production servers（生产服务器的inventory文件）
+staging                   # inventory file for staging environment（临时环境的inventory文件）
 
+group_vars/
+   group1.yml             # here we assign variables to particular groups（将变量分配给特定的groups）
+   group2.yml
+host_vars/
+   hostname1.yml          # here we assign variables to particular systems（将变量分配给特定systems）
+   hostname2.yml
+
+library/                  # if any custom modules, put them here (可选)（放置自定义modules）
+module_utils/             # if any custom module_utils to support modules, put them here (可选)（放置支持modules的自定义module_utils）
+filter_plugins/           # if any custom filter plugins, put them here (可选)（放置自定义filter plugins）
+
+site.yml                  # master playbook（playbook入口）
+webservers.yml            # playbook for webserver tier（webserver层playbook）
+dbservers.yml             # playbook for dbserver tier（dbserver层playbook）
+
+roles/
+    common/               # this hierarchy represents a "role"（这个层次代表role）
+        tasks/            #
+            main.yml      #  <-- tasks file can include smaller files if warranted（tasks文件）
+        handlers/         #
+            main.yml      #  <-- handlers file（处理程序文件）
+        templates/        #  <-- files for use with the template resource（用于模板资源的文件）
+            ntp.conf.j2   #  <------- templates end in .j2（模板以.j2结尾）
+        files/            #
+            bar.txt       #  <-- files for use with the copy resource（用于复制资源的文件）
+            foo.sh        #  <-- script files for use with the script resource（用于脚本资源的脚本文件）
+        vars/             #
+            main.yml      #  <-- variables associated with this role（与此role关联的变量）
+        defaults/         #
+            main.yml      #  <-- default lower priority variables for this role（此role的默认优先级较低的变量）
+        meta/             #
+            main.yml      #  <-- role dependencies（role依赖）
+        library/          # roles can also include custom modules（role还可以包括自定义modules）
+        module_utils/     # roles can also include custom module_utils（role还可以包括自定义module_utils）
+        lookup_plugins/   # or other types of plugins, like lookup in this case（或其他类型的plugins，例如lookup）
+
+    webtier/              # same kind of structure as "common" was above, done for the webtier role（与上面的"common"相同的结构，为webtier role定义）
+    monitoring/           # ""
+    fooapp/               # ""
 ```
 
 
