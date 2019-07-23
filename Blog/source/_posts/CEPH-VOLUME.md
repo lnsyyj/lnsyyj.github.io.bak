@@ -47,20 +47,48 @@ tags: CEPH-Luminous
 
 实现此功能需要通过lvm子命令来部署OSDs：`ceph-volume lvm`
 
-### Command Line Subcommands
+## Command Line Subcommands
+
+### prepare
 
 [prepare](http://docs.ceph.com/docs/master/ceph-volume/lvm/prepare/#ceph-volume-lvm-prepare)
+
+该子命令允许[filestore](http://docs.ceph.com/docs/master/glossary/#term-filestore)或[bluestore](http://docs.ceph.com/docs/master/glossary/#term-bluestore)设置。 建议在使用`ceph-volume lvm`之前预先配置逻辑卷。除添加额外元数据外，逻辑卷不会改变。
+
+为了帮助识别volumes，preparing的过程中该工具使用[LVM tags](http://docs.ceph.com/docs/master/glossary/#term-lvm-tags)分配一些元数据信息。
+
+[LVM tags](http://docs.ceph.com/docs/master/glossary/#term-lvm-tags)使volume易于发现，帮助识别它们作为Ceph系统的一部分，扮演着什么角色（journal, filestore, bluestore, etc…）
+
+虽然最初支持[filestore](http://docs.ceph.com/docs/master/glossary/#term-filestore)（默认情况下支持），但可以使用以下命令指定：
+
+- [–filestore](http://docs.ceph.com/docs/master/ceph-volume/lvm/prepare/#ceph-volume-lvm-prepare-filestore)
+- [–bluestore](http://docs.ceph.com/docs/master/ceph-volume/lvm/prepare/#ceph-volume-lvm-prepare-bluestore)
+
+**FILESTORE**
+
+这个OSD backend，允许为[filestore](http://docs.ceph.com/docs/master/glossary/#term-filestore) objectstore OSD准备逻辑卷。
+
+它可以使用OSD数据的逻辑卷和日志的分区物理设备或逻辑卷。 除了遵循数据和期刊的最小尺寸要求之外，这些卷不需要特殊准备。
+
+
+
 [activate](http://docs.ceph.com/docs/master/ceph-volume/lvm/activate/#ceph-volume-lvm-activate)
+
+
+
 [create](http://docs.ceph.com/docs/master/ceph-volume/lvm/create/#ceph-volume-lvm-create)
+
+
+
 [list](http://docs.ceph.com/docs/master/ceph-volume/lvm/list/#ceph-volume-lvm-list)
+
+
 
 ### Internal functionality
 
 lvm子命令的其他部分是internal的，不向用户公开，这些部分解释了如何协同工作，阐明了工具的工作流程。
 
 [Systemd Units](http://docs.ceph.com/docs/master/ceph-volume/lvm/systemd/#ceph-volume-lvm-systemd) | [lvm](http://docs.ceph.com/docs/master/dev/ceph-volume/lvm/#ceph-volume-lvm-api)
-
-
 
 # SIMPLE
 
@@ -72,9 +100,14 @@ lvm子命令的其他部分是internal的，不向用户公开，这些部分解
 - [activate](http://docs.ceph.com/docs/master/ceph-volume/simple/activate/#ceph-volume-simple-activate)
 - [systemd](http://docs.ceph.com/docs/master/ceph-volume/simple/systemd/#ceph-volume-simple-systemd)
 
+通过接管管理，它会disable所有用于在startup时触发device的ceph-disk systemd units，依赖基本的（可定制的）JSON配置和systemd来启动OSD。
 
+此过程包括两个步骤：
 
+1、[Scan](http://docs.ceph.com/docs/master/ceph-volume/simple/scan/#ceph-volume-simple-scan)（扫描）正在运行的OSD或data device
 
+2、[Activate](http://docs.ceph.com/docs/master/ceph-volume/simple/activate/#ceph-volume-simple-activate)（激活）扫描的OSD
 
+扫描将推断出ceph-volume启动OSD所需的所有内容，因此当需要激活时，OSD可以正常启动而不会受到来自ceph-disk的干扰。
 
-
+作为激活过程的一部分，负责对udev事件作出反应的ceph-disk的systemd units链接到/dev/null，以便它们完全处于非活动状态。
