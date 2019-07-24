@@ -66,9 +66,23 @@ tags: CEPH-Luminous
 
 **FILESTORE**
 
-这个OSD backend，允许为[filestore](http://docs.ceph.com/docs/master/glossary/#term-filestore) objectstore OSD准备逻辑卷。
+这是OSD backend，允许为[filestore](http://docs.ceph.com/docs/master/glossary/#term-filestore) objectstore OSD 准备逻辑卷。
 
-它可以使用OSD数据的逻辑卷和日志的分区物理设备或逻辑卷。 除了遵循数据和期刊的最小尺寸要求之外，这些卷不需要特殊准备。
+它可以使用逻辑卷作为OSD data和带分区的physical device或逻辑卷作为journal。除了遵循data和journal的最小大小要求外,这些卷不需要特殊准备。
+
+API调用如下所示：
+
+```
+ceph-volume lvm prepare --filestore --data volume_group/lv_name --journal journal
+```
+
+启用[encryption](http://docs.ceph.com/docs/mimic/ceph-volume/lvm/encryption/#ceph-volume-lvm-encryption)（加密），需要使用--dmcrypt标志：
+
+```
+ceph-volume lvm prepare --filestore --dmcrypt --data volume_group/lv_name --journal journal
+```
+
+
 
 
 
