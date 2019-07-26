@@ -49,3 +49,9 @@ scl enable devtoolset-7 bash
 sudo yum install -y epel-release
 ```
 
+### Linux批量创建嵌套目录
+
+```
+mkdir -pv roles/vdbench/{tasks,templates,meta,defaults,vars,files,plugins,handler}
+```
+
