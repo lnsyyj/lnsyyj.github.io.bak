@@ -9,6 +9,9 @@ tags: Linux
 Python pip安装
 
 ```
+yum -y install python-setuptools
+easy install pip
+或者
 curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
 python get-pip.py
 ```
@@ -28,6 +31,26 @@ pip install setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
 [global]
 index-url=http://pypi.douban.com/simple/
 #index-url=https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+Python开源项目编译安装
+
+```
+1、下载开源项目源代码
+2、安装依赖
+pip install -r requirements.txt
+3、安装开源项目
+python setup.py install
+```
+
+安装python3
+
+```
+yum -y install python36 python36-tools
+
+安装python3的pip
+curl "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
+python3.6 get-pip.py
 ```
 
 ### Centos 7升级GCC 7

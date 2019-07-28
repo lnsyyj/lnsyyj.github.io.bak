@@ -422,6 +422,14 @@ roles/
     fooapp/               # ""
 ```
 
+# 常用操作
+
+查看环境变量
+
+```
+ansible-config dump
+```
+
 
 
 ## 课程地址
