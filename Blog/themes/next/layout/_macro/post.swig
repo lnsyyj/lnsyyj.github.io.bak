@@ -368,7 +368,7 @@
         {% include 'recommended_posts.swig' with {post: post, site: site} %}
       </div>
       {% endif %}
-      {% include 'google_adsense.swig' %}
+
 
       {% if post.tags and post.tags.length and not is_index %}
         <div class="post-tags">
