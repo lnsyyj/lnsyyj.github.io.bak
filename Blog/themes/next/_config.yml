@@ -100,6 +100,8 @@ menu:
   #schedule: /schedule/ || calendar
   #sitemap: /sitemap.xml || sitemap
   #commonweal: /404/ || heartbeat
+  ads: ads.txt
+  # verification: google8f923441585e08a1.html
 
 # Enable/Disable menu icons.
 menu_icons:

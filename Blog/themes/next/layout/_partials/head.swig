@@ -2,6 +2,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
 <meta name="theme-color" content="{{ theme.android_chrome_color }}">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4" />
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 <script>
