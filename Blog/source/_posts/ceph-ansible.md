@@ -565,6 +565,35 @@ lvm_volumes:
 ansible all -m ping
 ```
 
+# 清除集群中的LVM
+
+```
+[root@dev yujiang]# cat remove_ceph_lvm.sh 
+#!/bin/bash
+
+DEVICE_LIST=(c d e f g h i j k l)
+DEVICE_PATH="/dev"
+
+VG=`ls -l /dev/ | grep ceph- | awk '{print $9}' `
+
+for name in ${DEVICE_LIST[@]}
+do
+	echo ${name}
+done
+
+for name in ${VG[@]}
+do
+	LV=`ls -l ${DEVICE_PATH}/${name} | grep osd- | awk '{print $9}'`
+	for lv in ${LV}
+	do
+		LV_PATH=${DEVICE_PATH}/${name}/${lv}
+		lvremove ${LV_PATH}
+	done
+	vgremove ${DEVICE_PATH}/${name}
+done
+
+```
+
 
 
 
