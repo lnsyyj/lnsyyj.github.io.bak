@@ -55,3 +55,4 @@ ceph-volume被设计成一个模块化工具，因为我们预计人们会使用
 # LVM PERFORMANCE PENALTY
 
 简而言之：我们未能注意到与LVM更改相关的任何重大性能损失。 通过与LVM合作，可以使用其他device mapper技术（例如dmcache）：处理任何位于Logical Volume以下的事情没有技术困难。
+
