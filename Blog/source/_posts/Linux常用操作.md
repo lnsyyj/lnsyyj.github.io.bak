@@ -78,3 +78,14 @@ sudo yum install -y epel-release
 mkdir -pv roles/vdbench/{tasks,templates,meta,defaults,vars,files,plugins,handler}
 ```
 
+### 压缩
+
+- tar.gz格式
+
+```
+压缩（把ceph-14.2.1目录压缩为ceph-14.2.1.tar.gz）：tar zcf ceph-14.2.1.tar.gz ceph-14.2.1
+解压缩：tar zxf ceph-14.2.1.tar.gz
+```
+
+
+

@@ -48,7 +48,7 @@ Example:	2
 technique={reed_sol_van|reed_sol_r6_op|cauchy_orig|cauchy_good|liberation|blaum_roth|liber8tion}
 
 ````
-Description:	更灵活的technique是reed_sol_van：只需要设置k和m。cauchy_good technique可以更快但您需要仔细选择packetsize。reed_sol_r6_op，liberation，blaum_roth，liber8tion都与RAID6等价，因为它们只能配置m=2。
+Description:	更灵活的technique是reed_sol_van：只需要设置k和m。cauchy_good technique可以更快但您需要调优packetsize。reed_sol_r6_op，liberation，blaum_roth，liber8tion都与RAID6等价，因为它们只能配置m=2。
 Type:	String
 Required:	No.
 Default:	reed_sol_van
