@@ -20,6 +20,10 @@ Python pip更新包
 
 ```
 pip install --upgrade setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+更新包是遇到类似问题，需要重新装
+ERROR: Cannot uninstall 'pyparsing'. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.
+sudo pip install -I tox -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 Python pip国内源指定
