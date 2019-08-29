@@ -589,9 +589,11 @@ ansible all -m ping
 ```
 [root@dev yujiang]# cat remove_ceph_lvm.sh 
 #!/bin/bash
+set -x
 
-DEVICE_LIST=(c d e f g h i j k l)
+DEVICE_LIST=(a b c d e f g h i j k l)
 DEVICE_PATH="/dev"
+DEVICE_PREFIX="sd"
 
 VG=`ls -l /dev/ | grep ceph- | awk '{print $9}' `
 
@@ -609,6 +611,11 @@ do
 		lvremove ${LV_PATH}
 	done
 	vgremove ${DEVICE_PATH}/${name}
+done
+
+for name in ${DEVICE_LIST[@]}
+do
+	pvremove ${DEVICE_PATH}/${DEVICE_PREFIX}${name}
 done
 
 ```
