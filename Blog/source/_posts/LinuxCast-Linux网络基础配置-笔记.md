@@ -84,5 +84,105 @@ TX packets 发送包数量
 
   /etc/hosts
 
+# 网络测试命令
 
+- 测试网络连通性
 
+  ping 192.168.1.1
+
+  ping www.baidu.com
+
+- 测试DNS解析
+
+  ```
+  yum install -y bind-utils
+  ```
+
+  host www.baidu.com
+
+  ```
+  域名到IP地址的解析
+  [root@dev ~]# host www.baidu.com
+  www.baidu.com is an alias for www.a.shifen.com.
+  www.a.shifen.com has address 61.135.169.125
+  www.a.shifen.com has address 61.135.169.121
+  ```
+
+  dig www.baidu.com
+
+- 显示路由表
+
+  ip route
+
+  ```
+  [root@aio1 ~]# ip route
+  default via 192.168.46.2 dev ens33 proto static metric 100 #跟我不在一个网段的，发给default
+  default via 192.168.46.2 dev ens34 proto static metric 101 
+  default via 192.168.46.2 dev ens35 proto static metric 102 
+  default via 192.168.46.2 dev ens36 proto dhcp metric 103 
+  172.29.232.0/22 dev br-dbaas proto kernel scope link src 172.29.232.100 
+  192.168.46.0/24 dev ens33 proto kernel scope link src 192.168.46.200 metric 100 
+  192.168.46.0/24 dev ens36 proto kernel scope link src 192.168.46.137 metric 103 
+  192.168.46.2 dev ens34 proto static scope link metric 101 
+  192.168.46.2 dev ens35 proto static scope link metric 102 
+  192.168.100.0/24 dev ens34 proto kernel scope link src 192.168.100.200 metric 101 
+  192.168.200.0/24 dev ens35 proto kernel scope link src 192.168.200.200 metric 102 
+  ```
+
+- 追踪到达目标地址的网络路径
+
+  ```
+  yum install -y traceroute
+  ```
+
+  traceroute www.baidu.com
+
+- 使用mtr进行网络质量测试（结合了traceroute和ping）
+
+  ```
+  yum install -y mtr
+  ```
+
+  mtr www.baidu.com
+
+# 修改主机名
+
+- 实时修改主机名
+
+  ```
+  hostname train.linuxcast.net
+  ```
+
+- 永久性修改主机名
+
+  ```
+  /etc/sysconfig/network
+  
+  HOSTNAME=train.linuxcast.net
+  ```
+
+# 故障排查
+
+网络故障排查遵循从底层到高层、从自身到外部的流程进行
+
+- 先查看网络配置信息是否正确
+
+  IP地址
+
+  子网掩码
+
+  网关
+
+  DNS
+
+- 查看到达网关是否连通
+
+  ping 网关IP地址
+
+- 查看DNS解析是否正常
+
+  ```
+  host www.baidu.com
+  ```
+
+- traceroute www.baidu.com

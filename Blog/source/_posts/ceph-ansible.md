@@ -260,6 +260,25 @@ ceph_conf_overrides:
 ```
 注意
 原始设备必须“干净”，没有gpt分区表或逻辑卷存在。
+[root@dev ~]# yum install gdisk -y
+[root@dev ~]# gdisk /dev/sda 
+GPT fdisk (gdisk) version 0.8.10
+
+Partition table scan:
+  MBR: not present
+  BSD: not present
+  APM: not present
+  GPT: not present
+
+Creating new GPT entries.
+
+Command (? for help): x
+
+Expert command (? for help): z
+About to wipe out GPT on /dev/sda. Proceed? (Y/N): Y
+GPT data structures destroyed! You may now partition the disk using fdisk or
+other utilities.
+Blank out MBR? (Y/N): Y
 ```
 
 例如，对于具有`/dev/sda`和`/dev/sdb`的节点，配置将是：
