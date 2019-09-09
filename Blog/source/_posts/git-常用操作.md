@@ -38,3 +38,40 @@ Date:   Tue Aug 20 09:32:05 2019 -0400
 
 ```
 
+# git subtree
+
+git submodule是link的概念
+
+git subtree是copy的概念
+
+https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt
+
+### create git subtree
+
+```
+1、首先clone主repo
+git clone --recurse-submodules -j8 git@github.com:lnsyyj/lnsyyj-ansible.git
+2、进入主repo
+cd lnsyyj-ansible
+3、添加子repo
+git subtree add --prefix=roles/elasticsearch --squash git@github.com:lnsyyj/ansible-role-elasticsearch.git master
+git subtree add --prefix=roles/kibana --squash git@github.com:lnsyyj/ansible-role-kibana.git master
+
+--squash  合并子repo的git log
+--prefix= 指定copy到主repo的位置
+```
+
+### push git subtree
+
+```
+
+```
+
+### pull git subtree
+
+```
+
+```
+
+
+
