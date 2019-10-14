@@ -147,22 +147,3 @@ mon_host = 10.0.0.1,10.0.0.2,10.0.0.3
 # PROTOCOL
 
 有关v2 wire protocol的详细说明，请参见[msgr2 protocol](https://docs.ceph.com/docs/nautilus/dev/msgr2/#msgr2-protocol)。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

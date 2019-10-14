@@ -236,6 +236,13 @@ ceph --version
 
 ## 升级Ceph服务端package
 
+### 升级可能带来的影响
+
+```
+（1）服务端升级可能会影响客户业务，导致业务中断一定时间。如果cephfs或rgw前端有流量（install ceph package时会自动停掉mds与rgw service），请先将升级节点流量先转向其他节点。
+（2）如果容器中有ceph client packages，同样需要逐一转走流量，再升级
+```
+
 1、查看当前环境与版本
 
 ```
@@ -355,7 +362,7 @@ name = Ceph Stable repo
 5、Ceph Object Gateways
 ```
 
-升级命令（`注意`：安装过程中rgw与mds服务会自动被stop）
+升级命令（`注意：安装过程中rgw与mds服务会自动被stop`）
 
 ```
 [root@ceph2 ~]# yum install ceph
@@ -805,33 +812,100 @@ cephfs-1/1/1 up  {0=ceph2=up:active}, 1 up:standby
 
 `注意`：当集群升级过程中，刚刚升级第一个MDS会出现`insufficient standby MDS daemons available`，当升级第二个MDS后，警告会自动消失。
 
-7、解除noout标志
+7、警告解除`Legacy BlueStore stats reporting detected on 6 OSD(s)`
+
+首先确认集群状态，无其他异常告警，并修复。
 
 ```
-[root@ceph2 ~]# ceph osd unset noout
+[root@ceph1 ~]# ceph -s
+  cluster:
+    id:     c4051efa-1997-43ef-8497-fb02bdf08233
+    health: HEALTH_WARN
+            noout flag(s) set
+            Legacy BlueStore stats reporting detected on 6 OSD(s)
+ 
+  services:
+    mon: 3 daemons, quorum ceph1,ceph3,ceph2 (age 111s)
+    mgr: ceph2(active, since 6h), standbys: ceph3, ceph1
+    mds: cephfs:1 {0=ceph2=up:active} 2 up:standby
+    osd: 6 osds: 6 up, 6 in
+         flags noout
+    rgw: 3 daemons active (ceph1, ceph2, ceph3)
+ 
+  data:
+    pools:   7 pools, 176 pgs
+    objects: 245 objects, 5.8 KiB
+    usage:   6.1 GiB used, 293 GiB / 299 GiB avail
+    pgs:     176 active+clean
+
+[root@ceph1 ~]# systemctl stop ceph-osd@1.service
+[root@ceph1 ~]# ceph-bluestore-tool repair --path /var/lib/ceph/osd/ceph-1/
+repair success
+[root@ceph1 ~]# systemctl start ceph-osd@1.service
 ```
 
-8、警告解除`Legacy BlueStore stats reporting detected on 6 OSD(s)`
+`当前出现问题：https://tracker.ceph.com/issues/42297，正在与社区沟通`
+
+相关ceph users
 
 ```
-
+http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/035889.html
+http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036010.html
+http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html
 ```
 
-9、告警解除`3 monitors have not enabled msgr2`（nautilus版本中mon需要打开v2，监听3300端口）
+8、告警解除`3 monitors have not enabled msgr2`（nautilus版本中mon需要打开v2，监听3300端口），关于msgr2参见http://lnsyyj.github.io/2019/10/14/Ceph-MESSENGER-V2/
 
 ```
 [root@ceph1 ~]# ceph mon enable-msgr2
 ```
 
-10、
+9、解除noout标志
 
+```
+[root@ceph2 ~]# ceph osd unset noout
+```
 
+10、确认ceph状态
+
+```
+[root@ceph2 ~]# ceph -s
+  cluster:
+    id:     c4051efa-1997-43ef-8497-fb02bdf08233
+    health: HEALTH_OK
+ 
+  services:
+    mon: 3 daemons, quorum ceph1,ceph3,ceph2 (age 30m)
+    mgr: ceph2(active, since 7h), standbys: ceph3, ceph1
+    mds: cephfs:1 {0=ceph2=up:active} 2 up:standby
+    osd: 6 osds: 6 up, 6 in
+    rgw: 3 daemons active (ceph1, ceph2, ceph3)
+ 
+  data:
+    pools:   7 pools, 176 pgs
+    objects: 245 objects, 5.8 KiB
+    usage:   6.1 GiB used, 293 GiB / 299 GiB avail
+    pgs:     176 active+clean
+```
 
 ## 升级Ceph客户端package
 
-1、
+### 升级可能带来的影响
 
 ```
+（1）客户端升级可能会影响客户业务，导致业务中断一定时间。
+（2）可能带来客户端程序不兼容ceph client package的情况。
+```
 
+1、升级package
+
+```
+[root@ceph1 ~]# yum install ceph-common librados2 librbd1 python-rbd python-rados -y
+```
+
+2、确认升级后的版本
+
+```
+ceph --version
 ```
 
