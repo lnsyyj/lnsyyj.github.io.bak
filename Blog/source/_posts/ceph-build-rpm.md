@@ -96,6 +96,13 @@ yum install bzip2 -y
 bzip2 -d ceph-12.2.8.tar.bz2
 tar xvf ceph-12.2.8.tar
 tar zcvf ceph-12.2.8.tar.gz ceph-12.2.8
+
+如果是ceph-14.2.4需要安装
+yum -y install centos-release-scl
+yum -y install devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-binutils
+scl enable devtoolset-7 bash
+yum install ceph-2:14.2.4-0.el7.x86_64
+rpmbuild -ba ~/rpmbuild/SPECS/ceph.spec
 ```
 
 

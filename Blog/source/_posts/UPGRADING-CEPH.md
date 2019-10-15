@@ -243,6 +243,141 @@ ceph --version
 （2）如果容器中有ceph client packages，同样需要逐一转走流量，再升级
 ```
 
+[原文](https://docs.ceph.com/docs/master/releases/nautilus/)
+
+### UPGRADING FROM PRE-LUMINOUS RELEASES (LIKE JEWEL)
+
+必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。另外，您的集群必须在运行Luminous的同时至少完成了所有PG的scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs标志。
+
+### UPGRADING FROM MIMIC OR LUMINOUS
+
+**NOTES** 
+
+```
+在从Luminous升级到Nautilus的过程中，将monitors升级到Nautilus后，将无法使用Luminous ceph-osd daemon创建新的OSD。我们建议您避免在升级过程中添加或替换任何OSD。
+我们建议您避免在升级过程中创建任何RADOS pools。
+您可以使用ceph version(s)命令在每个阶段监视升级进度，该命令将告诉您每种daemon正在运行的ceph version(s)。
+```
+
+**INSTRUCTIONS**
+
+```
+1、如果您的集群最初安装的是Luminous之前的版本，请确保在运行Luminous时集群已完成对所有PG的至少一次完整scrub。否则，将导致您的monitor daemons在启动时拒绝加入quorum，从而使其无法运行。如果不确定Luminous集群是否已完成所有PG的完全scrub，则可以通过运行以下命令检查集群的状态：
+ceph osd dump | grep ^flags		(OSD map必须包含recovery_deletes和purged_snapdirs标志)
+
+如果您的OSD map不包含这两个标志，则只需等待大约24-48小时，在标准群集配置中，应该有充足的时间，以便至少一次scrub所有placement groups，然后重复上述过程 重新检查。
+如果您刚刚完成了对Luminous的升级，并且想在短时间内进行升级到Mimic，可以使用shell命令在所有placement groups上强制执行scrub，例如：
+ceph pg dump pgs_brief | cut -d " " -f 1 | xargs -n1 ceph pg scrub
+您应该考虑到这种强制性scrub可能会对您的Ceph客户的性能产生负面影响。
+
+2、确保您的群集stable且healthy（没有宕机或无法恢复的OSD）。 （可选，但推荐。）
+
+3、在升级期间设置noout标志。 （可选，但建议使用。）
+ceph osd set noout
+
+4、通过安装新软件包并重新启动monitor daemons来升级monitors。 例如，在每个monitors主机上，：
+systemctl restart ceph-mon.target
+所有monitors启动之后，通过在mon map中查找nautilus字符串来验证monitor升级是否完成。 命令：
+ceph mon dump | grep min_mon_release
+应报告：
+min_mon_release 14 (nautilus)
+如果不是，则表示尚未升级和重新启动monitors，或者quorum不包括所有monitors。
+
+5、通过安装新packages并重新启动所有manager daemons来升级ceph-mgr daemons。 例如，在每个manager主机上，：
+systemctl restart ceph-mgr.target
+请注意，如果您使用的是Ceph Dashboard，则升级ceph-mgr package后可能需要单独安装ceph-mgr-dashboard。ceph-mgr-dashboard的安装脚本将自动为您重新启动manager daemons。 因此，在这种情况下，您可以跳过该步骤以重新启动daemons。
+通过检查ceph -s来验证ceph-mgr daemons是否正在运行：
+# ceph -s
+...
+  services:
+   mon: 3 daemons, quorum foo,bar,baz
+   mgr: foo(active), standbys: bar, baz
+...
+
+6、通过安装新packages并在所有OSD主机上重新启动ceph-osd daemons来升级所有OSD：
+systemctl restart ceph-osd.target
+您可以使用ceph versions或ceph osd versions命令监视OSD升级的进度：
+# ceph osd versions
+{
+   "ceph version 13.2.5 (...) mimic (stable)": 12,
+   "ceph version 14.2.0 (...) nautilus (stable)": 22,
+}
+
+7、如果集群中通过ceph-disk部署了OSD（例如，几乎所有在Mimic版本之前创建的OSD），您都需要让ceph-volume承担启动daemons的责任。 在包含OSD的每个主机上，确保OSD当前正在运行，然后：
+ceph-volume simple scan
+ceph-volume simple activate --all
+我们建议按照此步骤重新启动每个OSD主机，以验证OSD是否自动启动。
+请注意，ceph-volume不具有与ceph-disk相同的hot-plug功能，后者通过udev events自动检测到新连接的磁盘。如果运行上述scan命令时OSD当前未running，或者将基于ceph-disk的OSD移至新主机，或者重新安装了主机OSD，或者/etc/ceph/osd目录丢失， 您将需要显式扫描每个ceph-disk OSD的主数据分区。例如，：
+ceph-volume simple scan /dev/sdb1
+输出将包括相应的ceph-volume simple activate命令以启用OSD。
+
+8、升级所有CephFS MDS daemons。 对于每个CephFS file system，
+	8.1	将ranks数减少到1。（如果您打算稍后还原它，请首先记录MDS守护程序的原始数量）：
+	ceph status
+	ceph fs set <fs_name> max_mds 1
+	8.2 通过定期检查状态，等待集群停用所有non-zero ranks：
+	ceph status
+	8.3 使用以下命令使所有standby MDS daemons在适当的主机上offline：
+	systemctl stop ceph-mds@<daemon_name>
+	8.4 确认只有一个MDS处于online，并且您的FS的rank 0：
+	ceph status
+	8.5 通过安装新packages并重新启动daemon来升级剩余的MDS daemon：
+	systemctl restart ceph-mds.target
+	
+	8.6 重新启动所有已offline的standby MDS daemons
+	systemctl start ceph-mds.target
+	
+	8.7 恢复该volume的max_mds原始值：
+	ceph fs set <fs_name> max_mds <original_max_mds>
+	
+9、通过升级packages并在所有主机上重新启动daemons来升级所有radosgw daemons：
+systemctl restart ceph-radosgw.target
+
+10、禁用Nautilus之前的OSD并启用所有Nautilus的新功能来完成升级：
+ceph osd require-osd-release nautilus
+
+11、如果您一开始设置noout，请确保清除它：
+ceph osd unset noout
+
+12、使用ceph health验证集群是否healthy
+如果您的CRUSH tunables（可调参数）早于Hammer，Ceph现在将发出健康警告。 如果您看到有这种效果的健康警报，则可以使用以下方法还原此更改：
+ceph config set mon mon_crush_min_required_version firefly
+但是，如果Ceph没有警报，那么我们建议您也将所有现有的CRUSH buckets都切换到straw2，这是Hammer版本中重新添加的。如果您有任何“straw” buckets，这将导致少量的数据移动，但通常不会太严重。
+ceph osd getcrushmap -o backup-crushmap
+ceph osd crush set-all-straw-buckets-to-straw2
+如果有问题，您可以还原：
+ceph osd setcrushmap -i backup-crushmap
+移至“straw2” buckets将解锁一些最新功能，例如在Luminous中crush-compat balancer mode（https://docs.ceph.com/docs/master/rados/operations/balancer/#balancer）。
+
+13、要启用新的 v2 network protocol，请发出以下命令：
+ceph mon enable-msgr2
+指示所有与旧版v1 protocol绑定到旧的默认端口6789的monitors，同时也绑定到新的3300 v2 protocol端口。要查看是否所有monitors都已更新，请执行以下操作：
+ceph mon dump
+并确认每个monitors都显示v2:和v1:地址。
+
+14、对于已升级的每个主机，应更新ceph.conf文件，使其不指定monitor端口（如果您在默认端口上运行monitor），或者显式引用v2和v1地址和端口。 如果仅列出了v1 IP和端口，则一切仍将起作用，但是在得知monitor也使用v2协议后，每个CLI实例或daemon都将需要重新连接，这会减慢速度并阻止完全过渡到v2协议。
+这也是将ceph.conf中的所有配置选项完全转换到集群的配置数据库中的好时机。 在每个主机上，您可以使用以下命令通过以下命令将所有选项导入monitor：
+ceph config assimilate-conf -i /etc/ceph/ceph.conf
+您可以通过以下方式查看集群的配置数据库：
+ceph config dump
+要为每个主机创建一个最小但足够的ceph.conf，请执行以下操作：
+ceph config generate-minimal-conf > /etc/ceph/ceph.conf.new
+mv /etc/ceph/ceph.conf.new /etc/ceph/ceph.conf
+确保仅在已升级到Nautilus的主机上使用此新配置，因为它可能包含mon_host值，该值包含Nautilus能理解的IP地址的新v2:和v1:前缀。
+有关更多信息，请参阅https://docs.ceph.com/docs/master/rados/configuration/msgr2/#msgr2-ceph-conf
+
+15、考虑启用telemetry module以将匿名使用情况统计信息和崩溃信息发送给Ceph upstream developers。 查看将要报告的内容（实际上没有向任何人发送任何信息），请执行以下操作：
+ceph mgr module enable telemetry
+ceph telemetry show
+如果您对所报告的数据感到满意，则可以选择使用以下方法自动报告high-level cluster metadata：
+ceph telemetry on
+有关telemetry module的更多信息，请参见文档：https://docs.ceph.com/docs/master/mgr/telemetry/#telemetry
+```
+
+
+
+
+
 1、查看当前环境与版本
 
 ```
