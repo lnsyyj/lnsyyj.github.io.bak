@@ -247,11 +247,11 @@ ceph --version
 
 ### UPGRADING FROM PRE-LUMINOUS RELEASES (LIKE JEWEL)
 
-必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。另外，您的集群必须在运行Luminous的同时至少完成了所有PG的scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs标志。
+您必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。 另外，您的集群必须在运行Luminous的同时至少完成了所有PG的一次scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs标志。
 
 ### UPGRADING FROM MIMIC OR LUMINOUS
 
-**NOTES** 
+**NOTES**
 
 ```
 在从Luminous升级到Nautilus的过程中，将monitors升级到Nautilus后，将无法使用Luminous ceph-osd daemon创建新的OSD。我们建议您避免在升级过程中添加或替换任何OSD。
@@ -259,7 +259,27 @@ ceph --version
 您可以使用ceph version(s)命令在每个阶段监视升级进度，该命令将告诉您每种daemon正在运行的ceph version(s)。
 ```
 
-**INSTRUCTIONS**
+### UPGRADE COMPATIBILITY NOTES（升级兼容性说明）
+
+这些更改发生在Mimic和Nautilus版本之间。
+
+- ceph pg stat输出已修改为json格式，以匹配ceph df输出：
+  - “raw_bytes” field renamed to “total_bytes”
+  - “raw_bytes_avail” field renamed to “total_bytes_avail”
+  - “raw_bytes_avail” field renamed to “total_bytes_avail”
+  - “raw_bytes_used” field renamed to “total_bytes_raw_used”
+  - 添加了“total_bytes_used” field 来表示分配给block(slow) device上data objects的（所有OSD）空间
+
+- ceph df [detail]输出（GLOBAL section）格式进行了修改：
+
+  - 新的‘USED’ column显示了分配给block(slow) device上data objects的（所有OSD）空间
+  - 现在，‘RAW USED’ 是‘USED’空间与为Ceph目的在块设备上分配/保留的空间之和。BlueStore的BlueFS部分。
+
+  
+
+
+
+### INSTRUCTIONS（使用说明）
 
 ```
 1、如果您的集群最初安装的是Luminous之前的版本，请确保在运行Luminous时集群已完成对所有PG的至少一次完整scrub。否则，将导致您的monitor daemons在启动时拒绝加入quorum，从而使其无法运行。如果不确定Luminous集群是否已完成所有PG的完全scrub，则可以通过运行以下命令检查集群的状态：
