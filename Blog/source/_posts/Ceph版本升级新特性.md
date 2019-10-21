@@ -26,9 +26,13 @@ tags: ceph
   - New landing page, showing more metrics and health info
   - I18N support（国际化）
   - REST API documentation with Swagger API
-
+  - Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。总体目标是使客户端和文件系统作为服务器以同样的速度来更新。文件的方法，参数和模型紧密集成到服务器端的代码，允许API来始终保持同步。作者：天马行空LQ
+      链接：https://www.jianshu.com/p/66a14ea07622
+    来源：简书
+      著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+  
   Ceph management新功能：
-
+  
   - OSD management (mark as down/out, change OSD settings, recovery profiles)
   - Cluster config settings editor
   - Ceph Pool management (create/modify/delete)
@@ -61,14 +65,14 @@ tags: ceph
   - 新的archive zone federation功能可将所有objects（包括历史记录）完全保留在一个单独的zone中。
 - CephFS
   - 对于具有large caches和large RAM并长期运行的客户端，MDS的稳定性已大大提高。Cache trimming（调整）和client capability recall现在受到限制，以防止MDS过载。
-  - 现在可以在Rook管理的群集环境中通过NFS-Ganesha导出CephFS。 Ceph负责管理集群并确保高可用性和可伸缩性。 [入门演示](https://ceph.com/community/deploying-a-cephnfs-server-cluster-with-rook/)。 预计在未来Nautilus的次要版本中实现此功能的更多自动化。
-  - MDS mds_standby_for_*，mon_force_standby_active和mds_standby_replay配置选项已过时。 相反，操作者现在可以在CephFS文件系统上[设置新的](https://docs.ceph.com/docs/master/cephfs/standby/#mds-standby-replay)allow_standby_replay标志。 该设置会使文件系统由standbys变为standby-replay，并且任何可用的rank都会生效。
+  - 现在可以在Rook管理的群集环境中通过NFS-Ganesha导出CephFS。Ceph负责管理集群并确保高可用性和可伸缩性。 [入门演示](https://ceph.com/community/deploying-a-cephnfs-server-cluster-with-rook/)。 预计在未来Nautilus的次要版本中实现此功能的更多自动化。
+  - MDS mds_standby_for_*，mon_force_standby_active和mds_standby_replay配置选项已过时。 相反，操作者现在可以在CephFS文件系统上[设置新的](https://docs.ceph.com/docs/master/cephfs/standby/#mds-standby-replay)allow_standby_replay标志。 该设置会使文件系统由standbys变为standby-replay，并且任何可用的rank都会生效。（一个 rank 可看作是一个元数据分片）
   - MDS支持客户端释放缓存的同时释放自己的存储端缓存，这个过程可由MDS admin socket命令 `cache drop`来完成
   - 现在可以检查MDS中正在进行的scrub的进度。 此外，scrub可能会暂停或中止。 有关更多信息，请参见[scrub文档](https://docs.ceph.com/docs/master/cephfs/scrub/#mds-scrub)。
   - 通过`ceph volume` command-line-interface提供了一个用于创建volumes的新interface。
-  - 新的cephfs-shell工具可用于处理CephFS文件系统而无需mounting。
+  - 新的[cephfs-shell工具](https://docs.ceph.com/docs/master/cephfs/cephfs-shell/)可用于处理CephFS文件系统而无需mounting。
   - 为了简洁，清楚和有用，已重新格式化了来自ceph status与CephFS相关的输出。
-  - Lazy IO已进行了改进。客户端可以使用ceph_open C/C++ API的新CEPH_O_LAZY flag将其打开或通过配置选项client_force_lazyio将其打开。
+  - Lazy IO已进行了改进。客户端可以使用ceph_open C/C++ API的新CEPH_O_LAZY flag将其打开或通过配置选项client_force_lazyio将其打开。（LazyIO放松了POSIX语义。 即使文件由多个客户端上的多个应用程序打开，也允许缓冲的读/写操作。 应用程序负责自己管理缓存的一致性。自Nautilus发行以来，Libcephfs支持LazyIO。）
   - 现在可以通过ceph fs fail命令快速关闭CephFS文件系统。有关更多信息，请参见 [the administration page](https://docs.ceph.com/docs/master/cephfs/administration/#cephfs-administration)。
 
 - RBD
@@ -85,14 +89,16 @@ tags: ceph
   - Ceph Luminous中引入的（只读）Ceph manager dashboard已由[openATTIC](https://openattic.org/) Ceph management tool新实现取代，提供了具有[许多其他管理功能](https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard)。
 - RADOS
   - 现在，配置选项可以由monitor集中存储和管理。
-  - 进行recovery或rebalancing操作时，monitor daemon占用的磁盘空间大大减少。
+  - 进行recovery或rebalancing操作时，monitor daemon占用的disk space大大减少。
   - 当OSD从最近的故障中恢复时，异步恢复功能可减少请求的tail latency（少量响应的延迟高于均值，我们把这些响应称为尾延迟）。
   - scrub时OSD冲突请求抢占tail latency减少。
 - RGW
   - RGW可以将zone （或subset of buckets）复制到外部云存储服务（例如S3）。
   - RGW在versioned buckets功能上支持S3 multi-factor authentication API。
+    - AWS Multi-Factor Authentication（MFA）它在用户名和密码的基础上增加了一层额外的保护。启用MFA后，当用户登录AWS网站时，系统将提示他们输入用户名和密码以及来自其AWS MFA设备的身份验证代码。这些因素综合在一起，为您的AWS账户设置和资源提供了更高的安全性。
+  - 版本控制是在相同的存储桶中保留对象的多个变量的方法。对于 Amazon S3 桶中存储的每个对象，您可以使用版本控制功能来保存、检索和还原它们的各个版本。使用版本控制能够轻松从用户意外操作和应用程序故障中恢复数据。
   - Beast frontend不再进行实验，被认为是稳定的并可以使用。
-
+  
 - CephFS
   - Snapshots与多个MDS daemons结合使用时，现在稳定。
 

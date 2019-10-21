@@ -6,7 +6,7 @@ tags: ceph
 
 # AUTOSCALING PLACEMENT GROUPS
 
-Placement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据群集的使用方式提出建议或自动调整PG。
+Placement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据集群的使用方式提出建议或自动调整PG。
 
 系统中的每个pool都有一个pg_autoscale_mode属性，可以将其设置为off，on或warn。
 
@@ -46,13 +46,14 @@ ceph osd pool autoscale-status
 
 ```
  POOL                         SIZE  TARGET SIZE  RATE  RAW CAPACITY   RATIO  TARGET RATIO  BIAS  PG_NUM  NEW PG_NUM  AUTOSCALE 
- cephfs_metadata             1536k                3.0        594.0G  0.0000                 4.0       8              warn      
+ cephfs_metadata             1540k                3.0        594.0G  0.0000                 4.0       8              warn      
  default.rgw.meta            1536k                3.0        594.0G  0.0000                 1.0       8              warn      
  cephfs_data                    0                 3.0        594.0G  0.0000                 1.0       8              warn      
  default.rgw.buckets.index      0                 3.0        594.0G  0.0000                 1.0       8              warn      
  default.rgw.control            0                 3.0        594.0G  0.0000                 1.0       8              warn      
+ yujiang                        0        553.2G   1.0        594.0G  0.9313                 1.0     512              on        
  .rgw.root                   1344k                3.0        594.0G  0.0000                 1.0       8              warn      
- rbd                            0                 3.0        594.0G  0.0000                 1.0      16           4  on        
+ rbd                        576.0k                3.0        594.0G  0.0000                 1.0       4              on        
  default.rgw.log                0                 3.0        594.0G  0.0000                 1.0       8              warn      
 ```
 
@@ -70,7 +71,7 @@ PG_NUM是该pool的当前PG数。系统认为应将pool的pg_num更改为NEW PG_
 
 ### AUTOMATED SCALING
 
-最简单的方法是允许群集根据使用情况自动扩展PG。Ceph将查看可用的总存储量和整个系统的target PG数量，查看每个pool中存储了多少数据并尝试分配相应的PG。该系统的方法相对保守，只有当当前 PG （pg_num） 的数量比它认为的要小 3 倍以上时，才会对pool进行更改。
+最简单的方法是允许集群根据使用情况自动扩展PG。Ceph将查看可用的总存储量和整个系统的target PG数量，查看每个pool中存储了多少数据并尝试分配相应的PG。该系统的方法相对保守，只有当当前 PG （pg_num） 的数量比它认为的要小 3 倍以上时，才会对pool进行更改。
 
 每个 OSD 的target PG 数基于可配置的 mon_target_pg_per_osd（默认值：100），可通过以下功能进行调整：
 
@@ -82,7 +83,7 @@ autoscaler根据每个per-subtree分析pool并进行调整。由于每个pool可
 
 ### SPECIFYING EXPECTED POOL SIZE（指定预期的pool大小）
 
-首次创建群集或pool时，它将占用群集总容量的一小部分，并在系统中显示只需要少量的placement groups。但是，在大多数情况下，群集管理员最好知道哪些pool会随着时间的推移消耗大部分系统容量。通过向ceph提供这些信息，可以从一开始就使用更适当数量的pg，从而防止pg-num中的后续更改以及在进行调整时与移动数据相关的开销。
+首次创建集群或pool时，它将占用集群总容量的一小部分，并在系统中显示只需要少量的placement groups。但是，在大多数情况下，集群管理员最好知道哪些pool会随着时间的推移消耗大部分系统容量。通过向ceph提供这些信息，可以从一开始就使用更适当数量的pg，从而防止pg-num中的后续更改以及在进行调整时与移动数据相关的开销。
 
 pool的target size*可通过两种方式指定：按pool的绝对大小（即字节）或群集总容量的ratio（比率）指定。
 
@@ -102,7 +103,7 @@ ceph osd pool set mypool target_size_ratio .9
 
 您还可以使用ceph osd pool create命令的可选`--target-size-bytes <bytes>`或`--target-size-ratio <ratio>`参数在创建时设置pool的target size。
 
-请注意，如果指定了不可能的target size值（例如，容量大于整个群集的容量或ratio(s)之和大于1.0），则会引发health警告（POOL_TARET_SIZE_RATIO_OVERCOMMITTED或POOL_TARGET_SIZE_BYTES_OVERCOMMITTED）。
+请注意，如果指定了不可能的target size值（例如，容量大于整个群集的容量或ratio(s)之和大于1.0），则会引发health警告（POOL_TARET_SIZE_RATIO_OVERCOMMITTED或POOL_TARGET_SIZE_BYTES_OVERCOMMITTED）。https://www.mail-archive.com/ceph-users@lists.ceph.com/msg56416.html
 
 ### SPECIFYING BOUNDS ON A POOL’S PGS（在pool的PGS上指定界限）
 
@@ -169,17 +170,17 @@ OSD发生故障后，数据丢失的风险会增加，直到完全恢复其中�
 - Ceph选择了另一个OSD并保持复制objects以恢复所需的副本数。
 - 在同一placement group中的第三个OSD在恢复完成之前发生故障。 如果此OSD包含object的唯一剩余副本，则它将永久丢失。
 
-在三个副本pool中包含10个OSD和512个placement groups的群集中，CRUSH将为每个placement groups提供三个OSD。 最后，每个OSD将托管(512 * 3) / 10 = ~150 Placement Groups。 当第一个OSD发生故障时，以上情况将同时启动所有150个placement groups的恢复。
+在三个副本pool中包含10个OSD和512个placement groups的集群中，CRUSH将为每个placement groups提供三个OSD。 最后，每个OSD将托管(512 * 3) / 10 = ~150 Placement Groups。 当第一个OSD发生故障时，以上情况将同时启动所有150个placement groups的恢复。
 
 恢复的150个placement groups可能均匀分布在剩余的9个OSD上。 因此，每个剩余的OSD可能会将objects的副本发送给所有其他objects，并且还可能会接收一些要存储的新objects，因为它们已成为新placement group的一部分。
 
 完成恢复所需的时间完全取决于Ceph集群的架构。 假设每个OSD由一台机器上的1TB SSD托管，并且所有OSD都连接到10Gb/s交换机，并且单个OSD的恢复在M分钟内完成。 如果每台计算机使用不带SSD journal的spinners和1Gb/s交换机的两个OSD，则速度至少要慢一个数量级。
 
-在这种大小的群集中，placement groups的数量几乎对数据持久性没有影响。 可能是128或8192，恢复速度不会变慢或变快。
+在这种大小的集群中，placement groups的数量几乎对数据持久性没有影响。 可能是128或8192，恢复速度不会变慢或变快。
 
 但是，将相同的Ceph集群增加到20个OSD而不是10个OSD可能会加快恢复速度，从而显着提高数据的持久性。 现在，每个OSD只能参与约75个placement groups，而不是只有10个OSD时的约150个placement groups，并且仍然需要全部19个剩余OSD执行相同数量的object副本才能恢复。 但是，如果10个OSD必须每个复制大约100GB，则现在它们必须每个复制50GB。 如果网络是瓶颈，恢复将以两倍的速度进行。 换句话说，当OSD数量增加时，恢复速度会更快。
 
-如果该群集增长到40个OSD，则每个OSD将仅托管约35个placement groups。 如果OSD死亡，则恢复将保持更快的速度，除非它被另一个瓶颈阻塞。 但是，如果该群集增长到200个OSD，则每个OSD将仅托管约7个placement groups。 如果OSD死亡，则将在这些placement groups中的最多约21 (7 * 3)个OSD之间进行恢复：恢复将比有40个OSD时花费的时间更长，这意味着应增加placement groups的数量。
+如果该群集增长到40个OSD，则每个OSD将仅托管约35个placement groups。 如果OSD死亡，则恢复将保持更快的速度，除非它被另一个瓶颈阻塞。 但是，如果该集群增长到200个OSD，则每个OSD将仅托管约7个placement groups。 如果OSD死亡，则将在这些placement groups中的最多约21 (7 * 3)个OSD之间进行恢复：恢复将比有40个OSD时花费的时间更长，这意味着应增加placement groups的数量。
 
 无论恢复时间有多短，第二个OSD在进行过程中都有可能发生故障。 在上述10个OSD群集中，如果它们中的任何一个失败，则〜17个placement groups（即，正在恢复〜150/9个placement groups）将只有一个幸存副本。 并且如果剩余的8个OSD中的任何一个失败，则两个placement groups的最后一个objects很可能会丢失（即〜17/8个placement groups，仅恢复了一个剩余副本）。
 
@@ -187,7 +188,7 @@ OSD发生故障后，数据丢失的风险会增加，直到完全恢复其中�
 
 简而言之，更多的OSD意味着恢复更快，较低的级联故障风险，从而导致Placement Group的永久丢失。 就数据持久性而言，在少于50个OSD的群集中，具有512或4096个Placement Group大致等效。
 
-注意：向群集添加的新OSD可能需要很长时间才能分配有分配给它的placement groups。 但是，不会降低任何object的质量，也不会影响群集中包含的数据的持久性。
+注意：向集群添加的新OSD可能需要很长时间才能分配有分配给它的placement groups。 但是，不会降低任何object的质量，也不会影响集群中包含的数据的持久性。
 
 ### OBJECT DISTRIBUTION WITHIN A POOL（pool内的object分布）
 
@@ -223,7 +224,7 @@ pool size是replicated pools的副本数或erasure coded pools的K + M总和（�
 
 只有2的幂可以平衡placement groups之间的objects数量。 其他值将导致OSD上的数据分布不均。
 
-例如，对于具有200个OSD和3个副本的pool大小的群集，您可以按以下方式估计PG的数量：
+例如，对于具有200个OSD和3个副本的pool大小的集群，您可以按以下方式估计PG的数量：
 
 ```
 (200 * 100)
@@ -233,19 +234,19 @@ pool size是replicated pools的副本数或erasure coded pools的K + M总和（�
 
 当使用多个data pools存储objects时，需要确保在每个pool的placement groups数量与每个OSD的placement groups数量之间取得平衡，以便获得合理的placement groups总数，从而为每个OSD提供合理的低偏差而不会增加系统资源的负担或使对等进程太慢。
 
-例如，一个10个pool的群集，每个pool在十个OSD上具有512个placement groups，则总共有5120个placement groups分布在十个OSD上，即每个OSD 512个placement groups。 那不会使用太多资源。 但是，如果创建了1000个pool，每个pool有512个placement groups，则OSD将分别处理约50,000个placement groups，这将需要更多的资源和时间来进行对等。
+例如，一个10个pool的集群，每个pool在十个OSD上具有512个placement groups，则总共有5120个placement groups分布在十个OSD上，即每个OSD 512个placement groups。 那不会使用太多资源。 但是，如果创建了1000个pool，每个pool有512个placement groups，则OSD将分别处理约50,000个placement groups，这将需要更多的资源和时间来进行对等。
 
 您可能会发现[PGCalc](http://ceph.com/pgcalc/)工具很有帮助。
 
 # SET THE NUMBER OF PLACEMENT GROUPS（设置PLACEMENT GROUPS数）
 
-要设置pool中的placement groups数量，必须在创建pool时指定placement groups的数量。 有关详细信息，请参见[Create a Pool](https://docs.ceph.com/docs/master/rados/operations/pools#createpool)。 即使在创建pool之后，您也可以使用以下方法更改placement groups的数量：
+要设置pool中的placement groups数量，必须在创建pool时指定placement groups的数量。有关详细信息，请参见[Create a Pool](https://docs.ceph.com/docs/master/rados/operations/pools#createpool)。 即使在创建pool之后，您也可以使用以下方法更改placement groups的数量：
 
 ```
 ceph osd pool set {pool-name} pg_num {pg_num}
 ```
 
-增加placement groups的数量之后，还必须增加placement（pgp_num）的数量，然后群集才能重新平衡。 pgp_num将是CRUSH算法考虑placement的placement groups的数量。 pg_num的增加会拆分placement groups，但是数据将不会迁移到较新的placement groups，直到placement的placement groups为止。 pgp_num增加了。 pgp_num应该等于pg_num。 要增加用于placement的placement groups的数量，请执行以下操作：
+增加placement groups的数量之后，还必须增加placement（pgp_num）的数量，然后集群才能重新平衡。 pgp_num将是CRUSH算法考虑placement的placement groups的数量。 pg_num的增加会拆分placement groups，但是数据将不会迁移到较新的placement groups，直到placement的placement groups为止。 pgp_num增加了。 pgp_num应该等于pg_num。 要增加用于placement的placement groups的数量，请执行以下操作：
 
 ```
 ceph osd pool set {pool-name} pgp_num {pgp_num}
@@ -377,7 +378,7 @@ ceph osd pool set {pool-name} recovery_priority {value}
 
 # REVERT LOST（永不消失）
 
-如果群集丢失了一个或多个object，并且您决定放弃对丢失数据的搜索，则必须将unfound的object标记为lost。
+如果集群丢失了一个或多个object，并且您决定放弃对丢失数据的搜索，则必须将unfound的object标记为lost。
 
 如果已查询所有可能的位置并且仍然丢失了objects，则可能必须放弃丢失的objects。
 
