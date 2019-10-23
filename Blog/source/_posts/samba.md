@@ -173,15 +173,15 @@ C:\Users\JiangYu>net use
 列表是空的。
 ```
 
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-登录后查看文件-1.png)
 
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-登录后查看文件-2.png)
 
 11、因为是使用root用户创建的ceph-rbd-1-mountpoint目录，所以ceph用户没有权限对这个目录进行写操作，需要修改目录所有者，修改后就可以对这个目录进行创建文件等写操作了
 
 ```
 chown ceph:ceph ceph-rbd-1-mountpoint/
 ```
-
-
 
 # samba配置
 
