@@ -477,20 +477,134 @@ smbpasswd -n 将用户的密码设置成空.
 
 ![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-7.png?raw=true)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-8.png)
-
 ![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-9.png)
 
 ![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-10.png?raw=true)
 
 ![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-11.png)
 
-![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-windows登陆.png)
 
 
+# samba相关rpm
+
+```
+Name        : ctdb
+Summary     : A Clustered Database based on Samba's Trivial Database (TDB)
+Description : CTDB是Samba和其他项目用来存储临时数据的TDB数据库的集群实现。如果应用程序已经在使用TDB来存储临时数据，则很容易将该应用程序转换为群集感知型，而使用CTDB。
+
+Name        : samba-client
+Summary     : Samba client programs
+Description : samba-client package提供了一些SMB/CIFS客户端，以补充Linux中内置的SMB/CIFS filesystem。这些客户端允许访问SMB/CIFS shares并打印到SMB/CIFS printers。
+
+Name        : samba-devel
+Summary     : Developer tools for Samba libraries
+Description : samba-devel package包含开发Samba套件时的SMB，RPC和其他程序所需libraries的header files。
+
+Name        : samba-vfs-glusterfs
+Summary     : Samba VFS module for GlusterFS
+Description : 包含GlusterFS集成Samba VFS的模块。
+
+Name        : ctdb-tests
+Summary     : CTDB clustered database test suite
+Description : CTDB的测试套件。CTDB是Samba和其他项目用来存储临时数据的TDB数据库的集群实现。如果应用程序已经在使用TDB来存储临时数据，则很容易将该应用程序转换为群集感知型，而使用CTDB。
+
+Name        : samba-client-libs
+Summary     : Samba client libraries
+Description : samba-client-libs package包含SMB/CIFS客户端所需的internal libraries。
+
+Name        : samba-krb5-printing
+Summary     : Samba CUPS backend for printing with Kerberos
+Description : 如果您需要 Kerberos 进行print jobs，通过 SMB后端连接到printer cups，则需要安装该软件包。它将允许cups访问发出print job的用户的 Kerberos credentials cache。
+
+Name        : samba-winbind
+Summary     : Samba winbind
+Description : samba-winbind package提供了winbind NSS library和一些客户端工具。 Winbind使Linux成为Windows domains中的正式成员，并在Linux上使用Windows user和group帐户。
+
+Name        : libsmbclient
+Summary     : The SMB client library
+Description : libsmbclient包含来自Samba套件的SMB客户端library。
+
+Name        : samba-common-libs
+Summary     : Libraries used by both Samba servers and clients
+Description : samba-common-libs package包含SMB/CIFS客户端所需的internal libraries。
+
+Name        : samba-libs
+Summary     : Samba libraries
+Description : samba-libs package包含Samba套件的SMB，RPC和其他协议所需的libraries。
+
+Name        : samba-winbind-clients
+Summary     : Samba winbind clients
+Description : samba-winbind-clients package提供wbinfo和ntlm_auth工具。
+
+Name        : libsmbclient-devel
+Summary     : Developer tools for the SMB client library
+Description : libsmbclient-devel package包含开发相关Samba套件的SMB client library link所需的header files和libraries。
+
+Name        : samba-common-tools
+Summary     : Tools for Samba servers and clients
+Description : samba-common-tools package包含用于Samba servers和SMB/CIFS clients的工具。
+
+Name        : samba-python
+Summary     : Samba Python libraries
+Description : samba-python package包含Python程序中使用SMB，RPC和其他Samba提供的协议的程序所需的Python libraries。
+
+Name        : samba-winbind-krb5-locator
+Summary     : Samba winbind krb5 locator
+Description : winbind krb5 locator是系统kerberos library的plugin，以允许本地kerberos library使用与samba和winbind相同的KDC。
+
+Name        : libwbclient
+Summary     : The winbind client library
+Description : libwbclient package包含Samba套件中的winbind client library。
+
+Name        : samba-dc
+Summary     : Samba AD Domain Controller
+Description : samba-dc package提供AD Domain Controller功能
+
+Name        : samba-python-test
+Summary     : Samba Python libraries
+Description : samba-python-test package包含Samba test suite使用的Python libraries。 如果要运行全套Samba测试，则需要安装此package。
+
+Name        : samba-winbind-modules
+Summary     : Samba winbind modules
+Description : samba-winbind-modules package提供了与Winbind Daemon通信所需的NSS library和PAM module。
+
+Name        : libwbclient-devel
+Summary     : Developer tools for the winbind library
+Description : libwbclient-devel package为wbclient library提供了developer tools。
+
+Name        : samba-dc-libs
+Summary     : Samba AD Domain Controller Libraries
+Description : samba-dc-libs package包含DC去链接SMB，RPC和其他协议所需的库。
+
+Name        : samba-test
+Summary     : Testing tools for Samba servers and clients
+Description : samba-test为Samba的server和client packages提供测试工具。
+
+Name        : samba
+Summary     : Server and Client software to interoperate with Windows machines
+Description : Samba is the standard Windows interoperability suite of programs
+            : for Linux and Unix.
+
+Name        : samba-debuginfo
+Summary     : Debug information for package samba
+Description : 该软件包提供了samba软件包的debug information。
+
+Name        : samba-test-libs
+Summary     : Libraries need by the testing tools for Samba servers and clients
+Description : samba-test-libs提供测试工具所需的libraries。
+
+Name        : samba-common
+Summary     : Samba servers 和 clients使用的文件
+Description : samba-common提供Samba的server和client packages所需的文件。
+
+Name        : samba-pidl
+Summary     : Perl IDL编译器
+Description : samba-pidl package包含Samba和Wireshark用于解析IDL和类似协议的Perl IDL编译器
+```
 
 
 
 # 参考资料
 
 【1】https://blog.csdn.net/skdkjzz/article/details/42101363
+
