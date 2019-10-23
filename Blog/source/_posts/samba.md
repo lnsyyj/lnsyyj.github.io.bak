@@ -147,15 +147,11 @@ systemctl restart smb
 smbpasswd -a ceph
 ```
 
-10、
+10、客户端访问samba
 
-
-
-
-
-11、客户端访问samba
-
-
+```
+\\10.20.10.23\ceph
+```
 
 window清除samba连接，重新登录
 
@@ -175,6 +171,14 @@ C:\Users\JiangYu>net use \\10.20.10.23\IPC$ /del
 C:\Users\JiangYu>net use
 会记录新的网络连接。
 列表是空的。
+```
+
+
+
+11、因为是使用root用户创建的ceph-rbd-1-mountpoint目录，所以ceph用户没有权限对这个目录进行写操作，需要修改目录所有者，修改后就可以对这个目录进行创建文件等写操作了
+
+```
+chown ceph:ceph ceph-rbd-1-mountpoint/
 ```
 
 
@@ -458,6 +462,30 @@ smbpasswd -n 将用户的密码设置成空.
 
 
 # LinuxCast笔记
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-1.png)
+
+![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-2.png?raw=true)
+
+![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-3.png?raw=true)
+
+![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-4.png?raw=true)
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-5.png)
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-6.png)
+
+![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-7.png?raw=true)
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-8.png)
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-9.png)
+
+![](https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/samba/linuxcast-smb-10.png?raw=true)
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-11.png)
+
+![](https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/samba/linuxcast-smb-windows登陆.png)
 
 
 
