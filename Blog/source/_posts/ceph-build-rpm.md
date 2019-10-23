@@ -103,6 +103,12 @@ yum -y install devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-binutils
 scl enable devtoolset-7 bash
 yum install ceph-2:14.2.4-0.el7.x86_64
 rpmbuild -ba ~/rpmbuild/SPECS/ceph.spec
+
+解包：tar xvf FileName.tar
+打包：tar cvf FileName.tar DirName
+
+压缩：bzip2 [原文件名].tar
+解压：bunzip2 [原文件名].tar.bz2
 ```
 
 
