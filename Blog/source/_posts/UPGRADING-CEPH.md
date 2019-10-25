@@ -256,7 +256,7 @@ ceph --version
 ```
 在从Luminous升级到Nautilus的过程中，将monitors升级到Nautilus后，将无法使用Luminous ceph-osd daemon创建新的OSD。我们建议您避免在升级过程中添加或替换任何OSD。
 我们建议您避免在升级过程中创建任何RADOS pools。
-您可以使用ceph version(s)命令在每个阶段监视升级进度，该命令将告诉您每种daemon正在运行的ceph version(s)。
+您可以使用ceph version(s)命令在每个阶段监视升级进度，该命令将告诉您每种daemon正在运行的ceph版本。
 ```
 
 ### UPGRADE COMPATIBILITY NOTES（升级兼容性说明）
@@ -324,8 +324,8 @@ systemctl restart ceph-osd.target
 }
 
 7、如果集群中通过ceph-disk部署了OSD（例如，几乎所有在Mimic版本之前创建的OSD），您都需要让ceph-volume承担启动daemons的责任。 在包含OSD的每个主机上，确保OSD当前正在运行，然后：
-ceph-volume simple scan
-ceph-volume simple activate --all
+ceph-volume simple scan   （所有使用ceph-disk创建的并正在运行的OSDs，从OSD data partition或directory中捕获元数据）
+ceph-volume simple activate --all （使systemd units可以mount已配置的devices，并启动Ceph OSD）
 我们建议按照此步骤重新启动每个OSD主机，以验证OSD是否自动启动。
 请注意，ceph-volume不具有与ceph-disk相同的hot-plug功能，后者通过udev events自动检测到新连接的磁盘。如果运行上述scan命令时OSD当前未running，或者将基于ceph-disk的OSD移至新主机，或者重新安装了主机OSD，或者/etc/ceph/osd目录丢失， 您将需要显式扫描每个ceph-disk OSD的主数据分区。例如，：
 ceph-volume simple scan /dev/sdb1
