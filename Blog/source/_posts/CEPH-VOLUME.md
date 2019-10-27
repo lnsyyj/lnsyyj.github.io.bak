@@ -125,3 +125,71 @@ lvm子命令的其他部分是internal的，不向用户公开，这些部分解
 扫描将推断出ceph-volume启动OSD所需的所有内容，因此当需要激活时，OSD可以正常启动而不会受到来自ceph-disk的干扰。
 
 作为激活过程的一部分，负责对udev事件作出反应的ceph-disk的systemd units链接到/dev/null，以便它们完全处于非活动状态。
+
+
+
+# 备注
+
+```
+ceph-volume lvm（使用LVM和LVM-based技术，像dmcache去部署OSD）
+1、activate                 Discover and mount the LVM device associated with an OSD ID and start the Ceph OSD（Discover并mount与OSD ID关联的LVM设备，然后启动Ceph OSD）
+2、prepare                  Format an LVM device and associate it with an OSD（Format LVM device并将其与OSD关联）
+3、create                   Create a new OSD from an LVM device（从LVM device创建新的OSD）
+4、list                     list logical volumes and devices associated with Ceph（列出与Ceph相关的logical volumes和devices）
+5、batch                    Automatically size devices for multi-OSD provisioning with minimal interaction（自动调整devices大小，以最少的交互进行多OSD配置）
+6、trigger                  systemd helper to activate an OSD（systemd助手来激活OSD）
+7、zap                      Removes all data and filesystems from a logical volume or partition.（从logical volume或分区中删除所有数据和文件系统。）
+
+ceph-volume simple（使用ceph-volume管理已部署的OSD）
+1、trigger                  systemd helper to activate an OSD（systemd助手来激活OSD）
+2、activate                 Enable systemd units to mount configured devices and start a Ceph OSD（使systemd units可以mount已配置的devices，并启动Ceph OSD）
+3、scan                     Capture metadata from all running ceph-disk OSDs, OSD data partition or directory（从所有正在运行的ceph-disk OSDs，OSD数据分区或目录中捕获元数据）
+
+例如：
+# ceph-volume simple scan
+执行命令后，会生成类似/etc/ceph/osd/0-ab0a204a-42e3-4a47-ab4c-0888edf429cb.json文件，文件内容为：
+{
+    "active": "ok", 
+    "block": {
+        "path": "/dev/disk/by-partuuid/0818811f-d70e-4ff0-91c9-58cd701c9a19", 
+        "uuid": "0818811f-d70e-4ff0-91c9-58cd701c9a19"
+    }, 
+    "block_uuid": "0818811f-d70e-4ff0-91c9-58cd701c9a19", 
+    "bluefs": 1, 
+    "ceph_fsid": "c4051efa-1997-43ef-8497-fb02bdf08233", 
+    "cluster_name": "ceph", 
+    "data": {
+        "path": "/dev/vdc1", 
+        "uuid": "ab0a204a-42e3-4a47-ab4c-0888edf429cb"
+    }, 
+    "fsid": "ab0a204a-42e3-4a47-ab4c-0888edf429cb", 
+    "keyring": "AQB1FLFdXVHVARAARTKkxT1xgrDNU/QECUqdxA==", 
+    "kv_backend": "rocksdb", 
+    "magic": "ceph osd volume v026", 
+    "mkfs_done": "yes", 
+    "ready": "ready", 
+    "systemd": "", 
+    "type": "bluestore", 
+    "whoami": 0
+}
+
+# ceph-volume simple activate --all
+--> activating OSD specified in /etc/ceph/osd/1-fe327306-54a4-4362-870d-92d28cf65e42.json
+Running command: ln -snf /dev/vdc2 /var/lib/ceph/osd/ceph-1/block
+Running command: chown -R ceph:ceph /dev/vdc2
+Running command: systemctl enable ceph-volume@simple-1-fe327306-54a4-4362-870d-92d28cf65e42
+Running command: ln -sf /dev/null /etc/systemd/system/ceph-disk@.service
+--> All ceph-disk systemd units have been disabled to prevent OSDs getting triggered by UDEV events
+Running command: systemctl enable --runtime ceph-osd@1
+Running command: systemctl start ceph-osd@1
+--> Successfully activated OSD 1 with FSID fe327306-54a4-4362-870d-92d28cf65e42
+
+ceph-volume inventory（获取此节点可用的disk清单）
+例如：
+ceph-volume inventory
+Device Path               Size         rotates available Model name
+/dev/vdb                  64.00 MB     True    True
+/dev/vdc                  50.00 GB     True    True
+/dev/vda                  100.00 GB    True    False
+```
+
