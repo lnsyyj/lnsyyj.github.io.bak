@@ -75,3 +75,16 @@ git subtree add --prefix=roles/kibana --squash git@github.com:lnsyyj/ansible-rol
 
 
 
+# 常见问题1
+
+```
+fatal: early EOF
+fatal: the remote end hung up unexpectedly
+fatal: index-pack failed
+error: RPC failed; curl 18 transfer closed with outstanding read data remaining
+
+解决办法：
+git config --global http.postBuffer 5242880000
+git clone https://github.com/ansible/ansible.git
+```
+
