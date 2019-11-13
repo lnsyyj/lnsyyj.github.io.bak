@@ -162,7 +162,7 @@ epoch barrier与所有capability messages一起发送，并指示message的接�
 
 # blacklist相关命令
 
-1、从blacklist中添加（可选项，直到` <expire> `秒后）或删除`<addr>`，默认3600秒
+### 1、从blacklist中添加（可选项，直到` <expire> `秒后）或删除`<addr>`，默认3600秒
 
 ```
 osd blacklist add|rm <EntityAddr> {<float[0.0-]>}                   add (optionally until <expire> seconds from now) or remove <addr> from blacklist
@@ -215,7 +215,7 @@ ceph-fuse[1704]: starting fuse
 ceph-fuse      fuse.ceph-fuse   93G     0   93G   0% /root/ceph-fuse
 ```
 
-2、清除所有列入blacklist的客户端
+### 2、清除所有列入blacklist的客户端
 
 ```
 osd blacklist clear                   clear all blacklisted clients
@@ -241,10 +241,123 @@ listed 2 entries
 listed 0 entries
 ```
 
-3、显示列入blacklist的客户端
+### 3、显示列入blacklist的客户端
 
 ```
-osd blacklist ls                   show blacklisted clients
+osd blacklist ls --format json                   show blacklisted clients
+```
+
+实验1
+
+```
+[root@ceph1 ~]# ceph osd blacklist ls --format json
+listed 1 entries
+
+[{"addr":"10.20.10.2:0/0","until":"2019-11-13 17:10:56.217959"}]
+
+/0表示：AsyncMessenger stuff approximately unique ID set by the Constructor for use in entity_addr_t
+```
+
+### 4、如果客户端在`session_autoclose <value>`秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。
+
+```
+fs set <fs_name> max_mds|max_file_size|allow_new_snaps|inline_data|cluster_down|allow_multimds|allow_dirfrags| balancer|standby_count_wanted|session_timeout|session_autoclose <val> {<confirm>}			set fs parameter <var> to <val>
+```
+
+实验1
+
+```
+[root@ceph1 ~]# ceph fs set cephfs session_autoclose 400
+```
+
+### 5、获取有关一个文件系统的信息
+
+```
+ceph fs get <fs_name> --format json
+```
+
+实验1
+
+```
+[root@ceph1 ~]# ceph fs get cephfs --format json
+{
+	"mdsmap": {
+		"epoch": 19,
+		"flags": 12,
+		"ever_allowed_features": 0,
+		"explicitly_allowed_features": 0,
+		"created": "2019-11-11 11:16:05.316461",
+		"modified": "2019-11-13 15:59:17.551876",
+		"tableserver": 0,
+		"root": 0,
+		"session_timeout": 60,
+		"session_autoclose": 400,
+		"max_file_size": 1099511627776,
+		"last_failure": 0,
+		"last_failure_osd_epoch": 104,
+		"compat": {
+			"compat": {},
+			"ro_compat": {},
+			"incompat": {
+				"feature_1": "base v0.20",
+				"feature_2": "client writeable ranges",
+				"feature_3": "default file layouts on dirs",
+				"feature_4": "dir inode in separate object",
+				"feature_5": "mds uses versioned encoding",
+				"feature_6": "dirfrag is stored in omap",
+				"feature_8": "no anchor table",
+				"feature_9": "file layout v2"
+			}
+		},
+		"max_mds": 1,
+		"in": [0],
+		"up": {
+			"mds_0": 4335
+		},
+		"failed": [],
+		"damaged": [],
+		"stopped": [],
+		"info": {
+			"gid_4335": {
+				"gid": 4335,
+				"name": "ceph2",
+				"rank": 0,
+				"incarnation": 14,
+				"state": "up:active",
+				"state_seq": 41535,
+				"addr": "10.20.10.13:6804/622620898",
+				"standby_for_rank": 0,
+				"standby_for_fscid": -1,
+				"standby_for_name": "",
+				"standby_replay": true,
+				"export_targets": [],
+				"features": 4611087853746454523
+			},
+			"gid_4456": {
+				"gid": 4456,
+				"name": "ceph3",
+				"rank": 0,
+				"incarnation": 0,
+				"state": "up:standby-replay",
+				"state_seq": 2,
+				"addr": "10.20.10.25:6805/1639008809",
+				"standby_for_rank": 0,
+				"standby_for_fscid": -1,
+				"standby_for_name": "",
+				"standby_replay": true,
+				"export_targets": [],
+				"features": 4611087853746454523
+			}
+		},
+		"data_pools": [6],
+		"metadata_pool": 7,
+		"enabled": true,
+		"fs_name": "cephfs",
+		"balancer": "",
+		"standby_count_wanted": 1
+	},
+	"id": 1
+}
 ```
 
 
@@ -254,14 +367,7 @@ osd blacklist ls                   show blacklisted clients
 
 
 ```
-OPTION(mds_session_blacklist_on_timeout, OPT_BOOL)    // whether to blacklist clients whose sessions are dropped due to timeout
-OPTION(mds_session_blacklist_on_evict, OPT_BOOL)  // whether to blacklist clients whose sessions are dropped via admin commands
-```
-
-
-
-```
-global相关
+MON相关配置
 	客户端blacklist entries保留在OSD map中的持续时间（以秒为单位）
     Option("mon_osd_blacklist_default_expire", Option::TYPE_FLOAT, Option::LEVEL_ADVANCED)
     .set_default(1_hr)
@@ -275,7 +381,7 @@ global相关
     .add_service("mon")
     .set_description("Duration in seconds that blacklist entries for MDS daemons remain in the OSD map"),
 
-RBD相关
+RBD相关配置
 	是否将损坏锁的客户端列入blacklist
     Option("rbd_blacklist_on_break_lock", Option::TYPE_BOOL, Option::LEVEL_ADVANCED)
     .set_default(true)
@@ -286,20 +392,27 @@ RBD相关
     .set_default(0)
     .set_description("number of seconds to blacklist - set to 0 for OSD default"),
 
-MDS相关
-	将sessions已过期的客户端列入blacklist
+MDS相关配置
+	是否将sessions已过期的客户端列入blacklist
     Option("mds_session_blacklist_on_timeout", Option::TYPE_BOOL, Option::LEVEL_ADVANCED)
     .set_default(true)
     .set_description("blacklist clients whose sessions have become stale"),
 
-	将被逐出的客户端列入blacklist
+	是否将被逐出的客户端列入blacklist
     Option("mds_session_blacklist_on_evict", Option::TYPE_BOOL, Option::LEVEL_ADVANCED)
     .set_default(true)
     .set_description("blacklist clients that have been evicted"),
 
+	数秒后，没有响应MDS的“cap revoke messages”的客户端将被驱逐。（默认为0，表示关闭该功能）
+    Option("mds_cap_revoke_eviction_timeout", Option::TYPE_FLOAT, Option::LEVEL_ADVANCED)
+     .set_default(0)
+     .set_description("number of seconds after which clients which have not responded to cap revoke messages by the MDS are evicted."),
+
+	MDS重新连接恢复状态期间等待客户端重新连接的超时时间（以秒为单位）
+    Option("mds_reconnect_timeout", Option::TYPE_FLOAT, Option::LEVEL_ADVANCED)
+    .set_default(45)
+    .set_description("timeout in seconds to wait for clients to reconnect during MDS reconnect recovery state"),
 ```
-
-
 
 
 
