@@ -255,7 +255,7 @@ listed 1 entries
 
 [{"addr":"10.20.10.2:0/0","until":"2019-11-13 17:10:56.217959"}]
 
-/0表示：AsyncMessenger stuff approximately unique ID set by the Constructor for use in entity_addr_t
+/0 表示：AsyncMessenger stuff approximately unique ID set by the Constructor for use in entity_addr_t
 ```
 
 ### 4、如果客户端在`session_autoclose <value>`秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。
@@ -421,3 +421,43 @@ MDS相关配置
 【1】https://access.redhat.com/solutions/3944931
 
 【2】https://docs.ceph.com/docs/mimic/cephfs/eviction/
+
+
+
+# 接口（CLI后加--format json可以以json格式输出结果）
+
+1、添加客户端到blacklist（add (optionally until `<expire> `seconds from now)` <addr> `from blacklist）
+
+```
+osd blacklist add <EntityAddr> {<float[0.0-]>}
+```
+
+2、从blacklist中删除客户端（remove `<addr>` from blacklist）
+
+```
+osd blacklist rm <EntityAddr>
+```
+
+3、清除所有列入blacklist的客户端（clear all blacklisted clients）
+
+```
+osd blacklist clear
+```
+
+4、显示列入blacklist的客户端（show blacklisted clients）
+
+```
+osd blacklist ls
+```
+
+5、设置session_autoclose，客户端在指定秒数未与MDS通信，则驱逐接口，加入blacklist（set fs parameter `<var> `to `<val>`）
+
+```
+fs set <fs_name> session_autoclose <val>
+```
+
+6、获取有关一个文件系统的session_autoclose信息
+
+```
+ceph fs get <fs_name>
+```
