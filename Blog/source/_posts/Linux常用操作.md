@@ -91,5 +91,14 @@ mkdir -pv roles/vdbench/{tasks,templates,meta,defaults,vars,files,plugins,handle
 解压缩：tar zxf ceph-14.2.1.tar.gz
 ```
 
+### iperf检查网络带宽
 
+```
+sudo yum install -y epel-release
+sudo yum install -y iperf
+服务端
+	iperf -s -p 12345 -i 1 -M
+客户端
+	iperf -c 192.168.1.10 -p 12345 -i 1 -t 600 -w 100M
+```
 
