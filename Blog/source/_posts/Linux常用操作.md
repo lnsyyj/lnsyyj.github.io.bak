@@ -102,3 +102,15 @@ sudo yum install -y iperf
 	iperf -c 192.168.1.10 -p 12345 -i 1 -t 600 -w 100M
 ```
 
+### ubuntu 1804添加repository
+
+```
+sudo apt update
+sudo apt install software-properties-common
+sudo add-apt-repository --yes --update ppa:ansible/ansible-2.8	（ 或 sudo apt-add-repository --yes --update ppa:ansible/ansible ）
+sudo apt install ansible
+
+repository站点地址
+https://launchpad.net/~ansible/+archive/ubuntu/ansible-2.8
+```
+
