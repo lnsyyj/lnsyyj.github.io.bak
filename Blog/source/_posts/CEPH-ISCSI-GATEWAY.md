@@ -6,9 +6,9 @@ tags: ceph,iscsi
 
 iSCSI gateway将Ceph Storage与iSCSI标准集成在一起，将RADOS Block Device（RBD）images导出为SCSI disks高可用（HA）iSCSI target。iSCSI协议允许客户端（initiators）通过TCP / IP网络将SCSI命令发送到SCSI storage devices（targets）。这允许异构客户端（例如Microsoft Windows）访问Ceph存储群集。
 
-每个iSCSI gateway网关都运行Linux IO target kernel subsystem（LIO）以提供iSCSI协议支持。LIO利用userspace直通（TCMU）Ceph的librbd库进行交互，并将RBD images公开给iSCSI客户端。借助Ceph的iSCSI gateway，您可以有效地运行完整的block-storage infrastructure，并具有传统Storage Area Network （SAN） 的所有功能和优势。
+每个iSCSI gateway都运行Linux IO target kernel subsystem（LIO）以提供iSCSI协议支持。LIO利用userspace直通（TCMU）Ceph的librbd库进行交互，并将RBD images公开给iSCSI客户端。借助Ceph的iSCSI gateway，您可以有效地运行完整的block-storage infrastructure，并具有传统Storage Area Network （SAN） 的所有功能和优势。
 
-![](<https://docs.ceph.com/docs/mimic/_images/ditaa-f7600ac6387b34e7a79850e43f3b46794cbbc62f.png>)
+![](https://docs.ceph.com/docs/master/_images/ditaa-176c606a1d1a5b7415ee811bd62dda640513a33a.png)
 
 # Requirements
 
@@ -52,14 +52,15 @@ ceph daemon osd.0 config set osd_heartbeat_interval 5
 
 传统上，对Ceph存储集群的块级访问仅限于QEMU和librbd，这是在OpenStack环境中采用的关键因素。从Ceph Luminous版本开始，块级访问正在扩展，以提供标准的iSCSI支持，从而允许更广泛的平台使用，并有可能打开新的用例。
 
-- RHEL/CentOS 7.5; Linux kernel v4.16 or newer; or the [Ceph iSCSI client test kernel](https://shaman.ceph.com/repos/kernel/ceph-iscsi-test)
-- 一个可用的Ceph Storage cluster
-- iSCSI gateways可以与OSD位于同一节点，也可以位于专用节点上
-- iSCSI前端流量和Ceph后端流量使用单独的网络
+- Red Hat Enterprise Linux/CentOS 7.5（或更高版本）；Linux内核v4.16（或更高版本）
+- 使用ceph-ansible或使用command-line interface部署的有效Ceph Storage集群
+- iSCSI gateways nodes，可以与OSD nodes同一节点，也可以使用专用节点上
+- iSCSI front-end traffic和Ceph back-end traffic使用单独的网络
 
 安装和配置 Ceph iSCSI gateway的方法： 
 
 - [Using Ansible](https://docs.ceph.com/docs/mimic/rbd/iscsi-target-ansible/)
+
 - [Using the Command Line Interface](https://docs.ceph.com/docs/mimic/rbd/iscsi-target-cli/)
 
 # Configuring the iSCSI Initiators
