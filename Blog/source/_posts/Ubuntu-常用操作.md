@@ -33,6 +33,16 @@ sudo apt-get update
 sudo apt-get install bcache-tools
 ```
 
+2、vim 粘贴串行问题
+
+```
+在粘贴前设置（粘贴前不会自动缩进）
+set paste
+
+在粘贴后恢复
+set nopaste
+```
+
 
 
 

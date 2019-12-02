@@ -251,6 +251,30 @@ api_secure = false
 # api_password = admin
 # api_port = 5001
 # trusted_ip_list = 192.168.0.10,192.168.0.11
+
+
+
+# ------------------------------------------------------
+# 翻译如下
+[config]
+＃Ceph存储集群的名称。如果不位于OSD节点上，则需要一个合适的Ceph配置文件，该文件允许从gateway节点访问Ceph存储群集。
+cluster_name = ceph
+
+＃将ceph集群的admin keyring的副本放置在gateway的/etc/ceph文件夹中，并在此处引用filename
+gateway_keyring = ceph.client.admin.keyring
+
+
+＃API设置。
+＃API支持许多选项，可让您根据本地环境进行定制。如果要在https下运行API，则需要为每个iSCSI gateway节点创建兼容的cert/key文件，该节点未锁定到特定节点。必须将SSL cert和key文件命名为'iscsi-gateway.crt'和'iscsi-gateway.key'，并放置在每个gateway节点上的'/etc/ceph/'目录中。放置好SSL文件后，您可以使用'api_secure = true'切换到https模式。
+
+＃为了支持API，至少需要配置如下：
+api_secure = false
+
+＃其他API配置选项如下，显示的默认值。（trusted翻译为信任）
+# api_user = admin
+# api_password = admin
+# api_port = 5001
+# trusted_ip_list = 192.168.0.10,192.168.0.11
 ```
 
 注意trusted_ip_list是每个iscsi gateway上IP地址的列表，将用于管理操作，如创建target，lun导出等。该IP可以与用于iSCSI data的IP相同，例如与RBD image之间的READ/WRITE命令，但建议使用单独的IP。
