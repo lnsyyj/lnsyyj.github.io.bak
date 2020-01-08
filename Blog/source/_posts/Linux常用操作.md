@@ -114,3 +114,10 @@ repository站点地址
 https://launchpad.net/~ansible/+archive/ubuntu/ansible-2.8
 ```
 
+### 查看硬盘类型
+
+```
+cat /sys/block/sda/queue/rotational
+0为ssd，1为hdd
+```
+

@@ -36,6 +36,10 @@ fix.go         fix_test.go    imports.go     mkindex.go     mkstdlib.go    sorti
 yujiangdeMBP-13:~ yujiang$ go build  golang.org/x/tools/cmd/goimports
 # 编译并安装到$GOPATH/bin/目录下
 yujiangdeMBP-13:~ yujiang$ go install  golang.org/x/tools/cmd/goimports
+
+
+go get -v github.com/golang/tools/go/...
+go get -v github.com/golang/tools/...
 ```
 
 - go build编译
