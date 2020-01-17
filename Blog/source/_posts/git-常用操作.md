@@ -57,6 +57,10 @@ cd lnsyyj-ansible
 git subtree add --prefix=roles/elasticsearch --squash git@github.com:lnsyyj/ansible-role-elasticsearch.git master
 git subtree add --prefix=roles/kibana --squash git@github.com:lnsyyj/ansible-role-kibana.git master
 
+git subtree add --prefix=roles/cloudalchemy.node-exporter --squash git@github.com:cloudalchemy/ansible-node-exporter.git master
+git subtree add --prefix=roles/cloudalchemy.prometheus --squash git@github.com:cloudalchemy/ansible-prometheus.git master
+
+
 --squash  合并子repo的git log
 --prefix= 指定copy到主repo的位置
 ```
