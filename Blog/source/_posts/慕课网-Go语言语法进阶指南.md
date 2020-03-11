@@ -301,6 +301,81 @@ func closeChan() {
 }
 ```
 
+# 结构体
+
+## 创建&初始化
+
+```
+func main() {
+	TestForStruct()
+}
+
+type Dog struct {
+	ID int
+	Name string
+	Age int
+}
+
+func TestForStruct() {
+	// 方式1
+	var dog Dog
+	dog.ID = 0
+	dog.Name = "KiKi"
+	dog.Age = 3
+	fmt.Println(dog)
+	// 方式2
+	dog_2 := Dog{ID: 1, Name: "Yaya", Age: 2}
+	fmt.Println(dog_2)
+	// 方式3
+	dog_3 := new(Dog)
+	dog_3.ID = 3
+	dog_3.Name = "Tom"
+	dog_3.Age = 4
+	fmt.Println(dog_3)
+}
+
+程序执行结果：
+{0 KiKi 3}
+{1 Yaya 2}
+&{3 Tom 4}
+```
+
+## 属性及函数
+
+```
+func main() {
+	TestForStruct()
+}
+
+type Dog struct {
+	ID int
+	Name string
+	Age int
+}
+
+func (d *Dog)Run()  {
+	fmt.Println("ID : ", d.ID, " Dog is running")
+}
+
+func TestForStruct() {
+	// 方式1
+	var dog Dog
+	dog.ID = 0
+	dog.Name = "KiKi"
+	dog.Age = 3
+	dog.Run()
+}
+
+程序执行结果：
+ID :  0  Dog is running
+```
+
+## 组合
+
+```
+
+```
+
 
 
 
