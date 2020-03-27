@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="CEPH-Luminous,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="通过jerasure plugin，当erasure coded的object存储在多个OSD中时，恢复丢失的1个OSD数据需要从所有其他OSD读取数据并修复。例如，如果jerasure配置为k = 8和m = 4，则丢失1个OSD需要从其他11个OSD读取并修复。 lrc erasure code plugin创建本地奇偶校验chunks，以便能够使用较少的OSD恢复。例如，如果lrc配置为k">
+<meta name="keywords" content="CEPH-Luminous">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LOCALLY REPAIRABLE ERASURE CODE PLUGIN">
+<meta property="og:url" content="http://yoursite.com/2018/05/17/LOCALLY-REPAIRABLE-ERASURE-CODE-PLUGIN/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="通过jerasure plugin，当erasure coded的object存储在多个OSD中时，恢复丢失的1个OSD数据需要从所有其他OSD读取数据并修复。例如，如果jerasure配置为k = 8和m = 4，则丢失1个OSD需要从其他11个OSD读取并修复。 lrc erasure code plugin创建本地奇偶校验chunks，以便能够使用较少的OSD恢复。例如，如果lrc配置为k">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-22T08:16:36.026Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LOCALLY REPAIRABLE ERASURE CODE PLUGIN">
+<meta name="twitter:description" content="通过jerasure plugin，当erasure coded的object存储在多个OSD中时，恢复丢失的1个OSD数据需要从所有其他OSD读取数据并修复。例如，如果jerasure配置为k = 8和m = 4，则丢失1个OSD需要从其他11个OSD读取并修复。 lrc erasure code plugin创建本地奇偶校验chunks，以便能够使用较少的OSD恢复。例如，如果lrc配置为k">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/17/LOCALLY-REPAIRABLE-ERASURE-CODE-PLUGIN/">
+
+
+
+
+
+  <title>LOCALLY REPAIRABLE ERASURE CODE PLUGIN | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/17/LOCALLY-REPAIRABLE-ERASURE-CODE-PLUGIN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LOCALLY REPAIRABLE ERASURE CODE PLUGIN</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-17T18:48:13+08:00">
+                2018-05-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <p>通过jerasure plugin，当erasure coded的object存储在多个OSD中时，恢复丢失的1个OSD数据需要从所有其他OSD读取数据并修复。例如，如果jerasure配置为k = 8和m = 4，则丢失1个OSD需要从其他11个OSD读取并修复。</p>
+<p>lrc erasure code plugin创建本地奇偶校验chunks，以便能够使用较少的OSD恢复。例如，如果lrc配置为k = 8，m = 4和l = 4，则会为每4个OSD创建一个附加奇偶校验chunk。当1个OSD丢失时，只需要使用4个OSD而不是11个来恢复。</p>
+<h2 id="ERASURE-CODE-PROFILE-EXAMPLES"><a href="#ERASURE-CODE-PROFILE-EXAMPLES" class="headerlink" title="ERASURE CODE PROFILE EXAMPLES"></a>ERASURE CODE PROFILE EXAMPLES</h2><h3 id="REDUCE-RECOVERY-BANDWIDTH-BETWEEN-HOSTS"><a href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-HOSTS" class="headerlink" title="REDUCE RECOVERY BANDWIDTH BETWEEN HOSTS"></a>REDUCE RECOVERY BANDWIDTH BETWEEN HOSTS</h3><p>当所有主机连接到相同的交换机时，实际上可以观察到减少的带宽。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     k=4 m=2 l=3 \</span><br><span class="line">     crush-failure-domain=host</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<h3 id="REDUCE-RECOVERY-BANDWIDTH-BETWEEN-RACKS"><a href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-RACKS" class="headerlink" title="REDUCE RECOVERY BANDWIDTH BETWEEN RACKS"></a>REDUCE RECOVERY BANDWIDTH BETWEEN RACKS</h3><p>在Firefly中，只有当primary OSD与丢失chunk在同一个rack中时，才会观察到减少的带宽。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     k=4 m=2 l=3 \</span><br><span class="line">     crush-locality=rack \</span><br><span class="line">     crush-failure-domain=host</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<h2 id="CREATE-AN-LRC-PROFILE"><a href="#CREATE-AN-LRC-PROFILE" class="headerlink" title="CREATE AN LRC PROFILE"></a>CREATE AN LRC PROFILE</h2><p>创建新的lrc erasure code profile：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile set &#123;name&#125; \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     k=&#123;data-chunks&#125; \</span><br><span class="line">     m=&#123;coding-chunks&#125; \</span><br><span class="line">     l=&#123;locality&#125; \</span><br><span class="line">     [crush-root=&#123;root&#125;] \</span><br><span class="line">     [crush-locality=&#123;bucket-type&#125;] \</span><br><span class="line">     [crush-failure-domain=&#123;bucket-type&#125;] \</span><br><span class="line">     [crush-device-class=&#123;device-class&#125;] \</span><br><span class="line">     [directory=&#123;directory&#125;] \</span><br><span class="line">     [--force]</span><br></pre></td></tr></table></figure>
+<p>其中：</p>
+<p>k={data chunks}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	每个object都分为多个data-chunks parts，每个part存储在不同的OSD上。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	Yes.</span><br><span class="line">Example:	4</span><br></pre></td></tr></table></figure>
+<p>m={coding-chunks}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	计算每个object的coding chunks并将它们存储在不同的OSD上。coding chunks的数量也是在不丢失数据的情况下，允许损失OSD的数量。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	Yes.</span><br><span class="line">Example:	2</span><br></pre></td></tr></table></figure>
+<p>l={locality}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Description:	将coding和data chunks分组为指定size locality的sets。例如，对于k = 4和m = 2，当locality = 3时，创建2个groups，每个group中3个。每个set都可以在不读取另一set中chunks的情况下恢复。</span><br><span class="line"></span><br><span class="line">Group the coding and data chunks into sets of size locality. For instance, for k=4 and m=2, when locality=3 two groups of three are created. Each set can be recovered without reading chunks from another set.</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	Yes.</span><br><span class="line">Example:	3</span><br></pre></td></tr></table></figure>
+<p>crush-root={root}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	crush bucket名字用于CRUSH rule的first step。&quot;take&quot;为step的默认值。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	default</span><br></pre></td></tr></table></figure>
+<p>crush-locality={bucket-type}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	crush bucket的type，其中由l定义的每个chunks集合将被存储。例如，如果它被设置为rack，则每个l chunks将被放置在不同的rack中。它用于创建CRUSH rule step，如step选择rack。如果没有设置，则不会进行这样的分组。</span><br><span class="line">The type of the crush bucket in which each set of chunks defined by l will be stored. For instance, if it is set to rack, each group of l chunks will be placed in a different rack. It is used to create a CRUSH rule step such as step choose rack. If it is not set, no such grouping is done.</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
+<p>crush-failure-domain={bucket-type}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Description:	确保不要有两个chunks位于相同故障域的bucket中。例如，如果故障域是host，则不会在同一主机上存储两个chunks。它用于创建CRUSH rule step，比如step chooseleaf host。</span><br><span class="line"></span><br><span class="line">Ensure that no two chunks are in a bucket with the same failure domain. For instance, if the failure domain is host no two chunks will be stored on the same host. It is used to create a CRUSH rule step such as step chooseleaf host.</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	host</span><br></pre></td></tr></table></figure>
+<p>crush-device-class={device-class}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	使用CRUSH map中的crush device class名称，限定存储到特定class devices（例如SSD或HDD）。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:</span><br></pre></td></tr></table></figure>
+<p>directory={directory}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	设置加载erasure code plugin的目录名。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	/usr/lib/ceph/erasure-code</span><br></pre></td></tr></table></figure>
+<p>–force</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description:	用相同的名称覆盖已有的profile。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
+<h2 id="LOW-LEVEL-PLUGIN-CONFIGURATION"><a href="#LOW-LEVEL-PLUGIN-CONFIGURATION" class="headerlink" title="LOW LEVEL PLUGIN CONFIGURATION"></a>LOW LEVEL PLUGIN CONFIGURATION</h2><p>k和m的和必须是l parameter的倍数。low level configuration parameters不会施加这样的限制，并且为了特定目的而使用它可能更加方便。例如可以定义两个groups，一个group有4个chunks，另一个group有3个chunks。还可以递归地定义locality sets，例如datacenters和racks到datacenters。通过生成low level configuration来实现k/m/l。</p>
+<p>lrc erasure code plugin递归地应用erasure code技术，以便在大多数情况下从某些chunks的丢失中仅恢复需要的可用chunks的子集。例如，three coding steps被描述为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line">step 1      _cDD_cDD</span><br><span class="line">step 2      cDDD____</span><br><span class="line">step 3      ____cDDD</span><br></pre></td></tr></table></figure>
+<p>其中c是从data chunks D计算出的coding chunks，丢失的chunk 7，可以用后4个chunks恢复。丢失的chunk 2的chunk可以用前4个chunks恢复。</p>
+<h2 id="ERASURE-CODE-PROFILE-EXAMPLES-USING-LOW-LEVEL-CONFIGURATION"><a href="#ERASURE-CODE-PROFILE-EXAMPLES-USING-LOW-LEVEL-CONFIGURATION" class="headerlink" title="ERASURE CODE PROFILE EXAMPLES USING LOW LEVEL CONFIGURATION"></a>ERASURE CODE PROFILE EXAMPLES USING LOW LEVEL CONFIGURATION</h2><h3 id="MINIMAL-TESTING"><a href="#MINIMAL-TESTING" class="headerlink" title="MINIMAL TESTING"></a>MINIMAL TESTING</h3><p>它严格等同于使用默认的erasure code profile。DD意味着K = 2，c意味着M = 1，并且使用默认的jerasure  plugin。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     mapping=DD_ \</span><br><span class="line">     layers=&apos;[ [ &quot;DDc&quot;, &quot;&quot; ] ]&apos;</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<h3 id="REDUCE-RECOVERY-BANDWIDTH-BETWEEN-HOSTS-1"><a href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-HOSTS-1" class="headerlink" title="REDUCE RECOVERY BANDWIDTH BETWEEN HOSTS"></a>REDUCE RECOVERY BANDWIDTH BETWEEN HOSTS</h3><p>当所有主机连接到同一个交换机时，可以观察到减少的带宽使用情况。它相当于k = 4，m = 2和l = 3，尽管chunks的layout不同：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     mapping=__DD__DD \</span><br><span class="line">     layers=&apos;[</span><br><span class="line">               [ &quot;_cDD_cDD&quot;, &quot;&quot; ],</span><br><span class="line">               [ &quot;cDDD____&quot;, &quot;&quot; ],</span><br><span class="line">               [ &quot;____cDDD&quot;, &quot;&quot; ],</span><br><span class="line">             ]&apos;</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<h3 id="REDUCE-RECOVERY-BANDWIDTH-BETWEEN-RACKS-1"><a href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-RACKS-1" class="headerlink" title="REDUCE RECOVERY BANDWIDTH BETWEEN RACKS"></a>REDUCE RECOVERY BANDWIDTH BETWEEN RACKS</h3><p>在Firefly中，只有当primary OSD与丢失chunk在同一个rack中时，才会观察到减少的带宽。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     mapping=__DD__DD \</span><br><span class="line">     layers=&apos;[</span><br><span class="line">               [ &quot;_cDD_cDD&quot;, &quot;&quot; ],</span><br><span class="line">               [ &quot;cDDD____&quot;, &quot;&quot; ],</span><br><span class="line">               [ &quot;____cDDD&quot;, &quot;&quot; ],</span><br><span class="line">             ]&apos; \</span><br><span class="line">     crush-steps=&apos;[</span><br><span class="line">                     [ &quot;choose&quot;, &quot;rack&quot;, 2 ],</span><br><span class="line">                     [ &quot;chooseleaf&quot;, &quot;host&quot;, 4 ],</span><br><span class="line">                    ]&apos;</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<h3 id="TESTING-WITH-DIFFERENT-ERASURE-CODE-BACKENDS"><a href="#TESTING-WITH-DIFFERENT-ERASURE-CODE-BACKENDS" class="headerlink" title="TESTING WITH DIFFERENT ERASURE CODE BACKENDS"></a>TESTING WITH DIFFERENT ERASURE CODE BACKENDS</h3><p>LRC现在使用jerasure作为默认的EC backend。可以使用low level configuration在每个layer基础上指定EC backend/algorithm。layers=’[ [ “DDc”, “” ] ]’ 的第二个参数实际上是用于此level的erasure code profile。下面的例子指定了在lrcpool中使用cauchy technique的ISA backend。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     mapping=DD_ \</span><br><span class="line">     layers=&apos;[ [ &quot;DDc&quot;, &quot;plugin=isa technique=cauchy&quot; ] ]&apos;</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<p>您还可以为每个layer使用不同的erasure code profile。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set LRCprofile \</span><br><span class="line">     plugin=lrc \</span><br><span class="line">     mapping=__DD__DD \</span><br><span class="line">     layers=&apos;[</span><br><span class="line">               [ &quot;_cDD_cDD&quot;, &quot;plugin=isa technique=cauchy&quot; ],</span><br><span class="line">               [ &quot;cDDD____&quot;, &quot;plugin=isa&quot; ],</span><br><span class="line">               [ &quot;____cDDD&quot;, &quot;plugin=jerasure&quot; ],</span><br><span class="line">             ]&apos;</span><br><span class="line">$ ceph osd pool create lrcpool 12 12 erasure LRCprofile</span><br></pre></td></tr></table></figure>
+<h2 id="ERASURE-CODING-AND-DECODING-ALGORITHM"><a href="#ERASURE-CODING-AND-DECODING-ALGORITHM" class="headerlink" title="ERASURE CODING AND DECODING ALGORITHM"></a>ERASURE CODING AND DECODING ALGORITHM</h2><p>在layers中找到的steps描述：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line"></span><br><span class="line">step 1      _cDD_cDD</span><br><span class="line">step 2      cDDD____</span><br><span class="line">step 3      ____cDDD</span><br></pre></td></tr></table></figure>
+<p>按顺序应用。例如，如果一个4K的object被encoded，它将首先通过step 1并被分成4个1K的chunk（4个大写D）。它们按顺序存储在chunk 2,3,6和7中。由此计算出两个coding chunks（两个小写字母c）。coding chunks分别存储在chunk 1和5中。</p>
+<p>step 2以类似的方式重新使用由step 1创建的内容，并在位置0处存储单个coding chunk c。为了便于阅读，最后四个标记有下划线（_）的chunks将被忽略。</p>
+<p>step 3在位置4存储单个coding chunk c。由step 1创建的3个chunks被用于计算该coding chunk，即来自step 1的coding chunk在step 3中变为data chunk。</p>
+<p>如果chunk 2丢失：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line"></span><br><span class="line">step 1      _c D_cDD</span><br><span class="line">step 2      cD D____</span><br><span class="line">step 3      __ _cDDD</span><br></pre></td></tr></table></figure>
+<p>decoding将尝试通过以相反的顺序来执行steps恢复它：step 3然后是step 2，最后是step 1。</p>
+<p>step 3对chunk 2（即它是下划线）一无所知并被跳过。</p>
+<p>存储在chunk 0中来自step 2的coding chunk允许其恢复chunk 2的内容。没有更多的chunks要恢复，过程停止，不考虑step 1。</p>
+<p>恢复chunk 2需要读取chunks 0,1,3，并写回chunk 2。</p>
+<p>如果chunk 2,3,6丢失：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line"></span><br><span class="line">step 1      _c  _c D</span><br><span class="line">step 2      cD  __ _</span><br><span class="line">step 3      __  cD D</span><br></pre></td></tr></table></figure>
+<p>step 3可以恢复chunk 6的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line"></span><br><span class="line">step 1      _c  _cDD</span><br><span class="line">step 2      cD  ____</span><br><span class="line">step 3      __  cDDD</span><br></pre></td></tr></table></figure>
+<p>step 2无法恢复并被跳过，因为缺少两个chunks（2,3），并且它只能从一个缺失的chunk中恢复。</p>
+<p>存储在chunk 1,5中的来自step 1的coding chunk允许它恢复chunk 2,3的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line"></span><br><span class="line">step 1      _cDD_cDD</span><br><span class="line">step 2      cDDD____</span><br><span class="line">step 3      ____cDDD</span><br></pre></td></tr></table></figure>
+<h2 id="CONTROLLING-CRUSH-PLACEMENT"><a href="#CONTROLLING-CRUSH-PLACEMENT" class="headerlink" title="CONTROLLING CRUSH PLACEMENT"></a>CONTROLLING CRUSH PLACEMENT</h2><p>默认的CRUSH rule提供位于不同hosts上隔离OSD。 例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">chunk nr    01234567</span><br><span class="line"></span><br><span class="line">step 1      _cDD_cDD</span><br><span class="line">step 2      cDDD____</span><br><span class="line">step 3      ____cDDD</span><br></pre></td></tr></table></figure>
+<p>需要8个OSD，每个chunk需要一个OSD。如果hosts位于两个相邻的racks中，则前4个chunks可以放在第一个rack中，最后4个放在第二个rack中。因此，从丢失的单个OSD中恢复并不需要在两个racks之间使用带宽。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crush-steps=&apos;[ [ &quot;choose&quot;, &quot;rack&quot;, 2 ], [ &quot;chooseleaf&quot;, &quot;host&quot;, 4 ] ]&apos;</span><br></pre></td></tr></table></figure>
+<p>将创建一个rule，将选择两个类型rack的crush buckets，为它们每个选择4个OSD，它们中的每一个都位于类型host的不同buckets中。</p>
+<p>CRUSH rule也可以手动制作以实现更精细的控制。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CEPH-Luminous/" rel="tag"># CEPH-Luminous</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/16/ISA-ERASURE-CODE-PLUGIN/" rel="next" title="ISA ERASURE CODE PLUGIN">
+                <i class="fa fa-chevron-left"></i> ISA ERASURE CODE PLUGIN
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/18/SHEC-ERASURE-CODE-PLUGIN/" rel="prev" title="SHEC ERASURE CODE PLUGIN">
+                SHEC ERASURE CODE PLUGIN <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ERASURE-CODE-PROFILE-EXAMPLES"><span class="nav-number">1.</span> <span class="nav-text">ERASURE CODE PROFILE EXAMPLES</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-HOSTS"><span class="nav-number">1.1.</span> <span class="nav-text">REDUCE RECOVERY BANDWIDTH BETWEEN HOSTS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-RACKS"><span class="nav-number">1.2.</span> <span class="nav-text">REDUCE RECOVERY BANDWIDTH BETWEEN RACKS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CREATE-AN-LRC-PROFILE"><span class="nav-number">2.</span> <span class="nav-text">CREATE AN LRC PROFILE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LOW-LEVEL-PLUGIN-CONFIGURATION"><span class="nav-number">3.</span> <span class="nav-text">LOW LEVEL PLUGIN CONFIGURATION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ERASURE-CODE-PROFILE-EXAMPLES-USING-LOW-LEVEL-CONFIGURATION"><span class="nav-number">4.</span> <span class="nav-text">ERASURE CODE PROFILE EXAMPLES USING LOW LEVEL CONFIGURATION</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MINIMAL-TESTING"><span class="nav-number">4.1.</span> <span class="nav-text">MINIMAL TESTING</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-HOSTS-1"><span class="nav-number">4.2.</span> <span class="nav-text">REDUCE RECOVERY BANDWIDTH BETWEEN HOSTS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#REDUCE-RECOVERY-BANDWIDTH-BETWEEN-RACKS-1"><span class="nav-number">4.3.</span> <span class="nav-text">REDUCE RECOVERY BANDWIDTH BETWEEN RACKS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TESTING-WITH-DIFFERENT-ERASURE-CODE-BACKENDS"><span class="nav-number">4.4.</span> <span class="nav-text">TESTING WITH DIFFERENT ERASURE CODE BACKENDS</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ERASURE-CODING-AND-DECODING-ALGORITHM"><span class="nav-number">5.</span> <span class="nav-text">ERASURE CODING AND DECODING ALGORITHM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CONTROLLING-CRUSH-PLACEMENT"><span class="nav-number">6.</span> <span class="nav-text">CONTROLLING CRUSH PLACEMENT</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

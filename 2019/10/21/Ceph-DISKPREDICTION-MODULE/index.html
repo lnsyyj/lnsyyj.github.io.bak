@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ceph,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="DISKPREDICTION MODULE磁盘预测模块支持两种模式：cloud mode和local mode。 在cloud mode下，磁盘和Ceph操作状态信息是从Ceph群集中收集的，并通过Internet发送到基于云的DiskPrediction服务器。 DiskPrediction服务器分析数据，并提供Ceph群集的性能和磁盘运行状况的分析和预测结果。 local mode不需要任何外">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph DISKPREDICTION MODULE">
+<meta property="og:url" content="http://yoursite.com/2019/10/21/Ceph-DISKPREDICTION-MODULE/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="DISKPREDICTION MODULE磁盘预测模块支持两种模式：cloud mode和local mode。 在cloud mode下，磁盘和Ceph操作状态信息是从Ceph群集中收集的，并通过Internet发送到基于云的DiskPrediction服务器。 DiskPrediction服务器分析数据，并提供Ceph群集的性能和磁盘运行状况的分析和预测结果。 local mode不需要任何外">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-22T08:16:35.963Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceph DISKPREDICTION MODULE">
+<meta name="twitter:description" content="DISKPREDICTION MODULE磁盘预测模块支持两种模式：cloud mode和local mode。 在cloud mode下，磁盘和Ceph操作状态信息是从Ceph群集中收集的，并通过Internet发送到基于云的DiskPrediction服务器。 DiskPrediction服务器分析数据，并提供Ceph群集的性能和磁盘运行状况的分析和预测结果。 local mode不需要任何外">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/21/Ceph-DISKPREDICTION-MODULE/">
+
+
+
+
+
+  <title>Ceph DISKPREDICTION MODULE | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/21/Ceph-DISKPREDICTION-MODULE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ceph DISKPREDICTION MODULE</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-21T14:41:49+08:00">
+                2019-10-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h3 id="DISKPREDICTION-MODULE"><a href="#DISKPREDICTION-MODULE" class="headerlink" title="DISKPREDICTION MODULE"></a>DISKPREDICTION MODULE</h3><p>磁盘预测模块支持两种模式：cloud mode和local mode。 在cloud mode下，磁盘和Ceph操作状态信息是从Ceph群集中收集的，并通过Internet发送到基于云的DiskPrediction服务器。 DiskPrediction服务器分析数据，并提供Ceph群集的性能和磁盘运行状况的分析和预测结果。</p>
+<p>local mode不需要任何外部服务器即可进行数据分析和输出结果。 在local mode下，磁盘<em>diskprediction</em> module将内部predictor module用于磁盘预测服务，然后将磁盘预测结果返回给Ceph系统。</p>
+<p>Local predictor: 70% 的准确性</p>
+<p>Cloud predictor for free: 95% 的准确性</p>
+<h1 id="ENABLING"><a href="#ENABLING" class="headerlink" title="ENABLING"></a>ENABLING</h1><p>运行以下命令以在Ceph环境中启用磁盘预测模块：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph mgr module enable diskprediction_cloud</span><br><span class="line">ceph mgr module enable diskprediction_local</span><br></pre></td></tr></table></figure>
+<p>选择预测模式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode local</span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode cloud</span><br></pre></td></tr></table></figure>
+<p>要禁用预测，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode none</span><br></pre></td></tr></table></figure>
+<h1 id="CONNECTION-SETTINGS"><a href="#CONNECTION-SETTINGS" class="headerlink" title="CONNECTION SETTINGS"></a>CONNECTION SETTINGS</h1><p>connection settings用于Ceph和DiskPrediction服务器之间的连接。</p>
+<h3 id="LOCAL-MODE"><a href="#LOCAL-MODE" class="headerlink" title="LOCAL MODE"></a>LOCAL MODE</h3><p>diskprediction module利用Ceph设备运行状况检查来收集磁盘运行状况指标，并使用内部predictor module来生成磁盘故障预测并返回Ceph。 因此，在local mode下不需要连接设置。 local predictor module至少需要六个设备健康状况数据集才能实施预测。</p>
+<p>运行以下命令以使用本地预测变量预测设备的预期寿命。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph device predict-life-expectancy &lt;device id&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device predict-life-expectancy 0d2a946c-413f-43f4-b</span><br><span class="line">unknown</span><br></pre></td></tr></table></figure>
+<h3 id="CLOUD-MODE"><a href="#CLOUD-MODE" class="headerlink" title="CLOUD MODE"></a>CLOUD MODE</h3><p>在cloud mode下，需要用户注册。 用户必须在<a href="https://www.diskprophet.com/#/上注册其帐户，以接收以下DiskPrediction服务器信息以进行连接设置。" target="_blank" rel="noopener">https://www.diskprophet.com/#/上注册其帐户，以接收以下DiskPrediction服务器信息以进行连接设置。</a></p>
+<p>Certificate file path: 确认用户注册后，系统将发送一封确认电子邮件，其中包括证书文件下载链接。 下载证书文件并将其保存到Ceph系统。 运行以下命令来验证文件。 如果没有证书文件验证，则无法完成连接设置。</p>
+<p>DiskPrediction server: DiskPrediction服务器名称。 如果需要，它可以是IP地址。</p>
+<p>Connection account: 用于在Ceph和DiskPrediction服务器之间建立连接的帐户名</p>
+<p>Connection password: 用于在Ceph和DiskPrediction服务器之间建立连接的密码</p>
+<p>运行以下命令以完成连接设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device set-cloud-prediction-config &lt;diskprediction_server&gt; &lt;connection_account&gt; &lt;connection_password&gt; &lt;certificate file path&gt;</span><br></pre></td></tr></table></figure>
+<p>您可以使用以下命令显示连接设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device show-prediction-config</span><br></pre></td></tr></table></figure>
+<p>其他可选配置设置如下：</p>
+<p>diskprediction_upload_metrics_interval: 指示定期将Ceph性能指标发送到DiskPrediction服务器的频率。 默认值为10分钟。</p>
+<p>diskprediction_upload_smart_interval: 指示定期将Ceph物理设备信息发送到DiskPrediction服务器的频率。 默认值为12小时。</p>
+<p>diskprediction_retrieve_prediction_interval: 指示Ceph有时会定期从DiskPrediction服务器检索物理设备预测数据。 默认值为12小时。</p>
+<h1 id="DISKPREDICTION-DATA"><a href="#DISKPREDICTION-DATA" class="headerlink" title="DISKPREDICTION DATA"></a>DISKPREDICTION DATA</h1><p>diskprediction module主动向/从DiskPrediction服务器发送/检索以下数据。</p>
+<h3 id="METRICS-DATA"><a href="#METRICS-DATA" class="headerlink" title="METRICS DATA"></a>METRICS DATA</h3><ul>
+<li>Ceph cluster status</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">key</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">cluster_health</td>
+<td style="text-align:left">Ceph health check status</td>
+</tr>
+<tr>
+<td style="text-align:left">num_mon</td>
+<td style="text-align:left">Number of monitor node</td>
+</tr>
+<tr>
+<td style="text-align:left">num_mon_quorum</td>
+<td style="text-align:left">Number of monitors in quorum</td>
+</tr>
+<tr>
+<td style="text-align:left">num_osd</td>
+<td style="text-align:left">Total number of OSD</td>
+</tr>
+<tr>
+<td style="text-align:left">num_osd_up</td>
+<td style="text-align:left">Number of OSDs that are up</td>
+</tr>
+<tr>
+<td style="text-align:left">num_osd_in</td>
+<td style="text-align:left">Number of OSDs that are in cluster</td>
+</tr>
+<tr>
+<td style="text-align:left">osd_epoch</td>
+<td style="text-align:left">Current epoch of OSD map</td>
+</tr>
+<tr>
+<td style="text-align:left">osd_bytes</td>
+<td style="text-align:left">Total capacity of cluster in bytes</td>
+</tr>
+<tr>
+<td style="text-align:left">osd_bytes_used</td>
+<td style="text-align:left">Number of used bytes on cluster</td>
+</tr>
+<tr>
+<td style="text-align:left">osd_bytes_avail</td>
+<td style="text-align:left">Number of available bytes on cluster</td>
+</tr>
+<tr>
+<td style="text-align:left">num_pool</td>
+<td style="text-align:left">Number of pools</td>
+</tr>
+<tr>
+<td style="text-align:left">num_pg</td>
+<td style="text-align:left">Total number of placement groups</td>
+</tr>
+<tr>
+<td style="text-align:left">num_pg_active_clean</td>
+<td style="text-align:left">Number of placement groups in active+clean state</td>
+</tr>
+<tr>
+<td style="text-align:left">num_pg_active</td>
+<td style="text-align:left">Number of placement groups in active state</td>
+</tr>
+<tr>
+<td style="text-align:left">num_pg_peering</td>
+<td style="text-align:left">Number of placement groups in peering state</td>
+</tr>
+<tr>
+<td style="text-align:left">num_object</td>
+<td style="text-align:left">Total number of objects on cluster</td>
+</tr>
+<tr>
+<td style="text-align:left">num_object_degraded</td>
+<td style="text-align:left">Number of degraded (missing replicas) objects</td>
+</tr>
+<tr>
+<td style="text-align:left">num_object_misplaced</td>
+<td style="text-align:left">Number of misplaced (wrong location in the cluster) objects</td>
+</tr>
+<tr>
+<td style="text-align:left">num_object_unfound</td>
+<td style="text-align:left">Number of unfound objects</td>
+</tr>
+<tr>
+<td style="text-align:left">num_bytes</td>
+<td style="text-align:left">Total number of bytes of all objects</td>
+</tr>
+<tr>
+<td style="text-align:left">num_mds_up</td>
+<td style="text-align:left">Number of MDSs that are up</td>
+</tr>
+<tr>
+<td style="text-align:left">num_mds_in</td>
+<td style="text-align:left">Number of MDS that are in cluster</td>
+</tr>
+<tr>
+<td style="text-align:left">num_mds_failed</td>
+<td style="text-align:left">Number of failed MDS</td>
+</tr>
+<tr>
+<td style="text-align:left">mds_epoch</td>
+<td style="text-align:left">Current epoch of MDS map</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Ceph mon/osd performance counts  </li>
+</ul>
+<p>Mon:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">key</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">num_sessions</td>
+<td style="text-align:left">Current number of opened monitor sessions</td>
+</tr>
+<tr>
+<td style="text-align:left">session_add</td>
+<td style="text-align:left">Number of created monitor sessions</td>
+</tr>
+<tr>
+<td style="text-align:left">session_rm</td>
+<td style="text-align:left">Number of remove_session calls in monitor</td>
+</tr>
+<tr>
+<td style="text-align:left">session_trim</td>
+<td style="text-align:left">Number of trimed monitor sessions</td>
+</tr>
+<tr>
+<td style="text-align:left">num_elections</td>
+<td style="text-align:left">Number of elections monitor took part in</td>
+</tr>
+<tr>
+<td style="text-align:left">election_call</td>
+<td style="text-align:left">Number of elections started by monitor</td>
+</tr>
+<tr>
+<td style="text-align:left">election_win</td>
+<td style="text-align:left">Number of elections won by monitor</td>
+</tr>
+<tr>
+<td style="text-align:left">election_lose</td>
+<td style="text-align:left">Number of elections lost by monitor</td>
+</tr>
+</tbody>
+</table>
+<p>Osd:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">key</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">op_wip</td>
+<td style="text-align:left">Replication operations currently being processed (primary)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_in_bytes</td>
+<td style="text-align:left">Client operations total write size</td>
+</tr>
+<tr>
+<td style="text-align:left">op_r</td>
+<td style="text-align:left">Client read operations</td>
+</tr>
+<tr>
+<td style="text-align:left">op_out_bytes</td>
+<td style="text-align:left">Client operations total read size</td>
+</tr>
+<tr>
+<td style="text-align:left">op_w</td>
+<td style="text-align:left">Client write operations</td>
+</tr>
+<tr>
+<td style="text-align:left">op_latency</td>
+<td style="text-align:left">Latency of client operations (including queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_process_latency</td>
+<td style="text-align:left">Latency of client operations (excluding queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_r_latency</td>
+<td style="text-align:left">Latency of read operation (including queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_r_process_latency</td>
+<td style="text-align:left">Latency of read operation (excluding queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_w_in_bytes</td>
+<td style="text-align:left">Client data written</td>
+</tr>
+<tr>
+<td style="text-align:left">op_w_latency</td>
+<td style="text-align:left">Latency of write operation (including queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_w_process_latency</td>
+<td style="text-align:left">Latency of write operation (excluding queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_rw</td>
+<td style="text-align:left">Client read-modify-write operations</td>
+</tr>
+<tr>
+<td style="text-align:left">op_rw_in_bytes</td>
+<td style="text-align:left">Client read-modify-write operations write in</td>
+</tr>
+<tr>
+<td style="text-align:left">op_rw_out_bytes</td>
+<td style="text-align:left">Client read-modify-write operations read out</td>
+</tr>
+<tr>
+<td style="text-align:left">op_rw_latency</td>
+<td style="text-align:left">Latency of read-modify-write operation (including queue time)</td>
+</tr>
+<tr>
+<td style="text-align:left">op_rw_process_latency</td>
+<td style="text-align:left">Latency of read-modify-write operation (excluding queue time)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Ceph pool statistics</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">key</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">bytes_used</td>
+<td style="text-align:left">Per pool bytes used</td>
+</tr>
+<tr>
+<td style="text-align:left">max_avail</td>
+<td style="text-align:left">Max available number of bytes in the pool</td>
+</tr>
+<tr>
+<td style="text-align:left">objects</td>
+<td style="text-align:left">Number of objects in the pool</td>
+</tr>
+<tr>
+<td style="text-align:left">wr_bytes</td>
+<td style="text-align:left">Number of bytes written in the pool</td>
+</tr>
+<tr>
+<td style="text-align:left">dirty</td>
+<td style="text-align:left">Number of bytes dirty in the pool</td>
+</tr>
+<tr>
+<td style="text-align:left">rd_bytes</td>
+<td style="text-align:left">Number of bytes read in the pool</td>
+</tr>
+<tr>
+<td style="text-align:left">stored_raw</td>
+<td style="text-align:left">Bytes used in pool including copies made</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Ceph physical device metadata</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">key</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">disk_domain_id</td>
+<td style="text-align:left">Physical device identify id</td>
+</tr>
+<tr>
+<td style="text-align:left">disk_name</td>
+<td style="text-align:left">Device attachment name</td>
+</tr>
+<tr>
+<td style="text-align:left">disk_wwn</td>
+<td style="text-align:left">Device wwn</td>
+</tr>
+<tr>
+<td style="text-align:left">model</td>
+<td style="text-align:left">Device model name</td>
+</tr>
+<tr>
+<td style="text-align:left">serial_number</td>
+<td style="text-align:left">Device serial number</td>
+</tr>
+<tr>
+<td style="text-align:left">size</td>
+<td style="text-align:left">Device size</td>
+</tr>
+<tr>
+<td style="text-align:left">vendor</td>
+<td style="text-align:left">Device vendor name</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Ceph each objects correlation information</li>
+<li>The module agent information</li>
+<li>The module agent cluster information</li>
+<li>The module agent host information</li>
+</ul>
+<h3 id="SMART-DATA"><a href="#SMART-DATA" class="headerlink" title="SMART DATA"></a>SMART DATA</h3><ul>
+<li>Ceph physical device SMART data (provided by Ceph <em>devicehealth</em> module)</li>
+</ul>
+<h3 id="PREDICTION-DATA"><a href="#PREDICTION-DATA" class="headerlink" title="PREDICTION DATA"></a>PREDICTION DATA</h3><ul>
+<li>Ceph physical device prediction data</li>
+</ul>
+<h1 id="RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）"><a href="#RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）" class="headerlink" title="RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）"></a>RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）</h1><p>您可以使用以下命令从Ceph OSD磁盘驱动器接收预测的健康状态。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device get-predicted-status &lt;device id&gt;</span><br></pre></td></tr></table></figure>
+<p>get-predicted-status命令返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;near_failure&quot;: &quot;Good&quot;,</span><br><span class="line">    &quot;disk_wwn&quot;: &quot;5000011111111111&quot;,</span><br><span class="line">    &quot;serial_number&quot;: &quot;111111111&quot;,</span><br><span class="line">    &quot;predicted&quot;: &quot;2018-05-30 18:33:12&quot;,</span><br><span class="line">    &quot;attachment&quot;: &quot;sdb&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Attribute</th>
+<th style="text-align:left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">near_failure</td>
+<td style="text-align:left">The disk failure prediction state: Good/Warning/Bad/Unknown</td>
+</tr>
+<tr>
+<td style="text-align:left">disk_wwn</td>
+<td style="text-align:left">Disk WWN number</td>
+</tr>
+<tr>
+<td style="text-align:left">serial_number</td>
+<td style="text-align:left">Disk serial number</td>
+</tr>
+<tr>
+<td style="text-align:left">predicted</td>
+<td style="text-align:left">Predicted date</td>
+</tr>
+<tr>
+<td style="text-align:left">attachment</td>
+<td style="text-align:left">device name on the local system</td>
+</tr>
+</tbody>
+</table>
+<p>磁盘故障预测状态的near_failure属性在下表中指示磁盘预期寿命。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">near_failure</th>
+<th style="text-align:left">Life expectancy (weeks)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Good</td>
+<td style="text-align:left">&gt; 6 weeks</td>
+</tr>
+<tr>
+<td style="text-align:left">Warning</td>
+<td style="text-align:left">2 weeks ~ 6 weeks</td>
+</tr>
+<tr>
+<td style="text-align:left">Bad</td>
+<td style="text-align:left">&lt; 2 weeks</td>
+</tr>
+</tbody>
+</table>
+<h1 id="DEBUGGING"><a href="#DEBUGGING" class="headerlink" title="DEBUGGING"></a>DEBUGGING</h1><p>如果要调试DiskPrediction module映射到Ceph日志记录级别，请使用以下命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mgr]</span><br><span class="line"></span><br><span class="line">    debug mgr = 20</span><br></pre></td></tr></table></figure>
+<p>将日志记录设置为管理器调试时，模块将打印出带有前缀mgr [diskprediction]的日志记录消息，以便于过滤。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/21/Ceph-DEVICE-MANAGEMENT/" rel="next" title="Ceph DEVICE MANAGEMENT">
+                <i class="fa fa-chevron-left"></i> Ceph DEVICE MANAGEMENT
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/21/samba/" rel="prev" title="samba">
+                samba <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#DISKPREDICTION-MODULE"><span class="nav-number">1.</span> <span class="nav-text">DISKPREDICTION MODULE</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#ENABLING"><span class="nav-number"></span> <span class="nav-text">ENABLING</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CONNECTION-SETTINGS"><span class="nav-number"></span> <span class="nav-text">CONNECTION SETTINGS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LOCAL-MODE"><span class="nav-number">1.</span> <span class="nav-text">LOCAL MODE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CLOUD-MODE"><span class="nav-number">2.</span> <span class="nav-text">CLOUD MODE</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DISKPREDICTION-DATA"><span class="nav-number"></span> <span class="nav-text">DISKPREDICTION DATA</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#METRICS-DATA"><span class="nav-number">1.</span> <span class="nav-text">METRICS DATA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SMART-DATA"><span class="nav-number">2.</span> <span class="nav-text">SMART DATA</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PREDICTION-DATA"><span class="nav-number">3.</span> <span class="nav-text">PREDICTION DATA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）"><span class="nav-number"></span> <span class="nav-text">RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#DEBUGGING"><span class="nav-number"></span> <span class="nav-text">DEBUGGING</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ceph,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="什么是OSD blacklist，如何处理？环境Red Hat Ceph Storage 问题我正在运行ceph osd dump命令，它确实列出了blacklist items： 123# ceph osd dump[...]blacklist 10.37.192.139:0/1308721908 expires 2019-02-27 10:10:52.049084 这是什么意思，我该如何解决？">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph osd blacklist">
+<meta property="og:url" content="http://yoursite.com/2019/11/13/ceph-osd-blacklist/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="什么是OSD blacklist，如何处理？环境Red Hat Ceph Storage 问题我正在运行ceph osd dump命令，它确实列出了blacklist items： 123# ceph osd dump[...]blacklist 10.37.192.139:0/1308721908 expires 2019-02-27 10:10:52.049084 这是什么意思，我该如何解决？">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-22T08:16:36.043Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ceph osd blacklist">
+<meta name="twitter:description" content="什么是OSD blacklist，如何处理？环境Red Hat Ceph Storage 问题我正在运行ceph osd dump命令，它确实列出了blacklist items： 123# ceph osd dump[...]blacklist 10.37.192.139:0/1308721908 expires 2019-02-27 10:10:52.049084 这是什么意思，我该如何解决？">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/11/13/ceph-osd-blacklist/">
+
+
+
+
+
+  <title>ceph osd blacklist | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/13/ceph-osd-blacklist/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ceph osd blacklist</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-13T09:03:48+08:00">
+                2019-11-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h1 id="什么是OSD-blacklist，如何处理？"><a href="#什么是OSD-blacklist，如何处理？" class="headerlink" title="什么是OSD blacklist，如何处理？"></a>什么是OSD blacklist，如何处理？</h1><h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>Red Hat Ceph Storage</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>我正在运行<code>ceph osd dump</code>命令，它确实列出了blacklist items：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ceph osd dump</span><br><span class="line">[...]</span><br><span class="line">blacklist 10.37.192.139:0/1308721908 expires 2019-02-27 10:10:52.049084</span><br></pre></td></tr></table></figure>
+<p>这是什么意思，我该如何解决？</p>
+<h3 id="决议"><a href="#决议" class="headerlink" title="决议"></a>决议</h3><p>尽管有一些控制命令可删除blacklist entries（例如<code>ceph osd blacklist rm ADDRESS[:source_port]</code>），但blacklists通常会自动维护，无需手动干预。因此，您无需采取任何措施。如有疑问，请联系Red Hat支持。</p>
+<h3 id="根本原因"><a href="#根本原因" class="headerlink" title="根本原因"></a>根本原因</h3><p>blacklist最常用于CephFS场景中，以防止滞后的元数据服务器对OSD上的数据进行不良更改。</p>
+<h3 id="诊断步骤"><a href="#诊断步骤" class="headerlink" title="诊断步骤"></a>诊断步骤</h3>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># ceph osd blacklist ls</span><br><span class="line">listed 1 entries</span><br><span class="line">10.37.192.139:0/1308721908 2019-02-27 10:10:52.049084</span><br></pre></td></tr></table></figure>
+<p>该解决方案是Red Hat快速发布计划的一部分，提供了Red Hat工程师在为客户提供支持时创建的庞大解决方案库。 为了使您立即获得所需的知识，这些文章可能以未经编辑的原始形式出现。</p>
+<h1 id="CEPH-FILESYSTEM-CLIENT-EVICTION（CEPH文件系统客户端驱逐）"><a href="#CEPH-FILESYSTEM-CLIENT-EVICTION（CEPH文件系统客户端驱逐）" class="headerlink" title="CEPH FILESYSTEM CLIENT EVICTION（CEPH文件系统客户端驱逐）"></a>CEPH FILESYSTEM CLIENT EVICTION（CEPH文件系统客户端驱逐）</h1><p>当文件系统客户端无响应或行为异常时，可能有必要强制终止其对文件系统的访问。 此过程称为eviction（驱逐）。</p>
+<p>驱逐CephFS客户端会阻止其与MDS daemons和OSD daemons进一步通信。 如果客户端正在对文件系统进行buffered IO，则所有未刷新的数据都将丢失。</p>
+<p>客户端可以自动退出（如果无法及时与MDS通信），也可以手动退出（由系统管理员）。</p>
+<p>客户端驱逐过程适用于各种客户端，包括FUSE mounts，kernel mounts，nfs-ganesha gateways以及任何使用libcephfs的进程。</p>
+<h3 id="AUTOMATIC-CLIENT-EVICTION（自动客户端逐出）"><a href="#AUTOMATIC-CLIENT-EVICTION（自动客户端逐出）" class="headerlink" title="AUTOMATIC CLIENT EVICTION（自动客户端逐出）"></a>AUTOMATIC CLIENT EVICTION（自动客户端逐出）</h3><p>在三种情况下，可能会自动将客户驱逐：</p>
+<ul>
+<li><p>在active MDS daemon上，如果客户端在session_autoclose（文件系统变量）秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。</p>
+</li>
+<li><p>在active MDS daemon上，如果客户端在mds_cap_revoke_eviction_timeout（配置选项）秒内未响应cap revoke messages。 默认情况下禁用。</p>
+</li>
+<li><p>在MDS启动期间（包括故障转移时），MDS称为reconnect的状态。 在此状态期间，它将等待所有客户端连接到新的MDS daemon。 如果客户端未在时间窗口内这样做（mds_reconnect_timeout，默认为45秒），则将其驱逐。</p>
+</li>
+</ul>
+<p>如果出现以上任何一种情况，warning message将发送到cluster log。</p>
+<h3 id="MANUAL-CLIENT-EVICTION（手动客户端驱逐）"><a href="#MANUAL-CLIENT-EVICTION（手动客户端驱逐）" class="headerlink" title="MANUAL CLIENT EVICTION（手动客户端驱逐）"></a>MANUAL CLIENT EVICTION（手动客户端驱逐）</h3><p>有时，管理员可能希望手动驱逐客户端。 如果客户端死亡，并且管理员不想等待其session超时；或者，如果客户端行为异常并且管理员无权访问客户端节点来卸载它。</p>
+<p>首先检查客户列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">ceph tell mds.0 client ls</span><br><span class="line"></span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;id&quot;: 4305,</span><br><span class="line">        &quot;num_leases&quot;: 0,</span><br><span class="line">        &quot;num_caps&quot;: 3,</span><br><span class="line">        &quot;state&quot;: &quot;open&quot;,</span><br><span class="line">        &quot;replay_requests&quot;: 0,</span><br><span class="line">        &quot;completed_requests&quot;: 0,</span><br><span class="line">        &quot;reconnecting&quot;: false,</span><br><span class="line">        &quot;inst&quot;: &quot;client.4305 172.21.9.34:0/422650892&quot;,</span><br><span class="line">        &quot;client_metadata&quot;: &#123;</span><br><span class="line">            &quot;ceph_sha1&quot;: &quot;ae81e49d369875ac8b569ff3e3c456a31b8f3af5&quot;,</span><br><span class="line">            &quot;ceph_version&quot;: &quot;ceph version 12.0.0-1934-gae81e49 (ae81e49d369875ac8b569ff3e3c456a31b8f3af5)&quot;,</span><br><span class="line">            &quot;entity_id&quot;: &quot;0&quot;,</span><br><span class="line">            &quot;hostname&quot;: &quot;senta04&quot;,</span><br><span class="line">            &quot;mount_point&quot;: &quot;/tmp/tmpcMpF1b/mnt.0&quot;,</span><br><span class="line">            &quot;pid&quot;: &quot;29377&quot;,</span><br><span class="line">            &quot;root&quot;: &quot;/&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>一旦识别出要逐出的客户机，就可以使用其唯一ID或各种其他属性来识别它：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># These all work</span><br><span class="line">ceph tell mds.0 client evict id=4305</span><br><span class="line">ceph tell mds.0 client evict client_metadata.=4305</span><br></pre></td></tr></table></figure>
+<h3 id="ADVANCED-UN-BLACKLISTING-A-CLIENT（进阶：取消blacklist客户）"><a href="#ADVANCED-UN-BLACKLISTING-A-CLIENT（进阶：取消blacklist客户）" class="headerlink" title="ADVANCED: UN-BLACKLISTING A CLIENT（进阶：取消blacklist客户）"></a>ADVANCED: UN-BLACKLISTING A CLIENT（进阶：取消blacklist客户）</h3><p>通常，列入blacklist的客户端可能无法重新连接到服务器：必须先将其unmount，然后再重新mount。</p>
+<p>但是，在某些情况下，允许被驱逐的客户端尝试重新连接可能会很有用。</p>
+<p>由于CephFS使用RADOS OSD blacklist控制客户端驱逐，因此可以通过从blacklist中删除CephFS客户端来重新连接它们：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd blacklist ls</span><br><span class="line">listed 1 entries</span><br><span class="line">127.0.0.1:0/3710147553 2018-03-19 11:32:24.716146</span><br><span class="line"></span><br><span class="line">$ ceph osd blacklist rm 127.0.0.1:0/3710147553</span><br><span class="line">un-blacklisting 127.0.0.1:0/3710147553</span><br></pre></td></tr></table></figure>
+<p>如果其他客户端访问了列入blacklist的客户端正在buffered IO的文件，则这样做可能会使数据完整性受到威胁。 也不能保证产生一个功能完备的客户端 — 在驱逐后恢复完全健康的客户端的最佳方法是unmount客户端并重新mount。</p>
+<p>如果您尝试以这种方式重新连接客户端，则在FUSE客户端中将client_reconnect_stale设置为true，以提示客户端尝试重新连接。</p>
+<h3 id="ADVANCED-CONFIGURING-BLACKLISTING（进阶：配置blacklist）"><a href="#ADVANCED-CONFIGURING-BLACKLISTING（进阶：配置blacklist）" class="headerlink" title="ADVANCED: CONFIGURING BLACKLISTING（进阶：配置blacklist）"></a>ADVANCED: CONFIGURING BLACKLISTING（进阶：配置blacklist）</h3><p>如果由于客户端主机速度慢或网络不可靠而频繁驱逐客户端，并且您无法解决根本问题，那么您可能希望要求MDS的严格性降低。</p>
+<p>可以通过放弃其MDS sessions来响应慢速客户端，但允许他们重新打开sessions并允许他们继续与OSD对话。 要启用此模式，请在MDS节点上将mds_session_blacklist_on_timeout设置为false。</p>
+<p>对于手动驱逐的等效行为，请将mds_session_blacklist_on_evict设置为false。</p>
+<p>请注意，如果禁用了blacklist，则驱逐客户端只会对您发送命令的MDS产生影响。 在具有multiple active MDS daemons的系统上，您需要向每个active daemon发送驱逐命令。 启用blacklist（默认设置）后，仅将驱逐命令发送到单个MDS就足够了，因为blacklist会将其传播到其他MDS。</p>
+<h3 id="BACKGROUND-BLACKLISTING-AND-OSD-EPOCH-BARRIER（背景：blacklist和OSD-epoch-barrier）"><a href="#BACKGROUND-BLACKLISTING-AND-OSD-EPOCH-BARRIER（背景：blacklist和OSD-epoch-barrier）" class="headerlink" title="BACKGROUND: BLACKLISTING AND OSD EPOCH BARRIER（背景：blacklist和OSD epoch barrier）"></a>BACKGROUND: BLACKLISTING AND OSD EPOCH BARRIER（背景：blacklist和OSD epoch barrier）</h3><p>在将客户端列入blacklist之后，有必要确保其他客户端和MDS daemons在尝试访问被列入blacklist的客户端可能已访问的任何数据对象之前，具有最新的OSDMap（包括blacklist entry）。</p>
+<p>使用内部的”osdmap epoch barrier”机制可以确保这一点。</p>
+<p>barrier的目的是确保当我们分发任何允许touching相同 RADOS objects的功能时，分发的客户端必须具有最新的 OSD map，不与已cancel的操作（来自 ENOSPC）或blacklist客户端（逐出）进行竞争。</p>
+<p>更具体地说，设置epoch barrier的情况是：</p>
+<ul>
+<li>Client eviction — 客户端驱逐（客户端被列入blacklist，其他客户端必须等待post-blacklist epoch后才能touch相同的objects）。</li>
+<li>客户端中的OSD map full flag handling（客户端可以从pre-full epoch取消某些OSD操作，因此其他客户端必须等到full epoch或更晚才能touching相同的objects）。</li>
+<li>MDS启动，因为我们不持续维护barrier epoch，因此，必须假定重新启动后始终需要最新的OSD map。</li>
+</ul>
+<p>请注意，这是简单的global value。 我们可以在每个inode的基础上进行维护。 但是我们没有，因为：</p>
+<ul>
+<li>它将更加复杂。</li>
+<li>每个inode将使用额外的4个字节的内存。</li>
+<li>因为几乎每个人都拥有最新的OSD map，所以效率不会更高。 而且，在大多数情况下，每个人都会轻而易举地克服这一barrier，而不是waiting。</li>
+<li>在极少数情况下遇到barrier，因此很少会看到每个inode粒度带来好处。</li>
+</ul>
+<p>epoch barrier与所有capability messages一起发送，并指示message的接收者避免在看到OSD epoch之前向OSD发送更多的RADOS操作。 这主要适用于客户端（将其数据直接写到文件中），但也适用于MDS，因为诸如文件大小probing和文件删除之类的操作是直接从MDS完成的。</p>
+<h1 id="blacklist相关命令"><a href="#blacklist相关命令" class="headerlink" title="blacklist相关命令"></a>blacklist相关命令</h1><h3 id="1、从blacklist中添加（可选项，直到-lt-expire-gt-秒后）或删除-lt-addr-gt-，默认3600秒"><a href="#1、从blacklist中添加（可选项，直到-lt-expire-gt-秒后）或删除-lt-addr-gt-，默认3600秒" class="headerlink" title="1、从blacklist中添加（可选项，直到&lt;expire&gt;秒后）或删除&lt;addr&gt;，默认3600秒"></a>1、从blacklist中添加（可选项，直到<code>&lt;expire&gt;</code>秒后）或删除<code>&lt;addr&gt;</code>，默认3600秒</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist add|rm &lt;EntityAddr&gt; &#123;&lt;float[0.0-]&gt;&#125;                   add (optionally until &lt;expire&gt; seconds from now) or remove &lt;addr&gt; from blacklist</span><br></pre></td></tr></table></figure>
+<p>实验1，添加删除blacklist测试</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph3 ~]# ceph osd blacklist add 10.20.10.28</span><br><span class="line">blacklisting 10.20.10.28:0/0 until 2019-11-13 12:55:53.700776 (3600 sec)</span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist add 10.20.10.13 6000</span><br><span class="line">blacklisting 10.20.10.13:0/0 until 2019-11-13 13:36:16.575894 (6000 sec)</span><br><span class="line"></span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist ls</span><br><span class="line">listed 2 entries</span><br><span class="line">10.20.10.13:0/0 2019-11-13 13:36:16.575894</span><br><span class="line">10.20.10.28:0/0 2019-11-13 12:55:53.700776</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist ls</span><br><span class="line">listed 1 entries</span><br><span class="line">10.20.10.28:0/0 2019-11-13 10:23:00.029669</span><br></pre></td></tr></table></figure>
+<p>实验2，当client在blacklist中时，在client端尝试mount cephfs（ceph-client  10.20.10.2）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">1、将ceph-client加入blacklist</span><br><span class="line">[root@ceph1 ~]# ceph osd blacklist add 10.20.10.2</span><br><span class="line">[root@ceph1 ~]# ceph osd blacklist ls</span><br><span class="line">listed 1 entries</span><br><span class="line">10.20.10.2:0/0 2019-11-13 15:42:54.260358</span><br><span class="line"></span><br><span class="line">2、ceph-client尝试mount cephfs</span><br><span class="line">[root@ceph-client ~]# ceph-fuse /root/ceph-fuse/ --verbose</span><br><span class="line">ceph-fuse[1664]: starting ceph client</span><br><span class="line">2019-11-13 14:45:18.902688 7f8f3b0db0c0 -1 init, newargv = 0x55c15933c000 newargc=10</span><br><span class="line">ceph-fuse[1664]: ceph mount failed with (1) Operation not permitted</span><br><span class="line"></span><br><span class="line">3、将ceph-client从blacklist中删除</span><br><span class="line">[root@ceph1 ~]# ceph osd blacklist rm 10.20.10.2</span><br><span class="line">un-blacklisting 10.20.10.2:0/0</span><br><span class="line"></span><br><span class="line">[root@ceph-client ~]# ceph-fuse /root/ceph-fuse/ </span><br><span class="line">ceph-fuse[1704]: starting ceph client</span><br><span class="line">2019-11-13 14:49:16.400939 7f9326c7c0c0 -1 init, newargv = 0x557665de4ea0 newargc=9</span><br><span class="line">ceph-fuse[1704]: starting fuse</span><br><span class="line"></span><br><span class="line">[root@ceph-client ~]# df -Th</span><br><span class="line">ceph-fuse      fuse.ceph-fuse   93G     0   93G   0% /root/ceph-fuse</span><br></pre></td></tr></table></figure>
+<h3 id="2、清除所有列入blacklist的客户端"><a href="#2、清除所有列入blacklist的客户端" class="headerlink" title="2、清除所有列入blacklist的客户端"></a>2、清除所有列入blacklist的客户端</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist clear                   clear all blacklisted clients</span><br></pre></td></tr></table></figure>
+<p>实验1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph3 ~]# ceph osd blacklist add 10.20.10.28</span><br><span class="line">blacklisting 10.20.10.28:0/0 until 2019-11-13 12:53:48.463948 (3600 sec)</span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist add 10.20.10.13</span><br><span class="line">blacklisting 10.20.10.13:0/0 until 2019-11-13 12:53:56.846733 (3600 sec)</span><br><span class="line"></span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist ls</span><br><span class="line">listed 2 entries</span><br><span class="line">10.20.10.13:0/0 2019-11-13 12:53:56.846733</span><br><span class="line">10.20.10.28:0/0 2019-11-13 12:53:48.463948</span><br><span class="line"></span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist clear</span><br><span class="line"> removed all blacklist entries</span><br><span class="line"></span><br><span class="line">[root@ceph3 ~]# ceph osd blacklist ls</span><br><span class="line">listed 0 entries</span><br></pre></td></tr></table></figure>
+<h3 id="3、显示列入blacklist的客户端"><a href="#3、显示列入blacklist的客户端" class="headerlink" title="3、显示列入blacklist的客户端"></a>3、显示列入blacklist的客户端</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist ls --format json                   show blacklisted clients</span><br></pre></td></tr></table></figure>
+<p>实验1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 ~]# ceph osd blacklist ls --format json</span><br><span class="line">listed 1 entries</span><br><span class="line"></span><br><span class="line">[&#123;&quot;addr&quot;:&quot;10.20.10.2:0/0&quot;,&quot;until&quot;:&quot;2019-11-13 17:10:56.217959&quot;&#125;]</span><br><span class="line"></span><br><span class="line">/0 表示：AsyncMessenger stuff approximately unique ID set by the Constructor for use in entity_addr_t</span><br></pre></td></tr></table></figure>
+<h3 id="4、如果客户端在session-autoclose-lt-value-gt-秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。"><a href="#4、如果客户端在session-autoclose-lt-value-gt-秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。" class="headerlink" title="4、如果客户端在session_autoclose &lt;value&gt;秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。"></a>4、如果客户端在<code>session_autoclose &lt;value&gt;</code>秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fs set &lt;fs_name&gt; max_mds|max_file_size|allow_new_snaps|inline_data|cluster_down|allow_multimds|allow_dirfrags| balancer|standby_count_wanted|session_timeout|session_autoclose &lt;val&gt; &#123;&lt;confirm&gt;&#125;			set fs parameter &lt;var&gt; to &lt;val&gt;</span><br></pre></td></tr></table></figure>
+<p>实验1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 ~]# ceph fs set cephfs session_autoclose 400</span><br></pre></td></tr></table></figure>
+<h3 id="5、获取有关一个文件系统的信息"><a href="#5、获取有关一个文件系统的信息" class="headerlink" title="5、获取有关一个文件系统的信息"></a>5、获取有关一个文件系统的信息</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph fs get &lt;fs_name&gt; --format json</span><br></pre></td></tr></table></figure>
+<p>实验1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 ~]# ceph fs get cephfs --format json</span><br><span class="line">&#123;</span><br><span class="line">	&quot;mdsmap&quot;: &#123;</span><br><span class="line">		&quot;epoch&quot;: 19,</span><br><span class="line">		&quot;flags&quot;: 12,</span><br><span class="line">		&quot;ever_allowed_features&quot;: 0,</span><br><span class="line">		&quot;explicitly_allowed_features&quot;: 0,</span><br><span class="line">		&quot;created&quot;: &quot;2019-11-11 11:16:05.316461&quot;,</span><br><span class="line">		&quot;modified&quot;: &quot;2019-11-13 15:59:17.551876&quot;,</span><br><span class="line">		&quot;tableserver&quot;: 0,</span><br><span class="line">		&quot;root&quot;: 0,</span><br><span class="line">		&quot;session_timeout&quot;: 60,</span><br><span class="line">		&quot;session_autoclose&quot;: 400,</span><br><span class="line">		&quot;max_file_size&quot;: 1099511627776,</span><br><span class="line">		&quot;last_failure&quot;: 0,</span><br><span class="line">		&quot;last_failure_osd_epoch&quot;: 104,</span><br><span class="line">		&quot;compat&quot;: &#123;</span><br><span class="line">			&quot;compat&quot;: &#123;&#125;,</span><br><span class="line">			&quot;ro_compat&quot;: &#123;&#125;,</span><br><span class="line">			&quot;incompat&quot;: &#123;</span><br><span class="line">				&quot;feature_1&quot;: &quot;base v0.20&quot;,</span><br><span class="line">				&quot;feature_2&quot;: &quot;client writeable ranges&quot;,</span><br><span class="line">				&quot;feature_3&quot;: &quot;default file layouts on dirs&quot;,</span><br><span class="line">				&quot;feature_4&quot;: &quot;dir inode in separate object&quot;,</span><br><span class="line">				&quot;feature_5&quot;: &quot;mds uses versioned encoding&quot;,</span><br><span class="line">				&quot;feature_6&quot;: &quot;dirfrag is stored in omap&quot;,</span><br><span class="line">				&quot;feature_8&quot;: &quot;no anchor table&quot;,</span><br><span class="line">				&quot;feature_9&quot;: &quot;file layout v2&quot;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;,</span><br><span class="line">		&quot;max_mds&quot;: 1,</span><br><span class="line">		&quot;in&quot;: [0],</span><br><span class="line">		&quot;up&quot;: &#123;</span><br><span class="line">			&quot;mds_0&quot;: 4335</span><br><span class="line">		&#125;,</span><br><span class="line">		&quot;failed&quot;: [],</span><br><span class="line">		&quot;damaged&quot;: [],</span><br><span class="line">		&quot;stopped&quot;: [],</span><br><span class="line">		&quot;info&quot;: &#123;</span><br><span class="line">			&quot;gid_4335&quot;: &#123;</span><br><span class="line">				&quot;gid&quot;: 4335,</span><br><span class="line">				&quot;name&quot;: &quot;ceph2&quot;,</span><br><span class="line">				&quot;rank&quot;: 0,</span><br><span class="line">				&quot;incarnation&quot;: 14,</span><br><span class="line">				&quot;state&quot;: &quot;up:active&quot;,</span><br><span class="line">				&quot;state_seq&quot;: 41535,</span><br><span class="line">				&quot;addr&quot;: &quot;10.20.10.13:6804/622620898&quot;,</span><br><span class="line">				&quot;standby_for_rank&quot;: 0,</span><br><span class="line">				&quot;standby_for_fscid&quot;: -1,</span><br><span class="line">				&quot;standby_for_name&quot;: &quot;&quot;,</span><br><span class="line">				&quot;standby_replay&quot;: true,</span><br><span class="line">				&quot;export_targets&quot;: [],</span><br><span class="line">				&quot;features&quot;: 4611087853746454523</span><br><span class="line">			&#125;,</span><br><span class="line">			&quot;gid_4456&quot;: &#123;</span><br><span class="line">				&quot;gid&quot;: 4456,</span><br><span class="line">				&quot;name&quot;: &quot;ceph3&quot;,</span><br><span class="line">				&quot;rank&quot;: 0,</span><br><span class="line">				&quot;incarnation&quot;: 0,</span><br><span class="line">				&quot;state&quot;: &quot;up:standby-replay&quot;,</span><br><span class="line">				&quot;state_seq&quot;: 2,</span><br><span class="line">				&quot;addr&quot;: &quot;10.20.10.25:6805/1639008809&quot;,</span><br><span class="line">				&quot;standby_for_rank&quot;: 0,</span><br><span class="line">				&quot;standby_for_fscid&quot;: -1,</span><br><span class="line">				&quot;standby_for_name&quot;: &quot;&quot;,</span><br><span class="line">				&quot;standby_replay&quot;: true,</span><br><span class="line">				&quot;export_targets&quot;: [],</span><br><span class="line">				&quot;features&quot;: 4611087853746454523</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;,</span><br><span class="line">		&quot;data_pools&quot;: [6],</span><br><span class="line">		&quot;metadata_pool&quot;: 7,</span><br><span class="line">		&quot;enabled&quot;: true,</span><br><span class="line">		&quot;fs_name&quot;: &quot;cephfs&quot;,</span><br><span class="line">		&quot;balancer&quot;: &quot;&quot;,</span><br><span class="line">		&quot;standby_count_wanted&quot;: 1</span><br><span class="line">	&#125;,</span><br><span class="line">	&quot;id&quot;: 1</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="blacklist相关配置"><a href="#blacklist相关配置" class="headerlink" title="blacklist相关配置"></a>blacklist相关配置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">MON相关配置</span><br><span class="line">	客户端blacklist entries保留在OSD map中的持续时间（以秒为单位）</span><br><span class="line">    Option(&quot;mon_osd_blacklist_default_expire&quot;, Option::TYPE_FLOAT, Option::LEVEL_ADVANCED)</span><br><span class="line">    .set_default(1_hr)</span><br><span class="line">    .add_service(&quot;mon&quot;)</span><br><span class="line">    .set_description(&quot;Duration in seconds that blacklist entries for clients remain in the OSD map&quot;),</span><br><span class="line"></span><br><span class="line">	MDS daemons的blacklist entries保留在OSD map中的持续时间（以秒为单位）</span><br><span class="line">    Option(&quot;mon_mds_blacklist_interval&quot;, Option::TYPE_FLOAT, Option::LEVEL_DEV)</span><br><span class="line">    .set_default(1_day)</span><br><span class="line">    .set_min(1_hr)</span><br><span class="line">    .add_service(&quot;mon&quot;)</span><br><span class="line">    .set_description(&quot;Duration in seconds that blacklist entries for MDS daemons remain in the OSD map&quot;),</span><br><span class="line"></span><br><span class="line">RBD相关配置</span><br><span class="line">	是否将损坏锁的客户端列入blacklist</span><br><span class="line">    Option(&quot;rbd_blacklist_on_break_lock&quot;, Option::TYPE_BOOL, Option::LEVEL_ADVANCED)</span><br><span class="line">    .set_default(true)</span><br><span class="line">    .set_description(&quot;whether to blacklist clients whose lock was broken&quot;),</span><br><span class="line"></span><br><span class="line">	blacklist的秒数 - OSD 默认值为 0</span><br><span class="line">    Option(&quot;rbd_blacklist_expire_seconds&quot;, Option::TYPE_UINT, Option::LEVEL_ADVANCED)</span><br><span class="line">    .set_default(0)</span><br><span class="line">    .set_description(&quot;number of seconds to blacklist - set to 0 for OSD default&quot;),</span><br><span class="line"></span><br><span class="line">MDS相关配置</span><br><span class="line">	是否将sessions已过期的客户端列入blacklist</span><br><span class="line">    Option(&quot;mds_session_blacklist_on_timeout&quot;, Option::TYPE_BOOL, Option::LEVEL_ADVANCED)</span><br><span class="line">    .set_default(true)</span><br><span class="line">    .set_description(&quot;blacklist clients whose sessions have become stale&quot;),</span><br><span class="line"></span><br><span class="line">	是否将被逐出的客户端列入blacklist</span><br><span class="line">    Option(&quot;mds_session_blacklist_on_evict&quot;, Option::TYPE_BOOL, Option::LEVEL_ADVANCED)</span><br><span class="line">    .set_default(true)</span><br><span class="line">    .set_description(&quot;blacklist clients that have been evicted&quot;),</span><br><span class="line"></span><br><span class="line">	数秒后，没有响应MDS的“cap revoke messages”的客户端将被驱逐。（默认为0，表示关闭该功能）</span><br><span class="line">    Option(&quot;mds_cap_revoke_eviction_timeout&quot;, Option::TYPE_FLOAT, Option::LEVEL_ADVANCED)</span><br><span class="line">     .set_default(0)</span><br><span class="line">     .set_description(&quot;number of seconds after which clients which have not responded to cap revoke messages by the MDS are evicted.&quot;),</span><br><span class="line"></span><br><span class="line">	MDS重新连接恢复状态期间等待客户端重新连接的超时时间（以秒为单位）</span><br><span class="line">    Option(&quot;mds_reconnect_timeout&quot;, Option::TYPE_FLOAT, Option::LEVEL_ADVANCED)</span><br><span class="line">    .set_default(45)</span><br><span class="line">    .set_description(&quot;timeout in seconds to wait for clients to reconnect during MDS reconnect recovery state&quot;),</span><br></pre></td></tr></table></figure>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>【1】<a href="https://access.redhat.com/solutions/3944931" target="_blank" rel="noopener">https://access.redhat.com/solutions/3944931</a></p>
+<p>【2】<a href="https://docs.ceph.com/docs/mimic/cephfs/eviction/" target="_blank" rel="noopener">https://docs.ceph.com/docs/mimic/cephfs/eviction/</a></p>
+<h1 id="接口（CLI后加–format-json可以以json格式输出结果）"><a href="#接口（CLI后加–format-json可以以json格式输出结果）" class="headerlink" title="接口（CLI后加–format json可以以json格式输出结果）"></a>接口（CLI后加–format json可以以json格式输出结果）</h1><p>1、添加客户端到blacklist（add (optionally until <code>&lt;expire&gt;</code>seconds from now)<code>&lt;addr&gt;</code>from blacklist）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist add &lt;EntityAddr&gt; &#123;&lt;float[0.0-]&gt;&#125;</span><br></pre></td></tr></table></figure>
+<p>2、从blacklist中删除客户端（remove <code>&lt;addr&gt;</code> from blacklist）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist rm &lt;EntityAddr&gt;</span><br></pre></td></tr></table></figure>
+<p>3、清除所有列入blacklist的客户端（clear all blacklisted clients）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist clear</span><br></pre></td></tr></table></figure>
+<p>4、显示列入blacklist的客户端（show blacklisted clients）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osd blacklist ls</span><br></pre></td></tr></table></figure>
+<p>5、设置session_autoclose，客户端在指定秒数未与MDS通信，则驱逐接口，加入blacklist（set fs parameter <code>&lt;var&gt;</code>to <code>&lt;val&gt;</code>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fs set &lt;fs_name&gt; session_autoclose &lt;val&gt;</span><br></pre></td></tr></table></figure>
+<p>6、获取有关一个文件系统的session_autoclose信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph fs get &lt;fs_name&gt;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/29/udev设备管理/" rel="next" title="udev设备管理">
+                <i class="fa fa-chevron-left"></i> udev设备管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/13/NIC-bonding-in-CentOS-7/" rel="prev" title="NIC bonding in CentOS 7">
+                NIC bonding in CentOS 7 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是OSD-blacklist，如何处理？"><span class="nav-number">1.</span> <span class="nav-text">什么是OSD blacklist，如何处理？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#环境"><span class="nav-number">1.0.1.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">1.0.2.</span> <span class="nav-text">问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#决议"><span class="nav-number">1.0.3.</span> <span class="nav-text">决议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根本原因"><span class="nav-number">1.0.4.</span> <span class="nav-text">根本原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#诊断步骤"><span class="nav-number">1.0.5.</span> <span class="nav-text">诊断步骤</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#CEPH-FILESYSTEM-CLIENT-EVICTION（CEPH文件系统客户端驱逐）"><span class="nav-number">2.</span> <span class="nav-text">CEPH FILESYSTEM CLIENT EVICTION（CEPH文件系统客户端驱逐）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AUTOMATIC-CLIENT-EVICTION（自动客户端逐出）"><span class="nav-number">2.0.1.</span> <span class="nav-text">AUTOMATIC CLIENT EVICTION（自动客户端逐出）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MANUAL-CLIENT-EVICTION（手动客户端驱逐）"><span class="nav-number">2.0.2.</span> <span class="nav-text">MANUAL CLIENT EVICTION（手动客户端驱逐）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ADVANCED-UN-BLACKLISTING-A-CLIENT（进阶：取消blacklist客户）"><span class="nav-number">2.0.3.</span> <span class="nav-text">ADVANCED: UN-BLACKLISTING A CLIENT（进阶：取消blacklist客户）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ADVANCED-CONFIGURING-BLACKLISTING（进阶：配置blacklist）"><span class="nav-number">2.0.4.</span> <span class="nav-text">ADVANCED: CONFIGURING BLACKLISTING（进阶：配置blacklist）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BACKGROUND-BLACKLISTING-AND-OSD-EPOCH-BARRIER（背景：blacklist和OSD-epoch-barrier）"><span class="nav-number">2.0.5.</span> <span class="nav-text">BACKGROUND: BLACKLISTING AND OSD EPOCH BARRIER（背景：blacklist和OSD epoch barrier）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#blacklist相关命令"><span class="nav-number">3.</span> <span class="nav-text">blacklist相关命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、从blacklist中添加（可选项，直到-lt-expire-gt-秒后）或删除-lt-addr-gt-，默认3600秒"><span class="nav-number">3.0.1.</span> <span class="nav-text">1、从blacklist中添加（可选项，直到&lt;expire&gt;秒后）或删除&lt;addr&gt;，默认3600秒</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、清除所有列入blacklist的客户端"><span class="nav-number">3.0.2.</span> <span class="nav-text">2、清除所有列入blacklist的客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、显示列入blacklist的客户端"><span class="nav-number">3.0.3.</span> <span class="nav-text">3、显示列入blacklist的客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、如果客户端在session-autoclose-lt-value-gt-秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。"><span class="nav-number">3.0.4.</span> <span class="nav-text">4、如果客户端在session_autoclose &lt;value&gt;秒（默认为300秒）以上未与MDS通信，则它将自动被驱逐。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、获取有关一个文件系统的信息"><span class="nav-number">3.0.5.</span> <span class="nav-text">5、获取有关一个文件系统的信息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#blacklist相关配置"><span class="nav-number">4.</span> <span class="nav-text">blacklist相关配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#接口（CLI后加–format-json可以以json格式输出结果）"><span class="nav-number">6.</span> <span class="nav-text">接口（CLI后加–format json可以以json格式输出结果）</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

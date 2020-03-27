@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Golang,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="课程介绍 go语言简介 beego框架介绍 beego环境搭建 应用实践 —— 看图猜电影项目 项目部署与发布 项目总结  go简介 语法简明紧凑 语法一致 噪音少   简洁的并发 go在语言级并发抽象 简洁优雅   执行速度与开发效率兼优 编译型语言 语法简明    环境搭建beego安装 beego的安装  1yujiangdeMBP-13:~ yujiang$ go get -u -v gi">
+<meta name="keywords" content="Golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="慕课网-使用Beego构建完整web项目">
+<meta property="og:url" content="http://yoursite.com/2018/10/28/慕课网-使用Beego构建完整web项目/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="课程介绍 go语言简介 beego框架介绍 beego环境搭建 应用实践 —— 看图猜电影项目 项目部署与发布 项目总结  go简介 语法简明紧凑 语法一致 噪音少   简洁的并发 go在语言级并发抽象 简洁优雅   执行速度与开发效率兼优 编译型语言 语法简明    环境搭建beego安装 beego的安装  1yujiangdeMBP-13:~ yujiang$ go get -u -v gi">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-framework.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-cache.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-config.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-context.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-httplibs.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-logs.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-%E5%85%B6%E4%BB%96.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-database.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-project-1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-project-2.png">
+<meta property="og:updated_time" content="2020-03-22T08:16:36.091Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="慕课网-使用Beego构建完整web项目">
+<meta name="twitter:description" content="课程介绍 go语言简介 beego框架介绍 beego环境搭建 应用实践 —— 看图猜电影项目 项目部署与发布 项目总结  go简介 语法简明紧凑 语法一致 噪音少   简洁的并发 go在语言级并发抽象 简洁优雅   执行速度与开发效率兼优 编译型语言 语法简明    环境搭建beego安装 beego的安装  1yujiangdeMBP-13:~ yujiang$ go get -u -v gi">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-framework.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/28/慕课网-使用Beego构建完整web项目/">
+
+
+
+
+
+  <title>慕课网-使用Beego构建完整web项目 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/28/慕课网-使用Beego构建完整web项目/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">慕课网-使用Beego构建完整web项目</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-28T16:25:42+08:00">
+                2018-10-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h2 id="课程介绍"><a href="#课程介绍" class="headerlink" title="课程介绍"></a>课程介绍</h2><ul>
+<li>go语言简介</li>
+<li>beego框架介绍</li>
+<li>beego环境搭建</li>
+<li>应用实践 —— 看图猜电影项目</li>
+<li>项目部署与发布</li>
+<li>项目总结</li>
+</ul>
+<h2 id="go简介"><a href="#go简介" class="headerlink" title="go简介"></a>go简介</h2><ul>
+<li>语法简明紧凑<ul>
+<li>语法一致</li>
+<li>噪音少</li>
+</ul>
+</li>
+<li>简洁的并发<ul>
+<li>go在语言级并发抽象</li>
+<li>简洁优雅</li>
+</ul>
+</li>
+<li>执行速度与开发效率兼优<ul>
+<li>编译型语言</li>
+<li>语法简明</li>
+</ul>
+</li>
+</ul>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><h3 id="beego安装"><a href="#beego安装" class="headerlink" title="beego安装"></a>beego安装</h3><ul>
+<li>beego的安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ go get -u -v github.com/astaxie/beego</span><br></pre></td></tr></table></figure>
+<ul>
+<li>bee工具安装</li>
+</ul>
+<p>bee工具是什么？</p>
+<p>​    一个工具包，为了协助快速开发beego项目而创建的项目。（beego项目创建、热编译、开发测试、部署）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ go get -u -v github.com/beego/bee</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:~ yujiang$ bee version</span><br><span class="line">______</span><br><span class="line">| ___ \</span><br><span class="line">| |_/ /  ___   ___</span><br><span class="line">| ___ \ / _ \ / _ \</span><br><span class="line">| |_/ /|  __/|  __/</span><br><span class="line">\____/  \___| \___| v1.10.0</span><br><span class="line"></span><br><span class="line">├── Beego     : 1.10.1</span><br><span class="line">├── GoVersion : go1.10</span><br><span class="line">├── GOOS      : darwin</span><br><span class="line">├── GOARCH    : amd64</span><br><span class="line">├── NumCPU    : 4</span><br><span class="line">├── GOPATH    : /Users/yujiang/go</span><br><span class="line">├── GOROOT    : /usr/local/go</span><br><span class="line">├── Compiler  : gc</span><br><span class="line">└── Date      : Sunday, 28 Oct 2018</span><br></pre></td></tr></table></figure>
+<h2 id="beego框架介绍"><a href="#beego框架介绍" class="headerlink" title="beego框架介绍"></a>beego框架介绍</h2><h3 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h3><ul>
+<li><p>快速开发</p>
+</li>
+<li><p>MVC架构</p>
+</li>
+<li><p>文档齐全，社区活跃</p>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-framework.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-cache.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-config.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-context.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-httplibs.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-logs.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-%E5%85%B6%E4%BB%96.png" alt></p>
+<h2 id="bee工具应用"><a href="#bee工具应用" class="headerlink" title="bee工具应用"></a>bee工具应用</h2><ul>
+<li><p>bee new：新建项目结构</p>
+</li>
+<li><p>bee run：自动编译部署</p>
+</li>
+<li><p>bee generate：自动生成代码</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ bee new imooc</span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ bee run</span><br><span class="line">浏览器输入 http://localhost:8080/</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ tree</span><br><span class="line">.</span><br><span class="line">├── conf</span><br><span class="line">│   └── app.conf</span><br><span class="line">├── controllers</span><br><span class="line">│   └── default.go</span><br><span class="line">├── main.go</span><br><span class="line">├── models</span><br><span class="line">├── routers</span><br><span class="line">│   └── router.go</span><br><span class="line">├── static</span><br><span class="line">│   ├── css</span><br><span class="line">│   ├── img</span><br><span class="line">│   └── js</span><br><span class="line">│       └── reload.min.js</span><br><span class="line">├── tests</span><br><span class="line">│   └── default_test.go</span><br><span class="line">└── views</span><br><span class="line">    └── index.tpl</span><br><span class="line"></span><br><span class="line">10 directories, 7 files</span><br></pre></td></tr></table></figure>
+<h3 id="beego项目运行基本流程"><a href="#beego项目运行基本流程" class="headerlink" title="beego项目运行基本流程"></a>beego项目运行基本流程</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line">文件 - main.go</span><br><span class="line">package main</span><br><span class="line">import (</span><br><span class="line">	_ &quot;imooc/routers&quot;	// _表示只执行imooc/routers的init()函数</span><br><span class="line">	&quot;github.com/astaxie/beego&quot;</span><br><span class="line">)</span><br><span class="line">func main() &#123;</span><br><span class="line">	beego.Run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">文件 - routers/router.go</span><br><span class="line">package routers</span><br><span class="line">import (</span><br><span class="line">	&quot;imooc/controllers&quot;</span><br><span class="line">	&quot;github.com/astaxie/beego&quot;</span><br><span class="line">)</span><br><span class="line">func init() &#123;</span><br><span class="line">	// </span><br><span class="line">    beego.Router(&quot;/&quot;, &amp;controllers.MainController&#123;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">文件 - controllers/default.go</span><br><span class="line">package controllers</span><br><span class="line">import (</span><br><span class="line">	&quot;github.com/astaxie/beego&quot;</span><br><span class="line">)</span><br><span class="line">type MainController struct &#123;</span><br><span class="line">	beego.Controller</span><br><span class="line">&#125;</span><br><span class="line">func (c *MainController) Get() &#123;</span><br><span class="line">	// 这里就是处理get请求的逻辑</span><br><span class="line">	c.Data[&quot;Website&quot;] = &quot;beego.me&quot;	// 向模板传递的数据</span><br><span class="line">	c.Data[&quot;Email&quot;] = &quot;astaxie@gmail.com&quot;	// 向模板传递的数据</span><br><span class="line">	c.TplName = &quot;index.tpl&quot;  // 渲染的模板文件</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">beego通过浏览器传递参数的方法：（http://localhost:8080/?name=&quot;yujiang&quot;）</span><br><span class="line">package controllers</span><br><span class="line">import (</span><br><span class="line">	&quot;github.com/astaxie/beego&quot;</span><br><span class="line">)</span><br><span class="line">type MainController struct &#123;</span><br><span class="line">	beego.Controller</span><br><span class="line">&#125;</span><br><span class="line">func (c *MainController) Get() &#123;</span><br><span class="line">	name := c.GetString(&quot;name&quot;)</span><br><span class="line">	//c.Data[&quot;Website&quot;] = &quot;beego.me&quot;</span><br><span class="line">	c.Data[&quot;Website&quot;] = name</span><br><span class="line">	c.Data[&quot;Email&quot;] = &quot;astaxie@gmail.com&quot;</span><br><span class="line">	c.TplName = &quot;index.tpl&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="beego如何进行数据交互"><a href="#beego如何进行数据交互" class="headerlink" title="beego如何进行数据交互"></a>beego如何进行数据交互</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# yum install mariadb-server -y</span><br><span class="line">[root@localhost ~]# systemctl start mariadb</span><br><span class="line">[root@localhost ~]# systemctl enable mariadb</span><br><span class="line">[root@localhost ~]# mysql -u root -p</span><br><span class="line"></span><br><span class="line">MariaDB [(none)]&gt; create database imooc;</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line">MariaDB [(none)]&gt; use imooc;</span><br><span class="line">MariaDB [imooc]&gt; CREATE TABLE `user` ( `id` int(11) NOT NULL AUTO_INCREMENT, `name` varchar(128) NOT NULL DEFAULT &apos;&apos;, `gender` tinyint(4) NOT NULL DEFAULT &apos;0&apos;, `age` int(11) NOT NULL DEFAULT &apos;0&apos;, PRIMARY KEY (`id`) )ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br><span class="line">Query OK, 0 rows affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [imooc]&gt; INSERT INTO user (name,gender,age) values(&apos;zhangsan&apos;,1,21);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line">MariaDB [imooc]&gt; INSERT INTO user (name,gender,age) values(&apos;lisi&apos;,0,22);</span><br><span class="line">Query OK, 1 row affected (0.01 sec)</span><br><span class="line">MariaDB [imooc]&gt; INSERT INTO user (name,gender,age) values(&apos;wangwu&apos;,1,20);</span><br><span class="line">Query OK, 1 row affected (0.00 sec)</span><br><span class="line"></span><br><span class="line">MariaDB [imooc]&gt; select * from user;</span><br><span class="line">+----+----------+--------+-----+</span><br><span class="line">| id | name     | gender | age |</span><br><span class="line">+----+----------+--------+-----+</span><br><span class="line">|  1 | zhangsan |      1 |  21 |</span><br><span class="line">|  2 | lisi     |      0 |  22 |</span><br><span class="line">|  3 | wangwu   |      1 |  20 |</span><br><span class="line">+----+----------+--------+-----+</span><br><span class="line">3 rows in set (0.00 sec)</span><br><span class="line"></span><br><span class="line">生成代码</span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ bee generate scaffold user -fields=&quot;id:int64,name:string,gender:int,age:int&quot; -driver=mysql -conn=&quot;root:@tcp(192.168.56.101:3306)/imooc&quot;</span><br><span class="line">______</span><br><span class="line">| ___ \</span><br><span class="line">| |_/ /  ___   ___</span><br><span class="line">| ___ \ / _ \ / _ \</span><br><span class="line">| |_/ /|  __/|  __/</span><br><span class="line">\____/  \___| \___| v1.10.0</span><br><span class="line">2018/10/28 19:30:25 INFO     ▶ 0001 Do you want to create a &apos;user&apos; model? [Yes|No] </span><br><span class="line">Yes</span><br><span class="line">2018/10/28 19:31:34 INFO     ▶ 0002 Using &apos;User&apos; as model name</span><br><span class="line">2018/10/28 19:31:34 INFO     ▶ 0003 Using &apos;models&apos; as package name</span><br><span class="line">	create	 /Users/yujiang/go/src/imooc/models/user.go</span><br><span class="line">2018/10/28 19:31:34 INFO     ▶ 0004 Do you want to create a &apos;user&apos; controller? [Yes|No] </span><br><span class="line">Yes</span><br><span class="line">2018/10/28 19:31:43 INFO     ▶ 0005 Using &apos;User&apos; as controller name</span><br><span class="line">2018/10/28 19:31:43 INFO     ▶ 0006 Using &apos;controllers&apos; as package name</span><br><span class="line">2018/10/28 19:31:43 INFO     ▶ 0007 Using matching model &apos;User&apos;</span><br><span class="line">	create	 /Users/yujiang/go/src/imooc/controllers/user.go</span><br><span class="line">2018/10/28 19:31:43 INFO     ▶ 0008 Do you want to create views for this &apos;user&apos; resource? [Yes|No] </span><br><span class="line">Yes</span><br><span class="line">2018/10/28 19:31:52 INFO     ▶ 0009 Generating view...</span><br><span class="line">	create	 /Users/yujiang/go/src/imooc/views/user/index.tpl</span><br><span class="line">	create	 /Users/yujiang/go/src/imooc/views/user/show.tpl</span><br><span class="line">	create	 /Users/yujiang/go/src/imooc/views/user/create.tpl</span><br><span class="line">	create	 /Users/yujiang/go/src/imooc/views/user/edit.tpl</span><br><span class="line">2018/10/28 19:31:52 INFO     ▶ 0010 Do you want to create a &apos;user&apos; migration and schema for this resource? [Yes|No] </span><br><span class="line">No</span><br><span class="line">2018/10/28 19:32:11 INFO     ▶ 0011 Do you want to migrate the database? [Yes|No] </span><br><span class="line">No</span><br><span class="line">2018/10/28 19:32:13 SUCCESS  ▶ 0012 All done! Don&apos;t forget to add  beego.Router(&quot;/user&quot; ,&amp;controllers.UserController&#123;&#125;) to routers/route.go</span><br><span class="line"></span><br><span class="line">2018/10/28 19:32:13 SUCCESS  ▶ 0013 Scaffold successfully generated!</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ tree</span><br><span class="line">.</span><br><span class="line">├── conf</span><br><span class="line">│   └── app.conf</span><br><span class="line">├── controllers</span><br><span class="line">│   ├── default.go</span><br><span class="line">│   └── user.go</span><br><span class="line">├── imooc</span><br><span class="line">├── main.go</span><br><span class="line">├── models</span><br><span class="line">│   └── user.go</span><br><span class="line">├── routers</span><br><span class="line">│   └── router.go</span><br><span class="line">├── static</span><br><span class="line">│   ├── css</span><br><span class="line">│   ├── img</span><br><span class="line">│   └── js</span><br><span class="line">│       └── reload.min.js</span><br><span class="line">├── tests</span><br><span class="line">│   └── default_test.go</span><br><span class="line">└── views</span><br><span class="line">    ├── index.tpl</span><br><span class="line">    └── user</span><br><span class="line">        ├── create.tpl</span><br><span class="line">        ├── edit.tpl</span><br><span class="line">        ├── index.tpl</span><br><span class="line">        └── show.tpl</span><br><span class="line"></span><br><span class="line">11 directories, 14 files</span><br></pre></td></tr></table></figure>
+<p>安装<code>go-sql-driver</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:~ yujiang$ go get -v -u github.com/go-sql-driver/mysql</span><br><span class="line"></span><br><span class="line">文件 - routers/router.go</span><br><span class="line">package routers</span><br><span class="line">import (</span><br><span class="line">	&quot;github.com/astaxie/beego&quot;</span><br><span class="line">	&quot;imooc/controllers&quot;</span><br><span class="line">)</span><br><span class="line">func init() &#123;</span><br><span class="line">	//beego.Router(&quot;/&quot;, &amp;controllers.MainController&#123;&#125;)</span><br><span class="line">	beego.Include(&amp;controllers.UserController&#123;&#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">文件 - main.go</span><br><span class="line">package main</span><br><span class="line">import (</span><br><span class="line">	_ &quot;imooc/routers&quot;</span><br><span class="line">	&quot;github.com/astaxie/beego&quot;</span><br><span class="line">	&quot;github.com/astaxie/beego/orm&quot;</span><br><span class="line">	_ &quot;github.com/go-sql-driver/mysql&quot;</span><br><span class="line">)</span><br><span class="line">func main() &#123;</span><br><span class="line">	orm.RegisterDataBase(&quot;default&quot;,&quot;mysql&quot;,&quot;root:root@tcp(192.168.56.101:3306)/imooc&quot;)</span><br><span class="line">	beego.Run()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">yujiangdeMBP-13:imooc yujiang$ bee run</span><br><span class="line">______</span><br><span class="line">| ___ \</span><br><span class="line">| |_/ /  ___   ___</span><br><span class="line">| ___ \ / _ \ / _ \</span><br><span class="line">| |_/ /|  __/|  __/</span><br><span class="line">\____/  \___| \___| v1.10.0</span><br><span class="line">2018/10/28 20:31:44 INFO     ▶ 0001 Using &apos;imooc&apos; as &apos;appname&apos;</span><br><span class="line">2018/10/28 20:31:44 INFO     ▶ 0002 Initializing watcher...</span><br><span class="line">imooc</span><br><span class="line">2018/10/28 20:31:46 SUCCESS  ▶ 0003 Built Successfully!</span><br><span class="line">2018/10/28 20:31:46 INFO     ▶ 0004 Restarting &apos;imooc&apos;...</span><br><span class="line">2018/10/28 20:31:46 SUCCESS  ▶ 0005 &apos;./imooc&apos; is running...</span><br><span class="line">2018/10/28 20:31:46.697 [I] [router.go:269]  /Users/yujiang/go/src/imooc/controllers no changed</span><br><span class="line">2018/10/28 20:31:46.719 [I] [asm_amd64.s:2361]  http server Running on http://:8080</span><br><span class="line">2018/10/28 20:31:55.475 [D] [server.go:2694]  |            ::1| 200 |   3.979416ms|   match| GET      /     r:/</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-database.png" alt></p>
+<h2 id="应用实践"><a href="#应用实践" class="headerlink" title="应用实践"></a>应用实践</h2><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-project-1.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/慕课网-使用Beego构建完整web项目/beego-project-2.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Golang/" rel="tag"># Golang</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/16/The-Ceph-Benchmarking-Tool/" rel="next" title="The Ceph Benchmarking Tool">
+                <i class="fa fa-chevron-left"></i> The Ceph Benchmarking Tool
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/29/Generic-Block-Device-Tuning-Parameters-read-ahead-kb/" rel="prev" title="Generic Block Device Tuning Parameters - read_ahead_kb">
+                Generic Block Device Tuning Parameters - read_ahead_kb <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#课程介绍"><span class="nav-number">1.</span> <span class="nav-text">课程介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#go简介"><span class="nav-number">2.</span> <span class="nav-text">go简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#环境搭建"><span class="nav-number">3.</span> <span class="nav-text">环境搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beego安装"><span class="nav-number">3.1.</span> <span class="nav-text">beego安装</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#beego框架介绍"><span class="nav-number">4.</span> <span class="nav-text">beego框架介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#特点"><span class="nav-number">4.1.</span> <span class="nav-text">特点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bee工具应用"><span class="nav-number">5.</span> <span class="nav-text">bee工具应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#beego项目运行基本流程"><span class="nav-number">5.1.</span> <span class="nav-text">beego项目运行基本流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#beego如何进行数据交互"><span class="nav-number">5.2.</span> <span class="nav-text">beego如何进行数据交互</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用实践"><span class="nav-number">6.</span> <span class="nav-text">应用实践</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

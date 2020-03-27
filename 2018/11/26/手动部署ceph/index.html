@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ceph,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="手动部署ceph是看懂官方ansible或ceph-deploy的关键，了解部署步骤和相关组件才能更好的理解代码，理解OSD的挂载流程，所以个人认为需要做此实验。 官方文档：http://docs.ceph.com/docs/master/install/manual-deployment/ MANUAL DEPLOYMENT所有Ceph集群都需要至少一个monitor，并且至少需要与集群中存储对">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手动部署ceph">
+<meta property="og:url" content="http://yoursite.com/2018/11/26/手动部署ceph/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="手动部署ceph是看懂官方ansible或ceph-deploy的关键，了解部署步骤和相关组件才能更好的理解代码，理解OSD的挂载流程，所以个人认为需要做此实验。 官方文档：http://docs.ceph.com/docs/master/install/manual-deployment/ MANUAL DEPLOYMENT所有Ceph集群都需要至少一个monitor，并且至少需要与集群中存储对">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://docs.ceph.com/docs/master/_images/ditaa-b67d58275cae03a5573d36907b437e36df685600.png">
+<meta property="og:updated_time" content="2020-03-22T08:16:36.108Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="手动部署ceph">
+<meta name="twitter:description" content="手动部署ceph是看懂官方ansible或ceph-deploy的关键，了解部署步骤和相关组件才能更好的理解代码，理解OSD的挂载流程，所以个人认为需要做此实验。 官方文档：http://docs.ceph.com/docs/master/install/manual-deployment/ MANUAL DEPLOYMENT所有Ceph集群都需要至少一个monitor，并且至少需要与集群中存储对">
+<meta name="twitter:image" content="http://docs.ceph.com/docs/master/_images/ditaa-b67d58275cae03a5573d36907b437e36df685600.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/26/手动部署ceph/">
+
+
+
+
+
+  <title>手动部署ceph | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/26/手动部署ceph/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">手动部署ceph</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-11-26T18:47:23+08:00">
+                2018-11-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <p>手动部署ceph是看懂官方ansible或ceph-deploy的关键，了解部署步骤和相关组件才能更好的理解代码，理解OSD的挂载流程，所以个人认为需要做此实验。</p>
+<p>官方文档：<a href="http://docs.ceph.com/docs/master/install/manual-deployment/" target="_blank" rel="noopener">http://docs.ceph.com/docs/master/install/manual-deployment/</a></p>
+<h1 id="MANUAL-DEPLOYMENT"><a href="#MANUAL-DEPLOYMENT" class="headerlink" title="MANUAL DEPLOYMENT"></a>MANUAL DEPLOYMENT</h1><p>所有Ceph集群都需要至少一个monitor，并且至少需要与集群中存储对象副本一样多的OSD。引导初始monitor(s)是部署Ceph存储集群的第一步。monitor部署还为整个集群设置了重要准则，例如pool的副本数，每个OSD的placement groups数（PG数），心跳间隔，是否需要身份验证等。这些值中的大多数都是默认设置的，因此在设置生产环境集群时，了解它们很有用。<br>遵循与<a href="http://docs.ceph.com/docs/master/start/" target="_blank" rel="noopener">安装（快速）</a>相同的配置，我们将设置一个集群，其中node1作为监控节点，node2和node3作为OSD节点</p>
+<p><img src="http://docs.ceph.com/docs/master/_images/ditaa-b67d58275cae03a5573d36907b437e36df685600.png" alt></p>
+<h2 id="MONITOR-BOOTSTRAPPING"><a href="#MONITOR-BOOTSTRAPPING" class="headerlink" title="MONITOR BOOTSTRAPPING"></a>MONITOR BOOTSTRAPPING</h2><p>引导monitor需要许多东西：</p>
+<ul>
+<li><p>Unique Identifier（唯一标识符）: fsid是集群的唯一标识符，它是 Ceph 作为文件系统时的文件系统标识符。现在Ceph也支持原生接口，块设备和对象存储网关接口，因此fsid有点不恰当的。</p>
+</li>
+<li><p>Cluster Name（集群名称）: Ceph集群有一个集群名称，这是一个没有空格的字符串。默认集群名称为ceph，但您可以指定其他集群名称。当您使用多个集群并且需要清楚地了解正在使用哪个集群时，覆盖默认集群名称尤其有用。</p>
+<p>例如，在<a href="http://docs.ceph.com/docs/master/radosgw/multisite/#multisite" target="_blank" rel="noopener">multisite configuration</a>中运行多个集群时，集群名称（例如，us-west，us-east）标识当前CLI会话的集群。注意：要在CLI标识集群名称，请使用集群名称指定Ceph配置文件（例如，ceph.conf，us-west.conf，us-east.conf等）。另请参阅CLI用法（ceph –cluster {cluster-name}）。</p>
+</li>
+<li><p>Monitor Name: 集群中的每个monitor实例都具有唯一的名称。通常，Ceph Monitor名称是主机名（我们建议独立一台主机运行Ceph Monitor，而不要将Ceph OSD Daemons与Ceph Monitors混合部署在一台机器上）。您可以使用hostname -s检索短主机名。</p>
+</li>
+<li><p>Monitor Map: 引导初始monitor(s)需要您生成monitor map。monitor map需要fsid，cluster name，以及至少一个host name及其IP地址。</p>
+</li>
+<li><p>Monitor Keyring: Monitors通过secret key相互通信。您必须生成带有monitor secret的keyring，并在引导初始monitor(s)时提供它。</p>
+</li>
+<li><p>Administrator Keyring: 要使用ceph CLI tools，您必须具有client.admin用户。因此，您必须生成admin用户和相应keyring，并且还必须将client.admin用户添加到monitor keyring。</p>
+</li>
+</ul>
+<p>上述要求并不意味着创建Ceph配置文件。但是，作为最佳实践，我们建议创建一个Ceph配置文件，并使用fsid，mon initial members和mon host填充它。</p>
+<p>您也可以在运行时获取并设置所有monitor settings。但是，Ceph配置文件可能只包含覆盖默认值的那些settings。将settings添加到Ceph配置文件时，这些settings会覆盖默认settings。在Ceph配置文件中维护这些settings可以使您更轻松地维护集群。</p>
+<p>过程如下：</p>
+<p>1、登录monitor节点：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh &#123;hostname&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh node1</span><br></pre></td></tr></table></figure>
+<p>2、确保您有Ceph配置文件的目录。 默认情况下，Ceph使用/etc/ceph。 安装ceph时，安装程序将自动创建/etc/ceph目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls /etc/ceph</span><br></pre></td></tr></table></figure>
+<p>注意：部署工具可能在清除集群时删除此目录（例如，ceph-deploy purgedata {node-name}，ceph-deploy purge {node-name}）。</p>
+<p>3、创建Ceph配置文件。 默认情况下，Ceph使用ceph.conf，其中ceph反映了集群名称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim /etc/ceph/ceph.conf</span><br></pre></td></tr></table></figure>
+<p>4、为您的集群生成唯一ID（即fsid）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uuidgen</span><br></pre></td></tr></table></figure>
+<p>5、将唯一ID添加到Ceph配置文件中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fsid = &#123;UUID&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fsid = a7f64266-0894-4f1e-a635-d0aeaca0e993</span><br></pre></td></tr></table></figure>
+<p>6、将初始monitor(s)添加到Ceph配置文件中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon initial members = &#123;hostname&#125;[,&#123;hostname&#125;]</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon initial members = node1</span><br></pre></td></tr></table></figure>
+<p>7、将初始monitor(s)的IP地址添加到Ceph配置文件并保存文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon host = &#123;ip-address&#125;[,&#123;ip-address&#125;]</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon host = 192.168.0.1</span><br></pre></td></tr></table></figure>
+<p>注意：您可以使用IPv6地址而不是IPv4地址，但必须将ms bind ipv6设置为true。有关网络配置的详细信息，请参阅<a href="http://docs.ceph.com/docs/master/rados/configuration/network-config-ref" target="_blank" rel="noopener">网络配置参考</a>。</p>
+<p>8、为集群创建keyring并生成monitor secret key。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-authtool --create-keyring /tmp/ceph.mon.keyring --gen-key -n mon. --cap mon &apos;allow *&apos;</span><br></pre></td></tr></table></figure>
+<p>9、生成administrator keyring，生成client.admin用户并将用户添加到keyring。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-authtool --create-keyring /etc/ceph/ceph.client.admin.keyring --gen-key -n client.admin --cap mon &apos;allow *&apos; --cap osd &apos;allow *&apos; --cap mds &apos;allow *&apos; --cap mgr &apos;allow *&apos;</span><br></pre></td></tr></table></figure>
+<p>10、生成bootstrap-osd keyring，生成client.bootstrap-osd用户并将用户添加到keyring。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-authtool --create-keyring /var/lib/ceph/bootstrap-osd/ceph.keyring --gen-key -n client.bootstrap-osd --cap mon &apos;profile bootstrap-osd&apos;</span><br></pre></td></tr></table></figure>
+<p>11、将生成的keys添加到ceph.mon.keyring。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-authtool /tmp/ceph.mon.keyring --import-keyring /etc/ceph/ceph.client.admin.keyring</span><br><span class="line">sudo ceph-authtool /tmp/ceph.mon.keyring --import-keyring /var/lib/ceph/bootstrap-osd/ceph.keyring</span><br></pre></td></tr></table></figure>
+<p>12、使用主机名，主机IP地址和FSID生成monitor map。将其另存为/tmp/monmap。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">monmaptool --create --add &#123;hostname&#125; &#123;ip-address&#125; --fsid &#123;uuid&#125; /tmp/monmap</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">monmaptool --create --add node1 192.168.0.1 --fsid a7f64266-0894-4f1e-a635-d0aeaca0e993 /tmp/monmap</span><br></pre></td></tr></table></figure>
+<p>13、在monitor主机上创建默认数据目录（或多个目录）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir /var/lib/ceph/mon/&#123;cluster-name&#125;-&#123;hostname&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -u ceph mkdir /var/lib/ceph/mon/ceph-node1</span><br></pre></td></tr></table></figure>
+<p>有关详细信息，请参阅<a href="http://docs.ceph.com/docs/master/rados/configuration/mon-config-ref#data" target="_blank" rel="noopener">Monitor Config Reference - Data</a>。</p>
+<p>14、使用monitor map和keyring填充monitor daemon(s)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -u ceph ceph-mon [--cluster &#123;cluster-name&#125;] --mkfs -i &#123;hostname&#125; --monmap /tmp/monmap --keyring /tmp/ceph.mon.keyring</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo -u ceph ceph-mon --mkfs -i node1 --monmap /tmp/monmap --keyring /tmp/ceph.mon.keyring</span><br></pre></td></tr></table></figure>
+<p>15、考虑Ceph配置文件的settings，常见settings包括以下内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">fsid = &#123;cluster-id&#125;</span><br><span class="line">mon initial members = &#123;hostname&#125;[, &#123;hostname&#125;]</span><br><span class="line">mon host = &#123;ip-address&#125;[, &#123;ip-address&#125;]</span><br><span class="line">public network = &#123;network&#125;[, &#123;network&#125;]</span><br><span class="line">cluster network = &#123;network&#125;[, &#123;network&#125;]</span><br><span class="line">auth cluster required = cephx</span><br><span class="line">auth service required = cephx</span><br><span class="line">auth client required = cephx</span><br><span class="line">osd journal size = &#123;n&#125;</span><br><span class="line">osd pool default size = &#123;n&#125;  # Write an object n times.</span><br><span class="line">osd pool default min size = &#123;n&#125; # Allow writing n copies in a degraded state.</span><br><span class="line">osd pool default pg num = &#123;n&#125;</span><br><span class="line">osd pool default pgp num = &#123;n&#125;</span><br><span class="line">osd crush chooseleaf type = &#123;n&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的示例中，配置的[global]部分可能如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[global]</span><br><span class="line">fsid = a7f64266-0894-4f1e-a635-d0aeaca0e993</span><br><span class="line">mon initial members = node1</span><br><span class="line">mon host = 192.168.0.1</span><br><span class="line">public network = 192.168.0.0/24</span><br><span class="line">auth cluster required = cephx</span><br><span class="line">auth service required = cephx</span><br><span class="line">auth client required = cephx</span><br><span class="line">osd journal size = 1024</span><br><span class="line">osd pool default size = 3</span><br><span class="line">osd pool default min size = 2</span><br><span class="line">osd pool default pg num = 333</span><br><span class="line">osd pool default pgp num = 333</span><br><span class="line">osd crush chooseleaf type = 1</span><br></pre></td></tr></table></figure>
+<p>16、启动monitor(s)。</p>
+<p>对于大多数linux发行版，services通过systemd启动：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start ceph-mon@node1</span><br></pre></td></tr></table></figure>
+<p>对于较旧的Debian/CentOS/RHEL，请使用sysvinit：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /etc/init.d/ceph start mon.node1</span><br></pre></td></tr></table></figure>
+<p>17、验证monitor是否正在运行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph -s</span><br></pre></td></tr></table></figure>
+<p>您应该看到monitor已启动并打印运行的输出，并且您应该看到一个运行状况错误，提示placement groups（PG）处于inactive状态。看起来像这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">cluster:</span><br><span class="line">  id:     a7f64266-0894-4f1e-a635-d0aeaca0e993</span><br><span class="line">  health: HEALTH_OK</span><br><span class="line"></span><br><span class="line">services:</span><br><span class="line">  mon: 1 daemons, quorum node1</span><br><span class="line">  mgr: node1(active)</span><br><span class="line">  osd: 0 osds: 0 up, 0 in</span><br><span class="line"></span><br><span class="line">data:</span><br><span class="line">  pools:   0 pools, 0 pgs</span><br><span class="line">  objects: 0 objects, 0 bytes</span><br><span class="line">  usage:   0 kB used, 0 kB / 0 kB avail</span><br><span class="line">  pgs:</span><br></pre></td></tr></table></figure>
+<p>注意：添加OSD并启动它们后，placement group（PG）错误应该消失。有关详细信息，请参阅<a href="http://docs.ceph.com/docs/master/install/manual-deployment/#adding-osds" target="_blank" rel="noopener">添加OSD</a>。</p>
+<h2 id="MANAGER-DAEMON-CONFIGURATION"><a href="#MANAGER-DAEMON-CONFIGURATION" class="headerlink" title="MANAGER DAEMON CONFIGURATION"></a>MANAGER DAEMON CONFIGURATION</h2><p>在运行ceph-mon daemon的每个节点上，还应该设置ceph-mgr daemon。</p>
+<p>请参阅<a href="http://docs.ceph.com/docs/master/mgr/administrator/#mgr-administrator-guide" target="_blank" rel="noopener">ceph-mgr管理员指南</a>。</p>
+<h2 id="ADDING-OSDS"><a href="#ADDING-OSDS" class="headerlink" title="ADDING OSDS"></a>ADDING OSDS</h2><p>初始monitor(s)运行后，应添加OSD。在有足够的OSD来处理对象的副本数量之前，您的集群无法达到active + clean状态（例如，osd pool default size = 2需要至少两个OSD）。</p>
+<p>引导monitor后，您的集群具有默认的CRUSH map，但是，CRUSH map没有映射到Ceph节点的任何Ceph OSD Daemons。</p>
+<h3 id="SHORT-FORM（简写）"><a href="#SHORT-FORM（简写）" class="headerlink" title="SHORT FORM（简写）"></a>SHORT FORM（简写）</h3><p>Ceph提供了ceph-volume实用程序，它可以prepare logical volume，disk或partition，以便与ceph一起使用。 ceph-volume实用程序通过递增索引来创建OSD ID。 此外，ceph-volume会将新OSD添加到CRUSH map中的host下。执行ceph-volume -h以获取CLI详细信息。ceph-volume实用程序自动执行下面的<a href="http://docs.ceph.com/docs/master/install/manual-deployment/#long-form" target="_blank" rel="noopener">Long Form</a>的步骤。要使用short form过程创建前两个OSD，请在node2和node3上执行以下操作：</p>
+<h3 id="BLUESTORE"><a href="#BLUESTORE" class="headerlink" title="BLUESTORE"></a>BLUESTORE</h3><p>1、创建OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh &#123;node-name&#125;</span><br><span class="line">sudo ceph-volume lvm create --data &#123;data-path&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh node1</span><br><span class="line">sudo ceph-volume lvm create --data /dev/hdd1</span><br></pre></td></tr></table></figure>
+<p>或者，创建过程可以分为两个阶段（prepare和activate）：</p>
+<p>1、Prepare the OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh &#123;node-name&#125;</span><br><span class="line">sudo ceph-volume lvm prepare --data &#123;data-path&#125; &#123;data-path&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh node1</span><br><span class="line">sudo ceph-volume lvm prepare --data /dev/hdd1</span><br></pre></td></tr></table></figure>
+<p>prepare后，激活prepare后的OSD的ID和FSID。这些可以通过列出当前服务器中的OSD来获得：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-volume lvm list</span><br></pre></td></tr></table></figure>
+<p>2、Activate the OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-volume lvm activate &#123;ID&#125; &#123;FSID&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-volume lvm activate 0 a7f64266-0894-4f1e-a635-d0aeaca0e993</span><br></pre></td></tr></table></figure>
+<h3 id="FILESTORE"><a href="#FILESTORE" class="headerlink" title="FILESTORE"></a>FILESTORE</h3><p>1、Create the OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh &#123;node-name&#125;</span><br><span class="line">sudo ceph-volume lvm create --filestore --data &#123;data-path&#125; --journal &#123;journal-path&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh node1</span><br><span class="line">sudo ceph-volume lvm create --filestore --data /dev/hdd1 --journal /dev/hdd2</span><br></pre></td></tr></table></figure>
+<p>或者，创建过程可以分为两个阶段（prepare和activate）：</p>
+<p>1、Prepare the OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh &#123;node-name&#125;</span><br><span class="line">sudo ceph-volume lvm prepare --filestore --data &#123;data-path&#125; --journal &#123;journal-path&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh node1</span><br><span class="line">sudo ceph-volume lvm prepare --filestore --data /dev/hdd1 --journal /dev/hdd2</span><br></pre></td></tr></table></figure>
+<p>prepare后，激活prepare后的OSD的ID和FSID。这些可以通过列出当前服务器中的OSD来获得：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-volume lvm list</span><br></pre></td></tr></table></figure>
+<p>2、Activate the OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-volume lvm activate --filestore &#123;ID&#125; &#123;FSID&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-volume lvm activate --filestore 0 a7f64266-0894-4f1e-a635-d0aeaca0e993</span><br></pre></td></tr></table></figure>
+<h3 id="LONG-FORM"><a href="#LONG-FORM" class="headerlink" title="LONG FORM"></a>LONG FORM</h3><p>如果没有任何helper实用程序，请创建一个OSD并使用以下步骤将其添加到集群和CRUSH map中。要使用long form方式创建前两个OSD，请对每个OSD执行以下步骤。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意：此过程没有描述使用dm-crypt“lockbox”在dm-crypt之上的部署。</span><br></pre></td></tr></table></figure>
+<p>1、连接到OSD主机并变为root用户。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh &#123;node-name&#125;</span><br><span class="line">sudo bash</span><br></pre></td></tr></table></figure>
+<p>2、为OSD生成UUID。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UUID=$(uuidgen)</span><br></pre></td></tr></table></figure>
+<p>3、为OSD生成cephx key。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OSD_SECRET=$(ceph-authtool --gen-print-key)</span><br></pre></td></tr></table></figure>
+<p>4、创建OSD。 请注意，如果您需要重用之前销毁的OSD ID，可以提供OSD ID作为ceph osd new的附加参数。我们假设机器上存在client.bootstrap-osd key。您也可以在拥有该key的其他主机上以client.admin身份执行此命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ID=$(echo &quot;&#123;\&quot;cephx_secret\&quot;: \&quot;$OSD_SECRET\&quot;&#125;&quot; | \</span><br><span class="line">   ceph osd new $UUID -i - \</span><br><span class="line">   -n client.bootstrap-osd -k /var/lib/ceph/bootstrap-osd/ceph.keyring)</span><br></pre></td></tr></table></figure>
+<p>也可以在JSON中包含crush_device_class属性，以设置默认值以外的initial class（基于自动检测到的设备类型，ssd或hdd）。</p>
+<p>5、在新OSD上创建默认目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /var/lib/ceph/osd/ceph-$ID</span><br></pre></td></tr></table></figure>
+<p>6、如果OSD使用操作系统以外的drive，先创建文件系统，并将其mount到刚刚创建的目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkfs.xfs /dev/&#123;DEV&#125;</span><br><span class="line">mount /dev/&#123;DEV&#125; /var/lib/ceph/osd/ceph-$ID</span><br></pre></td></tr></table></figure>
+<p>7、将secret写入OSD keyring文件中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph-authtool --create-keyring /var/lib/ceph/osd/ceph-$ID/keyring \</span><br><span class="line">     --name osd.$ID --add-key $OSD_SECRET</span><br></pre></td></tr></table></figure>
+<p>8、初始化OSD数据目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-osd -i $ID --mkfs --osd-uuid $UUID</span><br></pre></td></tr></table></figure>
+<p>9、修复所有权。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R ceph:ceph /var/lib/ceph/osd/ceph-$ID</span><br></pre></td></tr></table></figure>
+<p>10、将OSD添加到Ceph后，OSD就在您的配置中。但是，它还没有运行。必须先启动新的OSD才能开始接收数据。</p>
+<p>systemd方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable ceph-osd@$ID</span><br><span class="line">systemctl start ceph-osd@$ID</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl enable ceph-osd@12</span><br><span class="line">systemctl start ceph-osd@12</span><br></pre></td></tr></table></figure>
+<h2 id="ADDING-MDS"><a href="#ADDING-MDS" class="headerlink" title="ADDING MDS"></a>ADDING MDS</h2><p>在以下说明中，{id}是任意名称，例如计算机的hostname。</p>
+<p>1、创建mds数据目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /var/lib/ceph/mds/&#123;cluster-name&#125;-&#123;id&#125;</span><br></pre></td></tr></table></figure>
+<p>2、创建一个keyring：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-authtool --create-keyring /var/lib/ceph/mds/&#123;cluster-name&#125;-&#123;id&#125;/keyring --gen-key -n mds.&#123;id&#125;</span><br></pre></td></tr></table></figure>
+<p>3、导入keyring并设置caps：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph auth add mds.&#123;id&#125; osd &quot;allow rwx&quot; mds &quot;allow&quot; mon &quot;allow profile mds&quot; -i /var/lib/ceph/mds/&#123;cluster&#125;-&#123;id&#125;/keyring</span><br></pre></td></tr></table></figure>
+<p>4、添加到ceph.conf：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[mds.&#123;id&#125;]</span><br><span class="line">host = &#123;id&#125;</span><br></pre></td></tr></table></figure>
+<p>5、以手动方式启动daemon：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-mds --cluster &#123;cluster-name&#125; -i &#123;id&#125; -m &#123;mon-hostname&#125;:&#123;mon-port&#125; [-f]</span><br></pre></td></tr></table></figure>
+<p>6、以正确的方式启动daemon（使用ceph.conf entry）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service ceph start</span><br></pre></td></tr></table></figure>
+<p>7、如果启动daemon失败并显示以下错误：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mds.-1.0 ERROR: failed to authenticate: (22) Invalid argument</span><br></pre></td></tr></table></figure>
+<p>那么，需要确认你没有在ceph.conf的global section中设置keyring；并将其移至client section。或添加特定于此mds daemon的keyring设置。并验证您是否在mds data目录中看到相同的key，并且与ceph auth get mds.{id}命令的输出相同。</p>
+<p>8、现在您已准备好<a href="http://docs.ceph.com/docs/master/cephfs/createfs/" target="_blank" rel="noopener">创建Ceph filesystem</a>。</p>
+<h2 id="SUMMARY"><a href="#SUMMARY" class="headerlink" title="SUMMARY"></a>SUMMARY</h2><p>一旦您的monitor和两个OSD启动并运行，可以通过执行以下操作来观察placement groups peer：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph -w</span><br></pre></td></tr></table></figure>
+<p>要查看tree，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd tree</span><br></pre></td></tr></table></figure>
+<p>你应该看到像这样的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># id    weight  type name       up/down reweight</span><br><span class="line">-1      2       root default</span><br><span class="line">-2      2               host node1</span><br><span class="line">0       1                       osd.0   up      1</span><br><span class="line">-3      1               host node2</span><br><span class="line">1       1                       osd.1   up      1</span><br></pre></td></tr></table></figure>
+<p>要添加（或删除）其他monitors，请参阅<a href="http://docs.ceph.com/docs/master/rados/operations/add-or-rm-mons/" target="_blank" rel="noopener">Add/Remove Monitors</a>。要添加（或删除）其他Ceph OSD Daemons，请参阅<a href="http://docs.ceph.com/docs/master/rados/operations/add-or-rm-osds/" target="_blank" rel="noopener">Add/Remove OSDs</a>。</p>
+<h1 id="部署实验"><a href="#部署实验" class="headerlink" title="部署实验"></a>部署实验</h1><h2 id="monitor部署实验"><a href="#monitor部署实验" class="headerlink" title="monitor部署实验"></a>monitor部署实验</h2><p>1、添加ceph源</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# vi /etc/yum.repos.d/ceph.repo </span><br><span class="line">[ceph]</span><br><span class="line">name=Ceph</span><br><span class="line">baseurl=http://mirrors.163.com/ceph/rpm-luminous/el7/x86_64/</span><br><span class="line"># baseurl=https://download.ceph.com/rpm-luminous/el7/x86_64/</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=1</span><br><span class="line">type=rpm-md</span><br><span class="line">gpgkey=http://mirrors.163.com/ceph/keys/release.asc</span><br><span class="line"># gpgkey=https://download.ceph.com/keys/release.asc</span><br></pre></td></tr></table></figure>
+<p>2、安装epel与ceph</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[1]epel参考：https://blog.csdn.net/yasi_xi/article/details/11746255</span><br><span class="line">EPEL的全称叫 Extra Packages for Enterprise Linux 。EPEL是由 Fedora 社区打造，为 RHEL 及衍生发行版如 CentOS、Scientific Linux 等提供高质量软件包的项目。装上了 EPEL之后，就相当于添加了一个第三方源。</span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# yum install epel-release -y &amp;&amp; yum install ceph -y</span><br></pre></td></tr></table></figure>
+<p>3、为集群创建keyring并生成monitor secret key。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# ceph-authtool --create-keyring /tmp/ceph.mon.keyring --gen-key -n mon. --cap mon &apos;allow *&apos;</span><br><span class="line">creating /tmp/ceph.mon.keyring</span><br><span class="line">[root@cephlm ~]# cat /tmp/ceph.mon.keyring</span><br><span class="line">[mon.]</span><br><span class="line">	key = AQAgbv1bc62FBBAAvuCz2a5EDtbAmy9ep1Dxxw==</span><br><span class="line">	caps mon = &quot;allow *&quot;</span><br></pre></td></tr></table></figure>
+<p>4、生成administrator keyring，生成client.admin用户并将用户添加到keyring。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# sudo ceph-authtool --create-keyring /etc/ceph/ceph.client.admin.keyring --gen-key -n client.admin --cap mon &apos;allow *&apos; --cap osd &apos;allow *&apos; --cap mds &apos;allow *&apos; --cap mgr &apos;allow *&apos;</span><br><span class="line">creating /etc/ceph/ceph.client.admin.keyring</span><br><span class="line">[root@cephlm ~]# cat /etc/ceph/ceph.client.admin.keyring</span><br><span class="line">[client.admin]</span><br><span class="line">	key = AQBFbv1bImaJCxAAYUiUCuia//zZSMIPyOHJuA==</span><br><span class="line">	caps mds = &quot;allow *&quot;</span><br><span class="line">	caps mgr = &quot;allow *&quot;</span><br><span class="line">	caps mon = &quot;allow *&quot;</span><br><span class="line">	caps osd = &quot;allow *&quot;</span><br></pre></td></tr></table></figure>
+<p>5、生成bootstrap-osd keyring，生成client.bootstrap-osd用户并将用户添加到keyring。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# sudo ceph-authtool --create-keyring /var/lib/ceph/bootstrap-osd/ceph.keyring --gen-key -n client.bootstrap-osd --cap mon &apos;profile bootstrap-osd&apos;</span><br><span class="line">creating /var/lib/ceph/bootstrap-osd/ceph.keyring</span><br><span class="line">[root@cephlm ~]# cat /var/lib/ceph/bootstrap-osd/ceph.keyring</span><br><span class="line">[client.bootstrap-osd]</span><br><span class="line">	key = AQBQbv1bXv0WAhAAo/hv7OOaftMHOovHNeyOFg==</span><br><span class="line">	caps mon = &quot;profile bootstrap-osd&quot;</span><br></pre></td></tr></table></figure>
+<p>6、将生成的keys添加到ceph.mon.keyring。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# sudo ceph-authtool /tmp/ceph.mon.keyring --import-keyring /etc/ceph/ceph.client.admin.keyring</span><br><span class="line">[root@cephlm ~]# sudo ceph-authtool /tmp/ceph.mon.keyring --import-keyring /var/lib/ceph/bootstrap-osd/ceph.keyring</span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# cat /tmp/ceph.mon.keyring</span><br><span class="line">[mon.]</span><br><span class="line">	key = AQAgbv1bc62FBBAAvuCz2a5EDtbAmy9ep1Dxxw==</span><br><span class="line">	caps mon = &quot;allow *&quot;</span><br><span class="line">[client.admin]</span><br><span class="line">	key = AQBFbv1bImaJCxAAYUiUCuia//zZSMIPyOHJuA==</span><br><span class="line">	caps mds = &quot;allow *&quot;</span><br><span class="line">	caps mgr = &quot;allow *&quot;</span><br><span class="line">	caps mon = &quot;allow *&quot;</span><br><span class="line">	caps osd = &quot;allow *&quot;</span><br><span class="line">[client.bootstrap-osd]</span><br><span class="line">	key = AQBQbv1bXv0WAhAAo/hv7OOaftMHOovHNeyOFg==</span><br><span class="line">	caps mon = &quot;profile bootstrap-osd&quot;</span><br></pre></td></tr></table></figure>
+<p>7、使用主机名，主机IP地址和FSID生成monitor map。将其另存为/tmp/monmap。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# monmaptool --create --add cephlm 192.168.0.10 --fsid c8b0b137-1ba7-4c1f-a514-281139c35233 /tmp/monmap</span><br><span class="line">monmaptool: monmap file /tmp/monmap</span><br><span class="line">monmaptool: set fsid to c8b0b137-1ba7-4c1f-a514-281139c35233</span><br><span class="line">monmaptool: writing epoch 0 to /tmp/monmap (1 monitors)</span><br><span class="line"></span><br><span class="line">更改权限，可是使ceph用户有读该文件的权限</span><br><span class="line">[root@cephlm ~]# chmod +r /tmp/monmap &amp;&amp; chmod +r /tmp/ceph.mon.keyring</span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# monmaptool --print /tmp/monmap</span><br><span class="line">monmaptool: monmap file /tmp/monmap</span><br><span class="line">epoch 0</span><br><span class="line">fsid c8b0b137-1ba7-4c1f-a514-281139c35233</span><br><span class="line">last_changed 2018-11-28 10:55:11.677288</span><br><span class="line">created 2018-11-28 10:55:11.677288</span><br><span class="line">0: 192.168.56.205:6789/0 mon.cephlm</span><br></pre></td></tr></table></figure>
+<p>8、创建配置文件文件<code>&lt;集群名&gt;.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# vi /etc/ceph/ceph.conf </span><br><span class="line">[global]</span><br><span class="line">fsid = c8b0b137-1ba7-4c1f-a514-281139c35233</span><br><span class="line">mon initial members = cephlm</span><br><span class="line">mon host = 192.168.0.10</span><br><span class="line">public network = 192.168.0.0/24</span><br><span class="line">cluster network = 192.168.0.0/24</span><br><span class="line">auth cluster required = cephx</span><br><span class="line">auth service required = cephx</span><br><span class="line">auth client required = cephx</span><br><span class="line">osd pool default size = 1</span><br><span class="line">osd pool default min size = 1</span><br><span class="line">osd pool default pg num = 16</span><br><span class="line">osd pool default pgp num = 16</span><br></pre></td></tr></table></figure>
+<p>9、使用monitor map和keyring填充monitor daemon(s)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# sudo -u ceph ceph-mon --cluster ceph --mkfs -i cephlm --monmap /tmp/monmap --keyring /tmp/ceph.mon.keyring</span><br></pre></td></tr></table></figure>
+<p>10、启动ceph-mon服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@cephlm ~]# systemctl enable ceph-mon@cephlm</span><br><span class="line">[root@cephlm ~]# systemctl start ceph-mon@cephlm</span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# ceph -s</span><br><span class="line">  cluster:</span><br><span class="line">    id:     c8b0b137-1ba7-4c1f-a514-281139c35233</span><br><span class="line">    health: HEALTH_OK</span><br><span class="line"> </span><br><span class="line">  services:</span><br><span class="line">    mon: 1 daemons, quorum cephlm</span><br><span class="line">    mgr: no daemons active</span><br><span class="line">    osd: 0 osds: 0 up, 0 in</span><br><span class="line"> </span><br><span class="line">  data:</span><br><span class="line">    pools:   0 pools, 0 pgs</span><br><span class="line">    objects: 0 objects, 0B</span><br><span class="line">    usage:   0B used, 0B / 0B avail</span><br><span class="line">    pgs:</span><br></pre></td></tr></table></figure>
+<h2 id="osd部署实验"><a href="#osd部署实验" class="headerlink" title="osd部署实验"></a>osd部署实验</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br><span class="line">613</span><br><span class="line">614</span><br><span class="line">615</span><br><span class="line">616</span><br><span class="line">617</span><br><span class="line">618</span><br><span class="line">619</span><br><span class="line">620</span><br><span class="line">621</span><br><span class="line">622</span><br><span class="line">623</span><br><span class="line">624</span><br><span class="line">625</span><br><span class="line">626</span><br><span class="line">627</span><br><span class="line">628</span><br><span class="line">629</span><br><span class="line">630</span><br><span class="line">631</span><br><span class="line">632</span><br><span class="line">633</span><br><span class="line">634</span><br><span class="line">635</span><br><span class="line">636</span><br><span class="line">637</span><br><span class="line">638</span><br><span class="line">639</span><br><span class="line">640</span><br><span class="line">641</span><br><span class="line">642</span><br><span class="line">643</span><br><span class="line">644</span><br><span class="line">645</span><br><span class="line">646</span><br><span class="line">647</span><br><span class="line">648</span><br><span class="line">649</span><br><span class="line">650</span><br><span class="line">651</span><br><span class="line">652</span><br><span class="line">653</span><br><span class="line">654</span><br><span class="line">655</span><br><span class="line">656</span><br><span class="line">657</span><br><span class="line">658</span><br><span class="line">659</span><br><span class="line">660</span><br><span class="line">661</span><br><span class="line">662</span><br><span class="line">663</span><br><span class="line">664</span><br><span class="line">665</span><br><span class="line">666</span><br><span class="line">667</span><br><span class="line">668</span><br><span class="line">669</span><br><span class="line">670</span><br><span class="line">671</span><br><span class="line">672</span><br><span class="line">673</span><br><span class="line">674</span><br></pre></td><td class="code"><pre><span class="line">1、为OSD生成UUID。</span><br><span class="line">[root@cephlm ~]# UUID=$(uuidgen)</span><br><span class="line">[root@cephlm ~]# echo $&#123;UUID&#125;</span><br><span class="line">265b6807-fa12-46f7-8e25-ce8b03dc2a2d</span><br><span class="line"></span><br><span class="line">2、为OSD生成cephx key。</span><br><span class="line">[root@cephlm ~]# OSD_SECRET=$(ceph-authtool --gen-print-key)</span><br><span class="line">[root@cephlm ~]# echo $&#123;OSD_SECRET&#125;</span><br><span class="line">AQDljwhcB8MxBxAATx/pqYOv0uRhQI9Tey5UeQ==</span><br><span class="line"></span><br><span class="line">3、为OSD生成cephx key（秘钥）。</span><br><span class="line">[root@cephlm ~]# ID=$(echo &quot;&#123;\&quot;cephx_secret\&quot;: \&quot;$OSD_SECRET\&quot;&#125;&quot; | \</span><br><span class="line">     ceph osd new $UUID -i - \/*</span><br><span class="line">     -n client.bootstrap-osd -k /var/lib/ceph/bootstrap-osd/ceph.keyring)</span><br><span class="line">[root@cephlm ~]# echo $&#123;ID&#125;</span><br><span class="line">0</span><br><span class="line"></span><br><span class="line">4、</span><br><span class="line">[root@cephlm ~]# mkdir /var/lib/ceph/osd/ceph-$ID</span><br><span class="line"></span><br><span class="line">5、</span><br><span class="line">[root@cephlm ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  20G  0 disk </span><br><span class="line">├─vda1 253:1    0   1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0   4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  15G  0 part /</span><br><span class="line">vdb    253:16   0  50G  0 disk </span><br><span class="line">vdc    253:32   0  50G  0 disk </span><br><span class="line">vdd    253:48   0  50G  0 disk </span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# ll /var/lib/ceph/osd/</span><br><span class="line">总用量 0</span><br><span class="line">drwxr-xr-x 2 root root 6 12月  6 11:03 ceph-0</span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# mkfs.xfs /dev/vdb -f</span><br><span class="line">meta-data=/dev/vdb               isize=512    agcount=4, agsize=3276800 blks</span><br><span class="line">         =                       sectsz=512   attr=2, projid32bit=1</span><br><span class="line">         =                       crc=1        finobt=0, sparse=0</span><br><span class="line">data     =                       bsize=4096   blocks=13107200, imaxpct=25</span><br><span class="line">         =                       sunit=0      swidth=0 blks</span><br><span class="line">naming   =version 2              bsize=4096   ascii-ci=0 ftype=1</span><br><span class="line">log      =internal log           bsize=4096   blocks=6400, version=2</span><br><span class="line">         =                       sectsz=512   sunit=0 blks, lazy-count=1</span><br><span class="line">realtime =none                   extsz=4096   blocks=0, rtextents=0</span><br><span class="line"></span><br><span class="line">[root@cephlm ~]# mount /dev/vdb /var/lib/ceph/osd/ceph-$ID/</span><br><span class="line">[root@cephlm ~]# df -Th</span><br><span class="line">文件系统       类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3      xfs        15G  1.6G   14G   11% /</span><br><span class="line">devtmpfs       devtmpfs  1.9G     0  1.9G    0% /dev</span><br><span class="line">tmpfs          tmpfs     1.9G     0  1.9G    0% /dev/shm</span><br><span class="line">tmpfs          tmpfs     1.9G  8.6M  1.9G    1% /run</span><br><span class="line">tmpfs          tmpfs     1.9G     0  1.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1      xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs          tmpfs     379M     0  379M    0% /run/user/0</span><br><span class="line">/dev/vdb       xfs        50G   33M   50G    1% /var/lib/ceph/osd/ceph-0</span><br><span class="line"></span><br><span class="line">6、将secret写入OSD keyring文件。</span><br><span class="line">[root@cephlm ~]# ceph-authtool --create-keyring /var/lib/ceph/osd/ceph-$ID/keyring --name osd.$ID --add-key $OSD_SECRET</span><br><span class="line">creating /var/lib/ceph/osd/ceph-0/keyring</span><br><span class="line">added entity osd.0 auth auth(auid = 18446744073709551615 key=AQDljwhcB8MxBxAATx/pqYOv0uRhQI9Tey5UeQ== with 0 caps)</span><br><span class="line"></span><br><span class="line">7、初始化OSD数据目录</span><br><span class="line">[root@cephlm ~]# ceph-osd -i $ID --mkfs --osd-uuid $UUID</span><br><span class="line">2019-08-02 18:07:34.990087 7f41b6680d80 -1 journal FileJournal::_open: disabling aio for non-block journal.  Use journal_force_aio to force use of aio anyway</span><br><span class="line">2019-08-02 18:07:35.061501 7f41b6680d80 -1 journal FileJournal::_open: disabling aio for non-block journal.  Use journal_force_aio to force use of aio anyway</span><br><span class="line">2019-08-02 18:07:35.062969 7f41b6680d80 -1 journal do_read_entry(4096): bad header magic</span><br><span class="line">2019-08-02 18:07:35.062993 7f41b6680d80 -1 journal do_read_entry(4096): bad header magic</span><br><span class="line">2019-08-02 18:07:35.063581 7f41b6680d80 -1 read_settings error reading settings: (2) No such file or directory</span><br><span class="line">2019-08-02 18:07:35.146735 7f41b6680d80 -1 created object store /var/lib/ceph/osd/ceph-0 for osd.0 fsid c8b0b137-1ba7-4c1f-a514-281139c35233</span><br><span class="line"></span><br><span class="line">8、</span><br><span class="line">[root@cephlm ~]# chown -R ceph:ceph /var/lib/ceph/osd/ceph-$ID</span><br><span class="line"></span><br><span class="line">9、</span><br><span class="line">[root@cephlm ~]# systemctl enable ceph-osd@$ID</span><br><span class="line">[root@cephlm ~]# systemctl start ceph-osd@$ID</span><br><span class="line">10、</span><br><span class="line">[root@sds-ceph-1 ~]# ceph osd pool create rbd 16</span><br><span class="line">[root@sds-ceph-1 ~]# rados bench -p rbd 10 write --no-cleanup</span><br><span class="line"></span><br><span class="line">[root@sds-ceph-1 ~]# tree -h  /var/lib/ceph/osd/ceph-0/current/</span><br><span class="line">/var/lib/ceph/osd/ceph-0/current/</span><br><span class="line">├── [4.0K]  1.0_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject126__head_314B9110__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject138__head_F0F776D0__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject149__head_9DC23D60__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject154__head_03D0DB50__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject179__head_E33CA580__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject209__head_3BFDF2F0__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject211__head_DECF96B0__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject212__head_5CED1CF0__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject217__head_1319A430__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject220__head_524D4D00__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject229__head_F40C7DE0__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject22__head_1686F940__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject235__head_516A6B20__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject236__head_12CA1390__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject73__head_397FC990__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject77__head_ADAEA100__1</span><br><span class="line">│   └── [   0]  __head_00000000__1</span><br><span class="line">├── [   6]  1.0_TEMP</span><br><span class="line">├── [4.0K]  1.1_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject102__head_862AA4F1__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject129__head_F5965891__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject151__head_98E52B51__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject184__head_E52D8D41__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject1__head_F5F320A1__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject234__head_00E8BB81__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject244__head_2363F6E1__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject25__head_581DDE31__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject32__head_324147A1__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject35__head_34FABC91__1</span><br><span class="line">│   └── [   0]  __head_00000001__1</span><br><span class="line">├── [   6]  1.1_TEMP</span><br><span class="line">├── [4.0K]  1.2_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject104__head_413DA2B2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject117__head_C0124C02__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject125__head_9DBB0642__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject153__head_37933452__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject167__head_0AE2CE12__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject173__head_821A3292__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject175__head_734C3FB2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject180__head_74A8D2D2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject195__head_7A482B82__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject214__head_C62A3262__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject227__head_FBA5E8D2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject230__head_F81DABF2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject240__head_96D571D2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject251__head_8C210072__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject28__head_8D1859C2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject43__head_9D4243F2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject4__head_6D94E022__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject53__head_F31A17D2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject74__head_BA8C88D2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject93__head_26EE91D2__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject97__head_1025B4F2__1</span><br><span class="line">│   └── [   0]  __head_00000002__1</span><br><span class="line">├── [   6]  1.2_TEMP</span><br><span class="line">├── [4.0K]  1.3_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject114__head_C05EC3E3__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject145__head_BB9B5383__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject187__head_7F2D3B93__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject20__head_FB09C543__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject222__head_CA878AF3__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject223__head_45D47B63__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject249__head_EB2C03F3__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject2__head_E1BEFAD3__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject48__head_C2ABBF03__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject58__head_73A784F3__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject66__head_7D1C7D23__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject68__head_64431003__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject75__head_EFA44023__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject7__head_1EDC2B13__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject83__head_56DE9F23__1</span><br><span class="line">│   └── [   0]  __head_00000003__1</span><br><span class="line">├── [   6]  1.3_TEMP</span><br><span class="line">├── [4.0K]  1.4_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject0__head_F8BC28D4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject160__head_866C8F94__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject162__head_02475BD4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject164__head_26707F24__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject16__head_3B6FF704__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject174__head_ECF6CC74__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject18__head_7CB94CE4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject202__head_503B6AE4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject237__head_1AF8F074__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject247__head_A70993B4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject31__head_09DBA9F4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject36__head_ABBB7824__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject39__head_E1727904__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject3__head_E0FE6334__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject46__head_9E9B4204__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject51__head_8C1E0DC4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject56__head_7065C2F4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject62__head_DB32DD24__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject87__head_BDBE9FC4__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject90__head_A1654F74__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject96__head_FC6F33F4__1</span><br><span class="line">│   └── [   0]  __head_00000004__1</span><br><span class="line">├── [   6]  1.4_TEMP</span><br><span class="line">├── [4.0K]  1.5_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject118__head_7B842745__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject123__head_5CEFA465__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject183__head_10F85FE5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject186__head_3000C235__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject191__head_BC532EE5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject224__head_92A1E3C5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject29__head_027ADDC5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject67__head_5BDDDAA5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject82__head_A64A01D5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject8__head_F68FCDE5__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject94__head_ECE61315__1</span><br><span class="line">│   └── [   0]  __head_00000005__1</span><br><span class="line">├── [   6]  1.5_TEMP</span><br><span class="line">├── [4.0K]  1.6_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject121__head_3F39BC76__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject12__head_88A43B86__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject13__head_FD5483D6__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject141__head_CDACF3C6__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject157__head_E56D1786__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject197__head_804A2DC6__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject207__head_A3266F06__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject216__head_DE5D3A76__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject226__head_CAFCCF66__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject44__head_0544C586__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject45__head_65E3FAB6__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject61__head_A2704176__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject72__head_6E3BA9D6__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject80__head_1B1E6F16__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject85__head_A0756156__1</span><br><span class="line">│   └── [   0]  __head_00000006__1</span><br><span class="line">├── [   6]  1.6_TEMP</span><br><span class="line">├── [4.0K]  1.7_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject100__head_EF2E6867__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject139__head_5E961CE7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject142__head_01BCFCA7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject143__head_A3CDD177__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject144__head_74883667__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject158__head_F5DD1EA7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject165__head_031366F7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject168__head_9BE47967__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject169__head_E96B49F7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject182__head_7119D257__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject194__head_D3C65A17__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject250__head_E9F80417__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject41__head_9295C277__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject55__head_70B967B7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject78__head_367C2607__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject89__head_7CDE0FC7__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject98__head_96668A47__1</span><br><span class="line">│   └── [   0]  __head_00000007__1</span><br><span class="line">├── [   6]  1.7_TEMP</span><br><span class="line">├── [4.0K]  1.8_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject116__head_F4318178__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject128__head_32ED4D38__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject134__head_486DF128__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject156__head_F2E7C068__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject190__head_5AAF63A8__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject219__head_50799E88__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject225__head_9EB9D0C8__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject242__head_F2EC42B8__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject33__head_64C2C558__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject34__head_65F25F38__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject38__head_D38CB608__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject49__head_FF4A4208__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject50__head_0F3F77A8__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject52__head_0F2A0548__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject69__head_BDEA5548__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject71__head_EA5383B8__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject76__head_02238F98__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject88__head_45AB4318__1</span><br><span class="line">│   └── [   0]  __head_00000008__1</span><br><span class="line">├── [   6]  1.8_TEMP</span><br><span class="line">├── [4.0K]  1.9_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject110__head_CE2B10A9__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject136__head_04EDA809__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject163__head_37F8AE49__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject177__head_5F771509__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject193__head_23935A99__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject215__head_15DEBEA9__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject21__head_11518C29__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject248__head_FAFE5689__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject27__head_5B7D7369__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject60__head_64B13949__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject70__head_F3A64E09__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject91__head_31511109__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject99__head_8A68E509__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject9__head_FC52C009__1</span><br><span class="line">│   └── [   0]  __head_00000009__1</span><br><span class="line">├── [   6]  1.9_TEMP</span><br><span class="line">├── [4.0K]  1.a_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject112__head_FF4D01DA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject113__head_CADF065A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject119__head_A72F161A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject122__head_BF4A0A6A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject124__head_5BC12E2A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject140__head_37A19CDA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject14__head_64FC3EDA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject152__head_14C2CA0A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject166__head_C47A6B0A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject171__head_79A2CFEA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject17__head_2A4A393A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject185__head_1D2DDDDA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject188__head_7FBA73AA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject204__head_AB1FBD8A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject205__head_B24EE76A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject206__head_9891B01A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject208__head_C07981EA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject210__head_1227C4DA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject228__head_0B9B39AA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject238__head_C56F1D5A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject23__head_4F279EBA__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject26__head_CCB3C59A__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject86__head_5ED418EA__1</span><br><span class="line">│   └── [   0]  __head_0000000A__1</span><br><span class="line">├── [   6]  1.a_TEMP</span><br><span class="line">├── [4.0K]  1.b_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject103__head_F8EF0F1B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject107__head_F3693ABB__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject108__head_13D4D0EB__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject109__head_11C8A99B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject132__head_227AA5FB__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject137__head_5D82744B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject148__head_989FE31B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject159__head_422DA2AB__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject178__head_01C4C3CB__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject181__head_0DC3436B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject213__head_05B8BA6B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject246__head_2140121B__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject24__head_5B8169AB__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject64__head_CC62D71B__1</span><br><span class="line">│   └── [   0]  __head_0000000B__1</span><br><span class="line">├── [   6]  1.b_TEMP</span><br><span class="line">├── [4.0K]  1.c_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject101__head_7711D38C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject11__head_0218B38C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject127__head_9A51BCDC__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject133__head_7E6B67EC__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject135__head_C67A3E8C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject150__head_8635CA6C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject161__head_3A42EA3C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject170__head_612CFAFC__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject172__head_EB33BB8C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject196__head_475FC6BC__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject19__head_D21864EC__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject200__head_52F1139C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject201__head_14AC036C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject243__head_3E9C237C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject245__head_DABE713C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject5__head_7CE3E36C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject65__head_86389E8C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject6__head_1FBF833C__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject81__head_05B34FAC__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject92__head_3988A13C__1</span><br><span class="line">│   └── [   0]  __head_0000000C__1</span><br><span class="line">├── [   6]  1.c_TEMP</span><br><span class="line">├── [4.0K]  1.d_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject111__head_66CE6C0D__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject115__head_71F498AD__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject120__head_1BFD990D__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject130__head_301FC3CD__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject232__head_320DC13D__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject37__head_AC68B41D__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject40__head_423D9AAD__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject47__head_0951C33D__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject84__head_5EB447DD__1</span><br><span class="line">│   ├── [  24]  benchmark\\ulast\\umetadata__head_8E7A861D__1</span><br><span class="line">│   └── [   0]  __head_0000000D__1</span><br><span class="line">├── [   6]  1.d_TEMP</span><br><span class="line">├── [4.0K]  1.e_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject105__head_C439984E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject10__head_1BF35FCE__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject131__head_DBAC810E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject146__head_6153061E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject176__head_80C2B02E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject189__head_4F8A59BE__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject199__head_5ACCE8EE__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject203__head_D77F59BE__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject221__head_C3ADCA4E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject231__head_0C48675E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject233__head_F01E13EE__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject30__head_9464F9BE__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject54__head_B1E1B44E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject59__head_CE84DF4E__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject79__head_CAFFBC0E__1</span><br><span class="line">│   └── [   0]  __head_0000000E__1</span><br><span class="line">├── [   6]  1.e_TEMP</span><br><span class="line">├── [4.0K]  1.f_head</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject106__head_48E9311F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject147__head_7211B38F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject155__head_551133AF__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject15__head_58EF207F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject192__head_9E2A248F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject198__head_D7D45B1F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject218__head_F2A93B5F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject239__head_2FC0444F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject241__head_286B4E0F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject42__head_6FF5EA1F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject57__head_2A0A792F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject63__head_2685437F__1</span><br><span class="line">│   ├── [4.0M]  benchmark\\udata\\usds-ceph-1.novalocal\\u12560\\uobject95__head_1786F82F__1</span><br><span class="line">│   └── [   0]  __head_0000000F__1</span><br><span class="line">├── [   6]  1.f_TEMP</span><br><span class="line">├── [   4]  commit_op_seq</span><br><span class="line">├── [4.0K]  meta</span><br><span class="line">│   ├── [ 802]  inc\\uosdmap.1__0_B65F4306__none</span><br><span class="line">│   ├── [ 232]  inc\\uosdmap.2__0_B65F40D6__none</span><br><span class="line">│   ├── [ 635]  inc\\uosdmap.3__0_B65F4066__none</span><br><span class="line">│   ├── [ 763]  inc\\uosdmap.4__0_B65F4136__none</span><br><span class="line">│   ├── [ 406]  inc\\uosdmap.5__0_B65F46C6__none</span><br><span class="line">│   ├── [ 454]  inc\\uosdmap.6__0_B65F4796__none</span><br><span class="line">│   ├── [ 212]  inc\\uosdmap.7__0_B65F4726__none</span><br><span class="line">│   ├── [ 204]  inc\\uosdmap.8__0_B65F44F6__none</span><br><span class="line">│   ├── [ 598]  osdmap.1__0_FD6E49B1__none</span><br><span class="line">│   ├── [ 869]  osdmap.2__0_FD6E4941__none</span><br><span class="line">│   ├── [ 960]  osdmap.3__0_FD6E4E11__none</span><br><span class="line">│   ├── [1.1K]  osdmap.4__0_FD6E4FA1__none</span><br><span class="line">│   ├── [1.0K]  osdmap.5__0_FD6E4F71__none</span><br><span class="line">│   ├── [1.3K]  osdmap.6__0_FD6E4C01__none</span><br><span class="line">│   ├── [1.3K]  osdmap.7__0_FD6E4DD1__none</span><br><span class="line">│   ├── [1.3K]  osdmap.8__0_FD6E4D61__none</span><br><span class="line">│   ├── [ 511]  osd\\usuperblock__0_23C2FCDE__none</span><br><span class="line">│   └── [   0]  snapmapper__0_A468EC03__none</span><br><span class="line">├── [   0]  nosnap</span><br><span class="line">└── [ 179]  omap</span><br><span class="line">    ├── [1002]  000007.sst</span><br><span class="line">    ├── [208K]  000009.log</span><br><span class="line">    ├── [  16]  CURRENT</span><br><span class="line">    ├── [  37]  IDENTITY</span><br><span class="line">    ├── [   0]  LOCK</span><br><span class="line">    ├── [ 15K]  LOG</span><br><span class="line">    ├── [ 108]  MANIFEST-000008</span><br><span class="line">    ├── [4.1K]  OPTIONS-000008</span><br><span class="line">    ├── [4.1K]  OPTIONS-000011</span><br><span class="line">    └── [  37]  osd_uuid</span><br><span class="line"></span><br><span class="line">34 directories, 299 files</span><br><span class="line"></span><br><span class="line">[root@sds-ceph-1 ~]# rados ls -p rbd</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object77</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object220</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object179</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object22</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object235</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object149</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object229</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object126</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object73</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object236</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object154</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object138</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object217</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object211</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object212</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object209</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object49</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object38</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object219</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object52</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object69</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object225</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object134</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object190</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object50</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object156</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object88</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object76</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object33</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object128</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object34</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object242</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object71</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object116</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object46</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object39</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object16</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object51</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object87</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object36</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object62</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object164</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object18</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object202</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object160</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object0</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object162</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object3</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object247</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object237</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object174</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object90</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object56</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object31</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object96</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object65</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object135</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object101</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object11</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object172</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object81</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object150</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object201</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object5</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object19</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object133</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object200</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object127</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object161</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object92</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object245</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object6</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object196</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object243</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object170</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object117</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object195</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object125</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object28</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object4</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object214</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object167</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object173</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object153</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object74</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object227</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object180</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object93</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object240</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object53</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object104</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object175</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object251</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object97</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object43</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object230</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object152</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object166</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object204</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object124</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object228</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object188</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object122</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object205</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object86</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object208</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object171</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object206</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object119</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object26</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object113</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object238</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object210</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object140</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object14</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object112</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object185</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object17</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object23</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object207</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object44</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object12</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object157</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object197</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object141</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object226</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object80</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object85</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object72</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object13</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object45</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object121</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object216</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object61</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object79</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object131</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object105</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object54</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object221</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object59</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object10</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object176</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object199</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object233</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object146</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object231</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object189</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object203</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object30</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object234</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object184</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object1</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object32</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object244</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object129</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object35</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object151</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object25</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object102</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object9</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object136</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object70</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object91</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object99</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object177</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object248</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object163</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object60</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object21</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object110</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object215</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object27</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object193</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object118</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object29</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object224</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object67</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object123</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object191</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object8</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object183</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object94</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object82</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object186</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object111</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object120</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object130</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object115</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object40</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object37</span><br><span class="line">benchmark_last_metadata</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object84</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object232</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object47</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object68</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object48</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object145</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object20</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object75</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object66</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object83</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object223</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object114</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object7</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object187</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object2</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object58</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object222</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object249</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object137</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object178</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object159</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object24</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object213</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object181</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object108</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object246</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object148</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object64</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object103</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object109</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object107</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object132</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object78</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object98</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object89</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object142</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object158</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object100</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object144</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object168</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object139</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object250</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object194</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object182</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object55</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object41</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object143</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object165</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object169</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object241</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object192</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object147</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object239</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object95</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object57</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object155</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object42</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object106</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object198</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object218</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object15</span><br><span class="line">benchmark_data_sds-ceph-1.novalocal_12560_object63</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/24/deploy-k8s-test/" rel="next" title="deploy k8s test">
+                <i class="fa fa-chevron-left"></i> deploy k8s test
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/12/03/gitlab-jenkins-ci/" rel="prev" title="gitlab jenkins ci">
+                gitlab jenkins ci <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MANUAL-DEPLOYMENT"><span class="nav-number">1.</span> <span class="nav-text">MANUAL DEPLOYMENT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MONITOR-BOOTSTRAPPING"><span class="nav-number">1.1.</span> <span class="nav-text">MONITOR BOOTSTRAPPING</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MANAGER-DAEMON-CONFIGURATION"><span class="nav-number">1.2.</span> <span class="nav-text">MANAGER DAEMON CONFIGURATION</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ADDING-OSDS"><span class="nav-number">1.3.</span> <span class="nav-text">ADDING OSDS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#SHORT-FORM（简写）"><span class="nav-number">1.3.1.</span> <span class="nav-text">SHORT FORM（简写）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLUESTORE"><span class="nav-number">1.3.2.</span> <span class="nav-text">BLUESTORE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FILESTORE"><span class="nav-number">1.3.3.</span> <span class="nav-text">FILESTORE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LONG-FORM"><span class="nav-number">1.3.4.</span> <span class="nav-text">LONG FORM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ADDING-MDS"><span class="nav-number">1.4.</span> <span class="nav-text">ADDING MDS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SUMMARY"><span class="nav-number">1.5.</span> <span class="nav-text">SUMMARY</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署实验"><span class="nav-number">2.</span> <span class="nav-text">部署实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#monitor部署实验"><span class="nav-number">2.1.</span> <span class="nav-text">monitor部署实验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#osd部署实验"><span class="nav-number">2.2.</span> <span class="nav-text">osd部署实验</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

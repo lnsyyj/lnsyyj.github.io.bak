@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ceph,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="AUTOSCALING PLACEMENT GROUPSPlacement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据集群的使用方式提出建议或自动调整PG。 系统中的每个pool都有一个pg_autoscale_mode属性，可以将其设置为off，on或warn。  off: Disable该pool的autoscaling，Choos">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AUTOSCALING PLACEMENT GROUPS">
+<meta property="og:url" content="http://yoursite.com/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="AUTOSCALING PLACEMENT GROUPSPlacement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据集群的使用方式提出建议或自动调整PG。 系统中的每个pool都有一个pg_autoscale_mode属性，可以将其设置为off，on或warn。  off: Disable该pool的autoscaling，Choos">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://docs.ceph.com/docs/master/_images/ditaa-1fde157d24b63e3b465d96eb6afea22078c85a90.png">
+<meta property="og:image" content="https://docs.ceph.com/docs/master/_images/ditaa-3c86866fb6edc99dad6ccf51e25e536806f0b079.png">
+<meta property="og:updated_time" content="2020-03-22T08:16:35.946Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AUTOSCALING PLACEMENT GROUPS">
+<meta name="twitter:description" content="AUTOSCALING PLACEMENT GROUPSPlacement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据集群的使用方式提出建议或自动调整PG。 系统中的每个pool都有一个pg_autoscale_mode属性，可以将其设置为off，on或warn。  off: Disable该pool的autoscaling，Choos">
+<meta name="twitter:image" content="https://docs.ceph.com/docs/master/_images/ditaa-1fde157d24b63e3b465d96eb6afea22078c85a90.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/">
+
+
+
+
+
+  <title>AUTOSCALING PLACEMENT GROUPS | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">AUTOSCALING PLACEMENT GROUPS</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-15T14:26:54+08:00">
+                2019-10-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h1 id="AUTOSCALING-PLACEMENT-GROUPS"><a href="#AUTOSCALING-PLACEMENT-GROUPS" class="headerlink" title="AUTOSCALING PLACEMENT GROUPS"></a>AUTOSCALING PLACEMENT GROUPS</h1><p>Placement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据集群的使用方式提出建议或自动调整PG。</p>
+<p>系统中的每个pool都有一个pg_autoscale_mode属性，可以将其设置为off，on或warn。</p>
+<ul>
+<li><p>off: Disable该pool的autoscaling，<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#choosing-number-of-placement-groups" target="_blank" rel="noopener">Choosing the number of Placement Groups</a></p>
+</li>
+<li><p>on: 为指定的pool启用PG count自动调整。</p>
+</li>
+<li><p>warn: 当调整PG count时提出health alerts</p>
+</li>
+</ul>
+<p>要为已有的pool设置autoscaling mode，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &lt;pool-name&gt; pg_autoscale_mode &lt;mode&gt;</span><br></pre></td></tr></table></figure>
+<p>例如，要对池foo启用autoscaling，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set foo pg_autoscale_mode on</span><br></pre></td></tr></table></figure>
+<p>您还可以使用以下命令配置默认pg_autoscale_mode，该默认pg_autoscale_mode应用于以后创建的任何pool：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global osd_pool_default_pg_autoscale_mode &lt;mode&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="VIEWING-PG-SCALING-RECOMMENDATIONS"><a href="#VIEWING-PG-SCALING-RECOMMENDATIONS" class="headerlink" title="VIEWING PG SCALING RECOMMENDATIONS"></a>VIEWING PG SCALING RECOMMENDATIONS</h3><p>您可以使用以下命令查看每个pool，pool的相对利用率以及对PG count的任何建议更改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool autoscale-status</span><br></pre></td></tr></table></figure>
+<p>输出将类似于：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POOL                         SIZE  TARGET SIZE  RATE  RAW CAPACITY   RATIO  TARGET RATIO  BIAS  PG_NUM  NEW PG_NUM  AUTOSCALE </span><br><span class="line">cephfs_metadata             1540k                3.0        594.0G  0.0000                 4.0       8              warn      </span><br><span class="line">default.rgw.meta            1536k                3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">cephfs_data                    0                 3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">default.rgw.buckets.index      0                 3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">default.rgw.control            0                 3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">yujiang                        0        553.2G   1.0        594.0G  0.9313                 1.0     512              on        </span><br><span class="line">.rgw.root                   1344k                3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">rbd                        576.0k                3.0        594.0G  0.0000                 1.0       4              on        </span><br><span class="line">default.rgw.log                0                 3.0        594.0G  0.0000                 1.0       8              warn</span><br></pre></td></tr></table></figure>
+<p>SIZE是存储在pool中的数据量。TARGET SIZE（如果存在）是管理员希望最终存储在该pool中的数据量。系统使用两个值中的较大者进行计算。</p>
+<p>RATE是pool的multiplier（乘数或倍数），它确定要消耗多少raw（原始） storage capacity。例如，3个副本池的比率为3.0，而k=4，m=2擦除编码池的比率为1.5。</p>
+<p>RAW CAPACITY是OSD上负责存储该pool（可能还有其他pool）数据的raw storage capacity的总量。RATIO是该pool消耗的总容量的比率（即ratio = size * rate / raw capacity）。</p>
+<p>TARGET RATIO（如果存在）是管理员指定他们希望该pool使用的存储空间的比率。系统使用actual ratio和target ratio中的较大者进行计算。 如果同时指定了target size bytes和ratio ，则ratio优先。</p>
+<p>PG_NUM是该pool的当前PG数。系统认为应将pool的pg_num更改为NEW PG_NUM（如果存在）。它始终是2的幂，并且仅在“理想”值与当前值的差异大于3倍时才存在。</p>
+<p>最后一列，AUTOSCALE，是pool pg_autoscale_mode，on, off或warn。</p>
+<h3 id="AUTOMATED-SCALING"><a href="#AUTOMATED-SCALING" class="headerlink" title="AUTOMATED SCALING"></a>AUTOMATED SCALING</h3><p>最简单的方法是允许集群根据使用情况自动扩展PG。Ceph将查看可用的总存储量和整个系统的target PG数量，查看每个pool中存储了多少数据并尝试分配相应的PG。该系统的方法相对保守，只有当当前 PG （pg_num） 的数量比它认为的要小 3 倍以上时，才会对pool进行更改。</p>
+<p>每个 OSD 的target PG 数基于可配置的 mon_target_pg_per_osd（默认值：100），可通过以下功能进行调整：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global mon_target_pg_per_osd 100</span><br></pre></td></tr></table></figure>
+<p>autoscaler根据每个per-subtree分析pool并进行调整。由于每个pool可能映射到不同的 CRUSH rule，并且每个rule可以跨不同的设备分发数据，所以Ceph将考虑独立使用层次结构的每个subtree。例如，映射到ssd类的OSD的pool和映射到hdd类的OSD的pool将分别具有最佳PG counts，具体取决于这些相应设备类型的数量。</p>
+<h3 id="SPECIFYING-EXPECTED-POOL-SIZE（指定预期的pool大小）"><a href="#SPECIFYING-EXPECTED-POOL-SIZE（指定预期的pool大小）" class="headerlink" title="SPECIFYING EXPECTED POOL SIZE（指定预期的pool大小）"></a>SPECIFYING EXPECTED POOL SIZE（指定预期的pool大小）</h3><p>首次创建集群或pool时，它将占用集群总容量的一小部分，并在系统中显示只需要少量的placement groups。但是，在大多数情况下，集群管理员最好知道哪些pool会随着时间的推移消耗大部分系统容量。通过向ceph提供这些信息，可以从一开始就使用更适当数量的pg，从而防止pg-num中的后续更改以及在进行调整时与移动数据相关的开销。</p>
+<p>pool的target size*可通过两种方式指定：按pool的绝对大小（即字节）或群集总容量的ratio（比率）指定。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set mypool target_size_bytes 100T</span><br></pre></td></tr></table></figure>
+<p>会告诉系统mypool预计会占用100 TiB的空间。 或者：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set mypool target_size_ratio .9</span><br></pre></td></tr></table></figure>
+<p>告诉系统mypool预计会消耗群集总容量的90％。</p>
+<p>您还可以使用ceph osd pool create命令的可选<code>--target-size-bytes &lt;bytes&gt;</code>或<code>--target-size-ratio &lt;ratio&gt;</code>参数在创建时设置pool的target size。</p>
+<p>请注意，如果指定了不可能的target size值（例如，容量大于整个群集的容量或ratio(s)之和大于1.0），则会引发health警告（POOL_TARET_SIZE_RATIO_OVERCOMMITTED或POOL_TARGET_SIZE_BYTES_OVERCOMMITTED）。<a href="https://www.mail-archive.com/ceph-users@lists.ceph.com/msg56416.html" target="_blank" rel="noopener">https://www.mail-archive.com/ceph-users@lists.ceph.com/msg56416.html</a></p>
+<h3 id="SPECIFYING-BOUNDS-ON-A-POOL’S-PGS（在pool的PGS上指定界限）"><a href="#SPECIFYING-BOUNDS-ON-A-POOL’S-PGS（在pool的PGS上指定界限）" class="headerlink" title="SPECIFYING BOUNDS ON A POOL’S PGS（在pool的PGS上指定界限）"></a>SPECIFYING BOUNDS ON A POOL’S PGS（在pool的PGS上指定界限）</h3><p>也可以为一个pool指定最小数量的PG。设置下限可防止Ceph将PG编号减少（或建议减少）到配置的编号以下。</p>
+<p>您可以使用以下方法设置pool的最小PG数量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &lt;pool-name&gt; pg_num_min &lt;num&gt;</span><br></pre></td></tr></table></figure>
+<p>您还可以使用ceph osd pool create命令的可选<code>--pg-num-min &lt;num&gt;</code>参数指定创建pool时的最小PG count。</p>
+<h1 id="A-PRESELECTION-OF-PG-NUM"><a href="#A-PRESELECTION-OF-PG-NUM" class="headerlink" title="A PRESELECTION OF PG_NUM"></a>A PRESELECTION OF PG_NUM</h1><p>使用以下方法创建新pool时：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool create &#123;pool-name&#125; [pg_num]</span><br></pre></td></tr></table></figure>
+<p>选择pg_num的值是可选的。 如果您未指定pg_num，则集群可以（默认情况下）根据pool中存储的数据为您自动对其进行调整（请参见上文， <a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler" target="_blank" rel="noopener">Autoscaling placement groups</a>）。</p>
+<p>或者，可以显式提供pg_num。 但是，是否指定pg_num值并不影响群集是否自动调整该值。 要启用或禁用自动调整，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; pg_autoscaler_mode (on|off|warn)</span><br></pre></td></tr></table></figure>
+<p>传统上，每个OSD PG的”rule of thumb”为100。使用balancer的附加功能（默认情况下也启用的），每个OSD大约50 PG可能是合理的。autoscaler通常为您提供：</p>
+<ul>
+<li>使每个pool中的PG与pool中的数据成比例</li>
+<li>考虑到每个PG在OSD上的replication或erasuring-coding，最终每个OSD会有50-100个PG</li>
+</ul>
+<h1 id="HOW-ARE-PLACEMENT-GROUPS-USED（如何使用PLACEMENT-GROUPS）"><a href="#HOW-ARE-PLACEMENT-GROUPS-USED（如何使用PLACEMENT-GROUPS）" class="headerlink" title="HOW ARE PLACEMENT GROUPS USED（如何使用PLACEMENT GROUPS）"></a>HOW ARE PLACEMENT GROUPS USED（如何使用PLACEMENT GROUPS）</h1><p>placement group (PG)聚集pool中的objects，因为以每个object为基础跟踪object placement和object metadata在计算上是昂贵的，即，具有数百万个object的系统无法实际以每个object为基础跟踪placement。</p>
+<p><img src="https://docs.ceph.com/docs/master/_images/ditaa-1fde157d24b63e3b465d96eb6afea22078c85a90.png" alt></p>
+<p>Ceph客户端将计算object应位于哪个placement group中。它通过hashing object ID并根据定义的pool中PG的数量和pool ID进行操作来实现此目的。有关详细信息，请参见 <a href="https://docs.ceph.com/docs/master/architecture#mapping-pgs-to-osds" target="_blank" rel="noopener">Mapping PGs to OSDs</a>。</p>
+<p>placement group中object的内容存储在一组OSD中。 例如，在大小为2的replicated pool中，每个placement group将在两个OSD上存储objects，如下所示。</p>
+<p><img src="https://docs.ceph.com/docs/master/_images/ditaa-3c86866fb6edc99dad6ccf51e25e536806f0b079.png" alt></p>
+<p>如果OSD #2失败，则将另一个分配给Placement Group #1，并用OSD #1中所有objects的副本填充。 如果pool大小从2更改为3，则会将一个额外的OSD分配给该placement group，并将接收该placement group中所有objects的副本。</p>
+<p>Placement groups不拥有OSD； 他们与同一资源pool甚至其他资源pool中的其他placement groups共享它。 如果OSD #2失败，则Placement Group #2还必须使用OSD #3恢复objects的副本。</p>
+<p>当placement groups的数量增加时，将为新的placement groups分配OSD。CRUSH函数的结果也将更改，并且先前placement groups中的某些objects将被复制到新的placement groups中，并从旧的placement groups中删除。</p>
+<h1 id="PLACEMENT-GROUPS-TRADEOFFS（权衡）"><a href="#PLACEMENT-GROUPS-TRADEOFFS（权衡）" class="headerlink" title="PLACEMENT GROUPS TRADEOFFS（权衡）"></a>PLACEMENT GROUPS TRADEOFFS（权衡）</h1><p>数据持久性以及所有OSD之间的均匀分配都需要更多的placement groups，但应将其数量减少到最少，以节省CPU和内存。</p>
+<h3 id="DATA-DURABILITY（数据持久性）"><a href="#DATA-DURABILITY（数据持久性）" class="headerlink" title="DATA DURABILITY（数据持久性）"></a>DATA DURABILITY（数据持久性）</h3><p>OSD发生故障后，数据丢失的风险会增加，直到完全恢复其中包含的数据为止。 假设有一种情况会导致单个placement group中的数据永久丢失：</p>
+<ul>
+<li>OSD失败，并且它包含的object的所有副本均丢失。对于placement group中的所有objects，副本的数量突然从3个减少到2个。</li>
+<li>Ceph通过选择一个新的OSD重新创建所有objects的第三个副本，开始对该placement group的恢复。</li>
+<li>在同一placement group内的另一个OSD在新OSD完全填充第三份副本之前发生故障。 这样，某些objects将只有一个幸存副本。</li>
+<li>Ceph选择了另一个OSD并保持复制objects以恢复所需的副本数。</li>
+<li>在同一placement group中的第三个OSD在恢复完成之前发生故障。 如果此OSD包含object的唯一剩余副本，则它将永久丢失。</li>
+</ul>
+<p>在三个副本pool中包含10个OSD和512个placement groups的集群中，CRUSH将为每个placement groups提供三个OSD。 最后，每个OSD将托管(512 * 3) / 10 = ~150 Placement Groups。 当第一个OSD发生故障时，以上情况将同时启动所有150个placement groups的恢复。</p>
+<p>恢复的150个placement groups可能均匀分布在剩余的9个OSD上。 因此，每个剩余的OSD可能会将objects的副本发送给所有其他objects，并且还可能会接收一些要存储的新objects，因为它们已成为新placement group的一部分。</p>
+<p>完成恢复所需的时间完全取决于Ceph集群的架构。 假设每个OSD由一台机器上的1TB SSD托管，并且所有OSD都连接到10Gb/s交换机，并且单个OSD的恢复在M分钟内完成。 如果每台计算机使用不带SSD journal的spinners和1Gb/s交换机的两个OSD，则速度至少要慢一个数量级。</p>
+<p>在这种大小的集群中，placement groups的数量几乎对数据持久性没有影响。 可能是128或8192，恢复速度不会变慢或变快。</p>
+<p>但是，将相同的Ceph集群增加到20个OSD而不是10个OSD可能会加快恢复速度，从而显着提高数据的持久性。 现在，每个OSD只能参与约75个placement groups，而不是只有10个OSD时的约150个placement groups，并且仍然需要全部19个剩余OSD执行相同数量的object副本才能恢复。 但是，如果10个OSD必须每个复制大约100GB，则现在它们必须每个复制50GB。 如果网络是瓶颈，恢复将以两倍的速度进行。 换句话说，当OSD数量增加时，恢复速度会更快。</p>
+<p>如果该群集增长到40个OSD，则每个OSD将仅托管约35个placement groups。 如果OSD死亡，则恢复将保持更快的速度，除非它被另一个瓶颈阻塞。 但是，如果该集群增长到200个OSD，则每个OSD将仅托管约7个placement groups。 如果OSD死亡，则将在这些placement groups中的最多约21 (7 * 3)个OSD之间进行恢复：恢复将比有40个OSD时花费的时间更长，这意味着应增加placement groups的数量。</p>
+<p>无论恢复时间有多短，第二个OSD在进行过程中都有可能发生故障。 在上述10个OSD群集中，如果它们中的任何一个失败，则〜17个placement groups（即，正在恢复〜150/9个placement groups）将只有一个幸存副本。 并且如果剩余的8个OSD中的任何一个失败，则两个placement groups的最后一个objects很可能会丢失（即〜17/8个placement groups，仅恢复了一个剩余副本）。</p>
+<p>当群集的大小增加到20个OSD时，丢失三个OSD损坏的Placement Groups的数量将减少。 第二个OSD丢失将降级〜4个（即恢复到约75个/ 19个Placement Groups），而不是〜17个，而第三个OSD丢失则仅在它是包含尚存副本的四个OSD之一时才丢失数据。 换句话说，如果在恢复时间范围内丢失一个OSD的概率为0.0001％，则它从具有10个OSD的群集中的17 <em> 10 </em> 0.0001％变为具有20个OSD的群集中的4 <em> 20 </em> 0.0001％。</p>
+<p>简而言之，更多的OSD意味着恢复更快，较低的级联故障风险，从而导致Placement Group的永久丢失。 就数据持久性而言，在少于50个OSD的群集中，具有512或4096个Placement Group大致等效。</p>
+<p>注意：向集群添加的新OSD可能需要很长时间才能分配有分配给它的placement groups。 但是，不会降低任何object的质量，也不会影响集群中包含的数据的持久性。</p>
+<h3 id="OBJECT-DISTRIBUTION-WITHIN-A-POOL（pool内的object分布）"><a href="#OBJECT-DISTRIBUTION-WITHIN-A-POOL（pool内的object分布）" class="headerlink" title="OBJECT DISTRIBUTION WITHIN A POOL（pool内的object分布）"></a>OBJECT DISTRIBUTION WITHIN A POOL（pool内的object分布）</h3><p>理想情况下，object均匀地分布在每个placement group中。 由于CRUSH计算每个object的placement group，但实际上不知道该placement group内每个OSD中存储了多少数据，因此placement group数与OSD数之比可能会显着影响数据的分布。</p>
+<p>例如，如果在三个副本pool中有一个用于十个OSD的placement group，则仅使用三个OSD，因为CRUSH别无选择。 当有更多的placement group可用时，object更有可能在其中均匀分布。 CRUSH还尽一切努力在所有现有的placement group中平均分配OSD。</p>
+<p>只要Placement Groups比OSD多一个或两个数量级，则分布应该均匀。 例如，用于3个OSD的256个Placement Groups，用于10个OSD的512或1024个Placement Groups等。</p>
+<p>数据分布不均可能是由OSD与placement groups之间的比率以外的因素引起的。 由于CRUSH未考虑object的大小，因此一些非常大的object可能会造成不平衡。 假设有100万个4K object（总计4GB）均匀分布在10个OSD的1024个placement groups中。 他们将在每个OSD上使用4GB / 10 = 400MB。 如果将一个400MB object添加到pool中，则支持放置object的placement groups的三个OSD将填充400MB + 400MB = 800MB，而其余七个将仅占据400MB。</p>
+<h3 id="MEMORY-CPU-AND-NETWORK-USAGE（内存，CPU和网络使用情况）"><a href="#MEMORY-CPU-AND-NETWORK-USAGE（内存，CPU和网络使用情况）" class="headerlink" title="MEMORY, CPU AND NETWORK USAGE（内存，CPU和网络使用情况）"></a>MEMORY, CPU AND NETWORK USAGE（内存，CPU和网络使用情况）</h3><p>对于每个placement group，OSD和MON始终需要内存，网络和CPU，并且在恢复期间甚至更多。 通过对placement group内的object进行聚类objects来共享此开销是它们存在的主要原因之一。</p>
+<p>最小化placement groups的数量可以节省大量资源。</p>
+<h1 id="CHOOSING-THE-NUMBER-OF-PLACEMENT-GROUPS（选择PLACEMENT-GROUPS的数量）"><a href="#CHOOSING-THE-NUMBER-OF-PLACEMENT-GROUPS（选择PLACEMENT-GROUPS的数量）" class="headerlink" title="CHOOSING THE NUMBER OF PLACEMENT GROUPS（选择PLACEMENT GROUPS的数量）"></a>CHOOSING THE NUMBER OF PLACEMENT GROUPS（选择PLACEMENT GROUPS的数量）</h1><p>如果您有超过50个OSD，我们建议每个OSD大约有50-100个placement groups，以平衡资源使用，数据持久性和分发。 如果OSD少于50个，则最好在上述<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#preselection" target="_blank" rel="noopener">preselection</a>中进行选择。 对于单个objects pool，可以使用以下公式获取baseline：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">             (OSDs * 100)</span><br><span class="line">Total PGs =  ------------</span><br><span class="line">              pool size</span><br></pre></td></tr></table></figure>
+<p>pool size是replicated pools的副本数或erasure coded pools的K + M总和（由ceph osd erasure-code-profile get返回）。</p>
+<p>然后，您应该检查设计Ceph集群的方式，以最大程度地提高<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#data-durability" target="_blank" rel="noopener">数据持久性</a>，<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#object-distribution" target="_blank" rel="noopener">对象分配</a>并最小化<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#resource-usage" target="_blank" rel="noopener">资源使用</a>。</p>
+<p>结果应始终四舍五入到最接近的2的幂。</p>
+<p>只有2的幂可以平衡placement groups之间的objects数量。 其他值将导致OSD上的数据分布不均。</p>
+<p>例如，对于具有200个OSD和3个副本的pool大小的集群，您可以按以下方式估计PG的数量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(200 * 100)</span><br><span class="line">----------- = 6667. Nearest power of 2: 8192</span><br><span class="line">     3</span><br></pre></td></tr></table></figure>
+<p>当使用多个data pools存储objects时，需要确保在每个pool的placement groups数量与每个OSD的placement groups数量之间取得平衡，以便获得合理的placement groups总数，从而为每个OSD提供合理的低偏差而不会增加系统资源的负担或使对等进程太慢。</p>
+<p>例如，一个10个pool的集群，每个pool在十个OSD上具有512个placement groups，则总共有5120个placement groups分布在十个OSD上，即每个OSD 512个placement groups。 那不会使用太多资源。 但是，如果创建了1000个pool，每个pool有512个placement groups，则OSD将分别处理约50,000个placement groups，这将需要更多的资源和时间来进行对等。</p>
+<p>您可能会发现<a href="http://ceph.com/pgcalc/" target="_blank" rel="noopener">PGCalc</a>工具很有帮助。</p>
+<h1 id="SET-THE-NUMBER-OF-PLACEMENT-GROUPS（设置PLACEMENT-GROUPS数）"><a href="#SET-THE-NUMBER-OF-PLACEMENT-GROUPS（设置PLACEMENT-GROUPS数）" class="headerlink" title="SET THE NUMBER OF PLACEMENT GROUPS（设置PLACEMENT GROUPS数）"></a>SET THE NUMBER OF PLACEMENT GROUPS（设置PLACEMENT GROUPS数）</h1><p>要设置pool中的placement groups数量，必须在创建pool时指定placement groups的数量。有关详细信息，请参见<a href="https://docs.ceph.com/docs/master/rados/operations/pools#createpool" target="_blank" rel="noopener">Create a Pool</a>。 即使在创建pool之后，您也可以使用以下方法更改placement groups的数量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; pg_num &#123;pg_num&#125;</span><br></pre></td></tr></table></figure>
+<p>增加placement groups的数量之后，还必须增加placement（pgp_num）的数量，然后集群才能重新平衡。 pgp_num将是CRUSH算法考虑placement的placement groups的数量。 pg_num的增加会拆分placement groups，但是数据将不会迁移到较新的placement groups，直到placement的placement groups为止。 pgp_num增加了。 pgp_num应该等于pg_num。 要增加用于placement的placement groups的数量，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; pgp_num &#123;pgp_num&#125;</span><br></pre></td></tr></table></figure>
+<p>当减少PG的数量时，将自动为您调整pgp_num。</p>
+<h1 id="GET-THE-NUMBER-OF-PLACEMENT-GROUPS（获取PLACEMENT-GROUPS数）"><a href="#GET-THE-NUMBER-OF-PLACEMENT-GROUPS（获取PLACEMENT-GROUPS数）" class="headerlink" title="GET THE NUMBER OF PLACEMENT GROUPS（获取PLACEMENT GROUPS数）"></a>GET THE NUMBER OF PLACEMENT GROUPS（获取PLACEMENT GROUPS数）</h1><p>要获取pool中的placement groups数，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool get &#123;pool-name&#125; pg_num</span><br></pre></td></tr></table></figure>
+<h1 id="GET-A-CLUSTER’S-PG-STATISTICS（获取集群的PG统计信息）"><a href="#GET-A-CLUSTER’S-PG-STATISTICS（获取集群的PG统计信息）" class="headerlink" title="GET A CLUSTER’S PG STATISTICS（获取集群的PG统计信息）"></a>GET A CLUSTER’S PG STATISTICS（获取集群的PG统计信息）</h1><p>要获取集群中placement groups的统计信息，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg dump [--format &#123;format&#125;]</span><br></pre></td></tr></table></figure>
+<p>有效格式为plain（默认）和json。</p>
+<h1 id="GET-STATISTICS-FOR-STUCK-PGS（获取STUCK-PGS的统计信息）"><a href="#GET-STATISTICS-FOR-STUCK-PGS（获取STUCK-PGS的统计信息）" class="headerlink" title="GET STATISTICS FOR STUCK PGS（获取STUCK PGS的统计信息）"></a>GET STATISTICS FOR STUCK PGS（获取STUCK PGS的统计信息）</h1><p>要获取所有处于指定状态的placement groups的统计信息，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg dump_stuck inactive|unclean|stale|undersized|degraded [--format &lt;format&gt;] [-t|--threshold &lt;seconds&gt;]</span><br></pre></td></tr></table></figure>
+<p>Inactive Placement groups无法处理读写，因为它们正在等待OSD包含最新数据。</p>
+<p>Unclean Placement groups包含的object未复制所需的次数。。 他们应该正在恢复。</p>
+<p>Stale Placement groups处于未知状态—承载这些PG的OSD在一段时间内未向monitor报告（由mon_osd_report_timeout配置）。</p>
+<p>有效格式为plain（默认）和json。 阈值定义placement group在将其包括在返回的统计信息之前卡住的最小秒数（默认为300秒）。</p>
+<h1 id="GET-A-PG-MAP"><a href="#GET-A-PG-MAP" class="headerlink" title="GET A PG MAP"></a>GET A PG MAP</h1><p>要获取特placement group map，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg map &#123;pg-id&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg map 1.6c</span><br></pre></td></tr></table></figure>
+<p>Ceph将返回placement group map，placement group和OSD状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osdmap e13 pg 1.6c (1.6c) -&gt; up [1,0] acting [1,0]</span><br></pre></td></tr></table></figure>
+<h1 id="GET-A-PGS-STATISTICS（获取PGS统计信息）"><a href="#GET-A-PGS-STATISTICS（获取PGS统计信息）" class="headerlink" title="GET A PGS STATISTICS（获取PGS统计信息）"></a>GET A PGS STATISTICS（获取PGS统计信息）</h1><p>要检索特定placement group的统计信息，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg &#123;pg-id&#125; query</span><br></pre></td></tr></table></figure>
+<h1 id="SCRUB-A-PLACEMENT-GROUP"><a href="#SCRUB-A-PLACEMENT-GROUP" class="headerlink" title="SCRUB A PLACEMENT GROUP"></a>SCRUB A PLACEMENT GROUP</h1><p>要scrub a placement group，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg scrub &#123;pg-id&#125;</span><br></pre></td></tr></table></figure>
+<p>Ceph检查primary和任何replica nodes生成的placement group中所有objects的目录进行比较，以确保没有丢失或不匹配的objects，并且它们的内容一致。 假设所有副本都匹配，则扫描可确保所有与snapshot-related的object metadata都是一致的。 通过日志报告错误。</p>
+<p>要清理特定pool中的所有placement groups，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool scrub &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="PRIORITIZE-BACKFILL-RECOVERY-OF-A-PLACEMENT-GROUP-S-（优先考虑PLACEMENT-GROUP的BACKFILL-RECOVERY）"><a href="#PRIORITIZE-BACKFILL-RECOVERY-OF-A-PLACEMENT-GROUP-S-（优先考虑PLACEMENT-GROUP的BACKFILL-RECOVERY）" class="headerlink" title="PRIORITIZE BACKFILL/RECOVERY OF A PLACEMENT GROUP(S)（优先考虑PLACEMENT GROUP的BACKFILL/RECOVERY）"></a>PRIORITIZE BACKFILL/RECOVERY OF A PLACEMENT GROUP(S)（优先考虑PLACEMENT GROUP的BACKFILL/RECOVERY）</h1><p>您可能会遇到这样的情况，即一堆placement groups需要recovery和/或backfill，并且某些特定的groups保存的数据比其他的更为重要（例如，那些PG可能保存正在运行的机器使用的images的数据，而其他PG可能由不活动的机器使用/较少的相关数据）。 在这种情况下，您可能希望优先考虑恢复这些groups，以便更早恢复存储在这些groups上的数据的性能和/或可用性。 为此（在backfill或recovery期间将特定的placement group(s)标记为优先），请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph pg force-recovery &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br><span class="line">ceph pg force-backfill &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br></pre></td></tr></table></figure>
+<p>这将导致Ceph首先在其他placement groups之前对指定的placement groups执行recovery或backfill。 这不会中断当前正在进行的backfill或recovery，但会导致尽快处理指定的PG。 如果您改变主意或优先考虑wrong groups，请使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph pg cancel-force-recovery &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br><span class="line">ceph pg cancel-force-backfill &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br></pre></td></tr></table></figure>
+<p>这将从这些PG中删除“force” flag，并将以默认顺序对其进行处理。 同样，这不会影响当前正在处理的placement groups，只会影响仍在排队的placement groups。</p>
+<p>recovery或backfill group后，将自动清除“force” flag。</p>
+<p>同样，您可以使用以下命令强制Ceph首先对指定pool中的所有placement groups执行recovery或backfill：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool force-recovery &#123;pool-name&#125;</span><br><span class="line">ceph osd pool force-backfill &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool cancel-force-recovery &#123;pool-name&#125;</span><br><span class="line">ceph osd pool cancel-force-backfill &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+<p>如果您改变主意，则可以恢复到默认的recovery或backfill优先级。</p>
+<p>请注意，这些命令可能会破坏Ceph内部优先级计算的顺序，因此请谨慎使用！ 特别是，如果您有多个当前共享相同底层OSD的pool，并且某些特定pool中的数据比其他pool更重要，我们建议您使用以下命令以更好的顺序重新排列所有pool的recovery/backfill优先级：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; recovery_priority &#123;value&#125;</span><br></pre></td></tr></table></figure>
+<p>例如，如果您有10个pool，则可以将最重要的一个优先级设置为10，下一个9，等等。或者您可以不理会大多数pool，而说3个重要的pool分别设置为优先级1或优先级3、2、1。</p>
+<h1 id="REVERT-LOST（永不消失）"><a href="#REVERT-LOST（永不消失）" class="headerlink" title="REVERT LOST（永不消失）"></a>REVERT LOST（永不消失）</h1><p>如果集群丢失了一个或多个object，并且您决定放弃对丢失数据的搜索，则必须将unfound的object标记为lost。</p>
+<p>如果已查询所有可能的位置并且仍然丢失了objects，则可能必须放弃丢失的objects。</p>
+<p>当前唯一受支持的选项是“revert”，它可以回滚到该object的先前版本，或者（如果是新object）则完全忘记它。 要将“unfound”的object标记为“lost”，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg &#123;pg-id&#125; mark_unfound_lost revert|delete</span><br></pre></td></tr></table></figure>
+<p>重要说明：请谨慎使用此功能，因为它可能会使期望object存在的应用程序感到困惑。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/14/ceph-问题列表/" rel="next" title="ceph 问题列表">
+                <i class="fa fa-chevron-left"></i> ceph 问题列表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/16/Ceph版本升级新特性/" rel="prev" title="Ceph版本升级新特性">
+                Ceph版本升级新特性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AUTOSCALING-PLACEMENT-GROUPS"><span class="nav-number">1.</span> <span class="nav-text">AUTOSCALING PLACEMENT GROUPS</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#VIEWING-PG-SCALING-RECOMMENDATIONS"><span class="nav-number">1.0.1.</span> <span class="nav-text">VIEWING PG SCALING RECOMMENDATIONS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AUTOMATED-SCALING"><span class="nav-number">1.0.2.</span> <span class="nav-text">AUTOMATED SCALING</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SPECIFYING-EXPECTED-POOL-SIZE（指定预期的pool大小）"><span class="nav-number">1.0.3.</span> <span class="nav-text">SPECIFYING EXPECTED POOL SIZE（指定预期的pool大小）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SPECIFYING-BOUNDS-ON-A-POOL’S-PGS（在pool的PGS上指定界限）"><span class="nav-number">1.0.4.</span> <span class="nav-text">SPECIFYING BOUNDS ON A POOL’S PGS（在pool的PGS上指定界限）</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#A-PRESELECTION-OF-PG-NUM"><span class="nav-number">2.</span> <span class="nav-text">A PRESELECTION OF PG_NUM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HOW-ARE-PLACEMENT-GROUPS-USED（如何使用PLACEMENT-GROUPS）"><span class="nav-number">3.</span> <span class="nav-text">HOW ARE PLACEMENT GROUPS USED（如何使用PLACEMENT GROUPS）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PLACEMENT-GROUPS-TRADEOFFS（权衡）"><span class="nav-number">4.</span> <span class="nav-text">PLACEMENT GROUPS TRADEOFFS（权衡）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DATA-DURABILITY（数据持久性）"><span class="nav-number">4.0.1.</span> <span class="nav-text">DATA DURABILITY（数据持久性）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OBJECT-DISTRIBUTION-WITHIN-A-POOL（pool内的object分布）"><span class="nav-number">4.0.2.</span> <span class="nav-text">OBJECT DISTRIBUTION WITHIN A POOL（pool内的object分布）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MEMORY-CPU-AND-NETWORK-USAGE（内存，CPU和网络使用情况）"><span class="nav-number">4.0.3.</span> <span class="nav-text">MEMORY, CPU AND NETWORK USAGE（内存，CPU和网络使用情况）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CHOOSING-THE-NUMBER-OF-PLACEMENT-GROUPS（选择PLACEMENT-GROUPS的数量）"><span class="nav-number">5.</span> <span class="nav-text">CHOOSING THE NUMBER OF PLACEMENT GROUPS（选择PLACEMENT GROUPS的数量）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SET-THE-NUMBER-OF-PLACEMENT-GROUPS（设置PLACEMENT-GROUPS数）"><span class="nav-number">6.</span> <span class="nav-text">SET THE NUMBER OF PLACEMENT GROUPS（设置PLACEMENT GROUPS数）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GET-THE-NUMBER-OF-PLACEMENT-GROUPS（获取PLACEMENT-GROUPS数）"><span class="nav-number">7.</span> <span class="nav-text">GET THE NUMBER OF PLACEMENT GROUPS（获取PLACEMENT GROUPS数）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GET-A-CLUSTER’S-PG-STATISTICS（获取集群的PG统计信息）"><span class="nav-number">8.</span> <span class="nav-text">GET A CLUSTER’S PG STATISTICS（获取集群的PG统计信息）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GET-STATISTICS-FOR-STUCK-PGS（获取STUCK-PGS的统计信息）"><span class="nav-number">9.</span> <span class="nav-text">GET STATISTICS FOR STUCK PGS（获取STUCK PGS的统计信息）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GET-A-PG-MAP"><span class="nav-number">10.</span> <span class="nav-text">GET A PG MAP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GET-A-PGS-STATISTICS（获取PGS统计信息）"><span class="nav-number">11.</span> <span class="nav-text">GET A PGS STATISTICS（获取PGS统计信息）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SCRUB-A-PLACEMENT-GROUP"><span class="nav-number">12.</span> <span class="nav-text">SCRUB A PLACEMENT GROUP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PRIORITIZE-BACKFILL-RECOVERY-OF-A-PLACEMENT-GROUP-S-（优先考虑PLACEMENT-GROUP的BACKFILL-RECOVERY）"><span class="nav-number">13.</span> <span class="nav-text">PRIORITIZE BACKFILL/RECOVERY OF A PLACEMENT GROUP(S)（优先考虑PLACEMENT GROUP的BACKFILL/RECOVERY）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#REVERT-LOST（永不消失）"><span class="nav-number">14.</span> <span class="nav-text">REVERT LOST（永不消失）</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

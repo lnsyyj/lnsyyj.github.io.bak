@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="LVM,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="LinuxCast视频教程笔记 传统磁盘管理的问题当分区大小不够用时无法扩展其大小，只能通过添加硬盘、创建新的分区来扩展空间，但是新添加进来的硬盘是作为独立文件系统存在的，原有的文件系统并未得到扩充，上层应用很多时候只能访问一个文件系统。只能让现有磁盘下线，换上新的磁盘之后，再将原始数据导入。 LVMLVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象封装起来，以">
+<meta name="keywords" content="LVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVM逻辑卷基本概念">
+<meta property="og:url" content="http://yoursite.com/2019/04/08/LVM逻辑卷基本概念/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="LinuxCast视频教程笔记 传统磁盘管理的问题当分区大小不够用时无法扩展其大小，只能通过添加硬盘、创建新的分区来扩展空间，但是新添加进来的硬盘是作为独立文件系统存在的，原有的文件系统并未得到扩充，上层应用很多时候只能访问一个文件系统。只能让现有磁盘下线，换上新的磁盘之后，再将原始数据导入。 LVMLVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象封装起来，以">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-1.png">
+<meta property="og:image" content="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-2.png?raw=true">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-3.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-4.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-5.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-6.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-7.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-8.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-9.png">
+<meta property="og:updated_time" content="2020-03-22T08:16:36.026Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LVM逻辑卷基本概念">
+<meta name="twitter:description" content="LinuxCast视频教程笔记 传统磁盘管理的问题当分区大小不够用时无法扩展其大小，只能通过添加硬盘、创建新的分区来扩展空间，但是新添加进来的硬盘是作为独立文件系统存在的，原有的文件系统并未得到扩充，上层应用很多时候只能访问一个文件系统。只能让现有磁盘下线，换上新的磁盘之后，再将原始数据导入。 LVMLVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象封装起来，以">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-1.png">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/04/08/LVM逻辑卷基本概念/">
+
+
+
+
+
+  <title>LVM逻辑卷基本概念 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/08/LVM逻辑卷基本概念/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LVM逻辑卷基本概念</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-08T10:06:35+08:00">
+                2019-04-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <p>LinuxCast视频教程笔记</p>
+<h1 id="传统磁盘管理的问题"><a href="#传统磁盘管理的问题" class="headerlink" title="传统磁盘管理的问题"></a>传统磁盘管理的问题</h1><p>当分区大小不够用时无法扩展其大小，只能通过添加硬盘、创建新的分区来扩展空间，但是新添加进来的硬盘是作为独立文件系统存在的，原有的文件系统并未得到扩充，上层应用很多时候只能访问一个文件系统。只能让现有磁盘下线，换上新的磁盘之后，再将原始数据导入。</p>
+<h1 id="LVM"><a href="#LVM" class="headerlink" title="LVM"></a>LVM</h1><p>LVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象封装起来，以逻辑卷的形式表现给上层系统，逻辑卷的大小可以动态调整，而且不会丢失现有数据。新加入的硬盘也不会改变现有上层的逻辑卷。</p>
+<p>作为一种动态磁盘管理机制，逻辑卷技术大大提高了磁盘管理的灵活性。</p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-1.png" alt></p>
+<p>上图黄色为：VG    橙色为：LV</p>
+<p>（1）首先把物理硬盘格式化（存储里面叫条带化）为物理卷（PV），格式化为物理卷的过程实际上是把硬盘空间化成一个一个的PE（PE是逻辑卷空间管理的最基本单位，默认4M）</p>
+<p>（2）第二步我们要创建一个VG，VG的作用是用来装PE的，就像一个空间池。我们可以把一个或者多个PV加到VG当中。加入多少个PV，我们的VG容量就是这些PV大小之和。（当创建VG以后，在/dev目录下会多出一个目录）</p>
+<p>（3）最后创建LV（每个LV的空间可能来自不同的物理硬盘）</p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-2.png?raw=true" alt></p>
+<h1 id="创建LVM"><a href="#创建LVM" class="headerlink" title="创建LVM"></a>创建LVM</h1><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-3.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-4.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-5.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  200G  0 disk </span><br><span class="line">├─vda1 253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  195G  0 part /</span><br><span class="line">vdb    253:16   0  100G  0 disk </span><br><span class="line">vdc    253:32   0  100G  0 disk</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdb /dev/vdc</span><br><span class="line">  Physical volume &quot;/dev/vdb&quot; successfully created.</span><br><span class="line">  Physical volume &quot;/dev/vdc&quot; successfully created.</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG Fmt  Attr PSize   PFree  </span><br><span class="line">  /dev/vdb      lvm2 ---  100.00g 100.00g</span><br><span class="line">  /dev/vdc      lvm2 ---  100.00g 100.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgcreate linuxcast /dev/vdb /dev/vdc </span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully created</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   0   0 wz--n- 199.99g 199.99g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mylv -L 2G linuxcast</span><br><span class="line">  Logical volume &quot;mylv&quot; created.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 2.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mynewlv -L 2G linuxcast</span><br><span class="line">  Logical volume &quot;mynewlv&quot; created.</span><br><span class="line">[root@teuthology ~]# ll /dev/linuxcast/</span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx 1 root root 7 Apr  8 14:59 mylv -&gt; ../dm-0</span><br><span class="line">lrwxrwxrwx 1 root root 7 Apr  8 15:03 mynewlv -&gt; ../dm-1</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mkfs.ext4 /dev/linuxcast/mylv</span><br><span class="line">[root@teuthology ~]# mount /dev/linuxcast/mylv /mnt/</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">Filesystem                 Type      Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G   2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G   0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G   0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G   1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G   0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M  17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M   0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.0G  6.0M  1.8G   1% /mnt</span><br><span class="line"></span><br><span class="line">#删除LVM</span><br><span class="line">[root@teuthology ~]# umount  /mnt/</span><br><span class="line">[root@teuthology ~]# lvremove /dev/linuxcast/mylv </span><br><span class="line">Do you really want to remove active logical volume linuxcast/mylv? [y/n]: y</span><br><span class="line">  Logical volume &quot;mylv&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# lvremove /dev/linuxcast/mynewlv </span><br><span class="line">Do you really want to remove active logical volume linuxcast/mynewlv? [y/n]: y</span><br><span class="line">  Logical volume &quot;mynewlv&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">[root@teuthology ~]# vgremove linuxcast</span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdb </span><br><span class="line">  Labels on physical volume &quot;/dev/vdb&quot; successfully wiped.</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdc</span><br><span class="line">  Labels on physical volume &quot;/dev/vdc&quot; successfully wiped.</span><br></pre></td></tr></table></figure>
+<h1 id="LVM逻辑卷的拉伸与缩小"><a href="#LVM逻辑卷的拉伸与缩小" class="headerlink" title="LVM逻辑卷的拉伸与缩小"></a>LVM逻辑卷的拉伸与缩小</h1><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-6.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  200G  0 disk </span><br><span class="line">├─vda1 253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  195G  0 part /</span><br><span class="line">vdb    253:16   0  100G  0 disk </span><br><span class="line">vdc    253:32   0  100G  0 disk </span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdb /dev/vdc</span><br><span class="line">  Physical volume &quot;/dev/vdb&quot; successfully created.</span><br><span class="line">  Physical volume &quot;/dev/vdc&quot; successfully created.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG Fmt  Attr PSize   PFree  </span><br><span class="line">  /dev/vdb      lvm2 ---  100.00g 100.00g</span><br><span class="line">  /dev/vdc      lvm2 ---  100.00g 100.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgcreate linuxcast /dev/vdb /dev/vdc</span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully created</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mylv -L 2G linuxcast</span><br><span class="line">WARNING: ext4 signature detected on /dev/linuxcast/mylv at offset 1080. Wipe it? [y/n]: y</span><br><span class="line">  Wiping ext4 signature on /dev/linuxcast/mylv.</span><br><span class="line">  Logical volume &quot;mylv&quot; created.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mkfs.ext4 /dev/linuxcast/mylv</span><br><span class="line">mke2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">文件系统标签=</span><br><span class="line">OS type: Linux</span><br><span class="line">块大小=4096 (log=2)</span><br><span class="line">分块大小=4096 (log=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">131072 inodes, 524288 blocks</span><br><span class="line">26214 blocks (5.00%) reserved for the super user</span><br><span class="line">第一个数据块=0</span><br><span class="line">Maximum filesystem blocks=536870912</span><br><span class="line">16 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks: </span><br><span class="line">	32768, 98304, 163840, 229376, 294912</span><br><span class="line"></span><br><span class="line">Allocating group tables: 完成                            </span><br><span class="line">正在写入inode表: 完成                            </span><br><span class="line">Creating journal (16384 blocks): 完成</span><br><span class="line">Writing superblocks and filesystem accounting information: 完成 </span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mount /dev/linuxcast/mylv /mnt/</span><br><span class="line">[root@teuthology ~]# df -TH</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       210G  2.8G  207G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  4.1G     0  4.1G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     4.2G     0  4.2G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     4.2G  9.0M  4.1G    1% /run</span><br><span class="line">tmpfs                      tmpfs     4.2G     0  4.2G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs       1.1G  180M  884M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     821M     0  821M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.1G  6.3M  2.0G    1% /mnt</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 197.99g</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-ao---- 2.00g</span><br><span class="line">[root@teuthology ~]# lvextend -L +1G /dev/linuxcast/mylv </span><br><span class="line">  Size of logical volume linuxcast/mylv changed from 2.00 GiB (512 extents) to 3.00 GiB (768 extents).</span><br><span class="line">  Logical volume linuxcast/mylv successfully resized.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-ao---- 3.00g</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.0G  6.0M  1.8G    1% /mnt</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv </span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem at /dev/linuxcast/mylv is mounted on /mnt; on-line resizing required</span><br><span class="line">old_desc_blocks = 1, new_desc_blocks = 1</span><br><span class="line">The filesystem on /dev/linuxcast/mylv is now 786432 blocks long.</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.9G  6.0M  2.8G    1% /mnt</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-7.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME             MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda              253:0    0  200G  0 disk </span><br><span class="line">├─vda1           253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2           253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3           253:3    0  195G  0 part /</span><br><span class="line">vdb              253:16   0  100G  0 disk </span><br><span class="line">└─linuxcast-mylv 252:0    0    3G  0 lvm  /mnt</span><br><span class="line">vdc              253:32   0  100G  0 disk </span><br><span class="line">vdd              253:48   0  100G  0 disk </span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vd</span><br><span class="line">vda   vda1  vda2  vda3  vdb   vdc   vdd   </span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdd </span><br><span class="line">  Physical volume &quot;/dev/vdd&quot; successfully created.</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 196.99g</span><br><span class="line">[root@teuthology ~]# vgextend linuxcast /dev/vdd </span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully extended</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize    VFree   </span><br><span class="line">  linuxcast   3   1   0 wz--n- &lt;299.99g &lt;296.99g</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-8.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# umount /mnt/</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统       类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3      xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs       devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs          tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs          tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs          tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1      xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs          tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 3.00g                                                    </span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G</span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">请先运行 &apos;e2fsck -f /dev/linuxcast/mylv&apos;.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# e2fsck -f /dev/linuxcast/mylv</span><br><span class="line">e2fsck 1.42.9 (28-Dec-2013)</span><br><span class="line">第一步: 检查inode,块,和大小</span><br><span class="line">第二步: 检查目录结构</span><br><span class="line">第3步: 检查目录连接性</span><br><span class="line">Pass 4: Checking reference counts</span><br><span class="line">第5步: 检查簇概要信息</span><br><span class="line">/dev/linuxcast/mylv: 11/196608 files (0.0% non-contiguous), 30268/786432 blocks</span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G</span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Resizing the filesystem on /dev/linuxcast/mylv to 524288 (4k) blocks.</span><br><span class="line">The filesystem on /dev/linuxcast/mylv is now 524288 blocks long.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvreduce -L -1G /dev/linuxcast/mylv </span><br><span class="line">  WARNING: Reducing active logical volume to 2.00 GiB.</span><br><span class="line">  THIS MAY DESTROY YOUR DATA (filesystem etc.)</span><br><span class="line">Do you really want to reduce linuxcast/mylv? [y/n]: y</span><br><span class="line">  Size of logical volume linuxcast/mylv changed from 3.00 GiB (768 extents) to 2.00 GiB (512 extents).</span><br><span class="line">  Logical volume linuxcast/mylv successfully resized.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 2.00g</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-9.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize    VFree   </span><br><span class="line">  linuxcast   3   1   0 wz--n- &lt;299.99g &lt;296.99g</span><br><span class="line">[root@teuthology ~]# vgreduce linuxcast /dev/vdd </span><br><span class="line">  Removed &quot;/dev/vdd&quot; from volume group &quot;linuxcast&quot;</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 197.99g</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG        Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/vdb   linuxcast lvm2 a--  &lt;100.00g  &lt;98.00g</span><br><span class="line">  /dev/vdc   linuxcast lvm2 a--  &lt;100.00g &lt;100.00g</span><br><span class="line">  /dev/vdd             lvm2 ---   100.00g  100.00g</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdd </span><br><span class="line">  Labels on physical volume &quot;/dev/vdd&quot; successfully wiped.</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG        Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/vdb   linuxcast lvm2 a--  &lt;100.00g  &lt;98.00g</span><br><span class="line">  /dev/vdc   linuxcast lvm2 a--  &lt;100.00g &lt;100.00g</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/LVM/" rel="tag"># LVM</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/01/LTP使用/" rel="next" title="LTP使用">
+                <i class="fa fa-chevron-left"></i> LTP使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/24/prometheus-ceph-exporter-监控项/" rel="prev" title="prometheus ceph_exporter 监控项">
+                prometheus ceph_exporter 监控项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#传统磁盘管理的问题"><span class="nav-number">1.</span> <span class="nav-text">传统磁盘管理的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LVM"><span class="nav-number">2.</span> <span class="nav-text">LVM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建LVM"><span class="nav-number">3.</span> <span class="nav-text">创建LVM</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LVM逻辑卷的拉伸与缩小"><span class="nav-number">4.</span> <span class="nav-text">LVM逻辑卷的拉伸与缩小</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

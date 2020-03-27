@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ceph,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC参考： 【1】https://docs.ceph.com/docs/master/releases/nautilus/ 【2】https://blog.csdn.net/Z_Stand/article/details/89739908 这是Ceph Nautilus的第一个稳定版本。  Dashboard Ceph">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ceph版本升级新特性">
+<meta property="og:url" content="http://yoursite.com/2019/10/16/Ceph版本升级新特性/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC参考： 【1】https://docs.ceph.com/docs/master/releases/nautilus/ 【2】https://blog.csdn.net/Z_Stand/article/details/89739908 这是Ceph Nautilus的第一个稳定版本。  Dashboard Ceph">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-22T08:16:35.963Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ceph版本升级新特性">
+<meta name="twitter:description" content="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC参考： 【1】https://docs.ceph.com/docs/master/releases/nautilus/ 【2】https://blog.csdn.net/Z_Stand/article/details/89739908 这是Ceph Nautilus的第一个稳定版本。  Dashboard Ceph">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/16/Ceph版本升级新特性/">
+
+
+
+
+
+  <title>Ceph版本升级新特性 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/16/Ceph版本升级新特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ceph版本升级新特性</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-16T22:13:29+08:00">
+                2019-10-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h1 id="V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC"><a href="#V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC" class="headerlink" title="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC"></a>V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC</h1><p>参考：</p>
+<p>【1】<a href="https://docs.ceph.com/docs/master/releases/nautilus/" target="_blank" rel="noopener">https://docs.ceph.com/docs/master/releases/nautilus/</a></p>
+<p>【2】<a href="https://blog.csdn.net/Z_Stand/article/details/89739908" target="_blank" rel="noopener">https://blog.csdn.net/Z_Stand/article/details/89739908</a></p>
+<p>这是Ceph Nautilus的第一个稳定版本。</p>
+<ul>
+<li><p>Dashboard</p>
+<p><a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">Ceph Dashboard</a>增加了许多新功能：</p>
+<ul>
+<li>Support for multiple users / roles</li>
+<li>SSO (SAMLv2) for user authentication</li>
+<li>Auditing support（审计支持）</li>
+<li>New landing page, showing more metrics and health info</li>
+<li>I18N support（国际化）</li>
+<li>REST API documentation with Swagger API</li>
+<li>Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。总体目标是使客户端和文件系统作为服务器以同样的速度来更新。文件的方法，参数和模型紧密集成到服务器端的代码，允许API来始终保持同步。作者：天马行空LQ<br>  链接：<a href="https://www.jianshu.com/p/66a14ea07622" target="_blank" rel="noopener">https://www.jianshu.com/p/66a14ea07622</a><br>来源：简书<br>  著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
+</ul>
+<p>Ceph management新功能：</p>
+<ul>
+<li>OSD management (mark as down/out, change OSD settings, recovery profiles)</li>
+<li>Cluster config settings editor</li>
+<li>Ceph Pool management (create/modify/delete)</li>
+<li><a href="https://www.oschina.net/news/2609" target="_blank" rel="noopener">ECP</a> management</li>
+<li>RBD mirroring configuration</li>
+<li>Embedded Grafana Dashboards (derived from Ceph Metrics)</li>
+<li>CRUSH map viewer</li>
+<li>NFS Ganesha management</li>
+<li>iSCSI target management (via <a href="https://docs.ceph.com/docs/master/rbd/iscsi-overview/#ceph-iscsi" target="_blank" rel="noopener">Ceph iSCSI Gateway</a>)</li>
+<li>RBD QoS configuration</li>
+<li>Ceph Manager (ceph-mgr) module management</li>
+<li>Prometheus alert Management</li>
+</ul>
+</li>
+</ul>
+<p>而且，Ceph Dashboard现在被拆分到ceph-mgr-dashboard的package。 如果您的package management software在安装ceph-mgr时失败，则可能需要单独安装ceph-mgr-dashboard。</p>
+<ul>
+<li>RADOS<ul>
+<li>现在可以随时减少每个pool的placement groups (PGs)数，并且可以根据群集利用率或管理员提示<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler" target="_blank" rel="noopener">自动调整PG数</a>。</li>
+<li>新的<a href="https://docs.ceph.com/docs/master/rados/configuration/msgr2/#msgr2" target="_blank" rel="noopener">v2 wire protocol</a>支持线路加密</li>
+<li>群集可以跟踪OSD和Monitor daemons消耗的物理<a href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices" target="_blank" rel="noopener">存储设备</a>以及运行状况指标（即SMART），并且群集可以通过预先训练的预测模型或者基于云预测服务来<a href="https://docs.ceph.com/docs/master/mgr/diskprediction/#diskprediction" target="_blank" rel="noopener">报告预测的HDD或SSD故障</a>。</li>
+<li>可通过ceph osd numa-status命令轻松监视OSD daemons的NUMA节点，并通过osd_numa_node config选项进行配置。</li>
+<li>现在，当使用BlueStore OSD时，空间利用率将按object data，omap data和internal metadata，pool以及压缩前和压缩后的大小进行细分。</li>
+<li>在执行recovery和backfill时，OSD可以更有效地选择重要的PG和objects优先处理。</li>
+<li>在设备出现问题以后，像recovery这种长期运行在后台的进程，可以使用ceph status命令查看进度。</li>
+<li>增加了一个实验性的（耦合层） <a href="https://www.usenix.org/conference/fast18/presentation/vajha" target="_blank" rel="noopener">Coupled-Layer “Clay” erasure code</a> plugin，该plugin可减少大多数recovery操作所需的网络带宽和IO。</li>
+</ul>
+</li>
+<li>RGW<ul>
+<li>S3 lifecycle可以在storage classes与tiering层之间转换</li>
+<li>Beast取代了civetweb成为默认的web frontend，从而提高了整体性能。</li>
+<li>支持新的publish/subscribe基础架构，允许RGW将events推送至serverless frameworks如knative或data pipelies如Kafka。</li>
+<li>新增一系列身份验证功能，使用OAuth2和OpenID::connect的STS联合以及OPA（开放策略代理）身份验证委派原型。</li>
+<li>新的archive zone federation功能可将所有objects（包括历史记录）完全保留在一个单独的zone中。</li>
+</ul>
+</li>
+<li><p>CephFS</p>
+<ul>
+<li>对于具有large caches和large RAM并长期运行的客户端，MDS的稳定性已大大提高。Cache trimming（调整）和client capability recall现在受到限制，以防止MDS过载。</li>
+<li>现在可以在Rook管理的群集环境中通过NFS-Ganesha导出CephFS。Ceph负责管理集群并确保高可用性和可伸缩性。 <a href="https://ceph.com/community/deploying-a-cephnfs-server-cluster-with-rook/" target="_blank" rel="noopener">入门演示</a>。 预计在未来Nautilus的次要版本中实现此功能的更多自动化。</li>
+<li>MDS mds_standby_for_*，mon_force_standby_active和mds_standby_replay配置选项已过时。 相反，操作者现在可以在CephFS文件系统上<a href="https://docs.ceph.com/docs/master/cephfs/standby/#mds-standby-replay" target="_blank" rel="noopener">设置新的</a>allow_standby_replay标志。 该设置会使文件系统由standbys变为standby-replay，并且任何可用的rank都会生效。（一个 rank 可看作是一个元数据分片）</li>
+<li>MDS支持客户端释放缓存的同时释放自己的存储端缓存，这个过程可由MDS admin socket命令 <code>cache drop</code>来完成</li>
+<li>现在可以检查MDS中正在进行的scrub的进度。 此外，scrub可能会暂停或中止。 有关更多信息，请参见<a href="https://docs.ceph.com/docs/master/cephfs/scrub/#mds-scrub" target="_blank" rel="noopener">scrub文档</a>。</li>
+<li>通过<code>ceph volume</code> command-line-interface提供了一个用于创建volumes的新interface。</li>
+<li>新的<a href="https://docs.ceph.com/docs/master/cephfs/cephfs-shell/" target="_blank" rel="noopener">cephfs-shell工具</a>可用于处理CephFS文件系统而无需mounting。</li>
+<li>为了简洁，清楚和有用，已重新格式化了来自ceph status与CephFS相关的输出。</li>
+<li>Lazy IO已进行了改进。客户端可以使用ceph_open C/C++ API的新CEPH_O_LAZY flag将其打开或通过配置选项client_force_lazyio将其打开。（LazyIO放松了POSIX语义。 即使文件由多个客户端上的多个应用程序打开，也允许缓冲的读/写操作。 应用程序负责自己管理缓存的一致性。自Nautilus发行以来，Libcephfs支持LazyIO。）</li>
+<li>现在可以通过ceph fs fail命令快速关闭CephFS文件系统。有关更多信息，请参见 <a href="https://docs.ceph.com/docs/master/cephfs/administration/#cephfs-administration" target="_blank" rel="noopener">the administration page</a>。</li>
+</ul>
+</li>
+<li><p>RBD</p>
+<ul>
+<li>Images可以在尽量短的停机时间内迁移，以帮助在pool之间移动images或移动到新的layouts。</li>
+<li>新的rbd perf image iotop和rbd perf image iostat命令为所有RBD images提供了类似于iotop和iostat的IO监视器。</li>
+<li>现在，ceph-mgr Prometheus exporter新增一个用于所有RBD images的IO监视器。</li>
+<li>支持pool中的单独image namespaces，以便进行租户隔离。</li>
+</ul>
+</li>
+<li>Misc<ul>
+<li>Ceph 拥有一组新的<a href="https://docs.ceph.com/docs/master/mgr/orchestrator_cli/#orchestrator-cli-module" target="_blank" rel="noopener">orchestrator modules</a>，可直接与外部orchestrators像ceph-ansible, DeepSea, Rook, or simply ssh通过一致的CLI interface(and, eventually, Dashboard) 进行交互。</li>
+</ul>
+</li>
+</ul>
+<h1 id="V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><a href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS" class="headerlink" title="V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS"></a>V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</h1><ul>
+<li>Dashboard<ul>
+<li>Ceph Luminous中引入的（只读）Ceph manager dashboard已由<a href="https://openattic.org/" target="_blank" rel="noopener">openATTIC</a> Ceph management tool新实现取代，提供了具有<a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">许多其他管理功能</a>。</li>
+</ul>
+</li>
+<li>RADOS<ul>
+<li>现在，配置选项可以由monitor集中存储和管理。</li>
+<li>进行recovery或rebalancing操作时，monitor daemon占用的disk space大大减少。</li>
+<li>当OSD从最近的故障中恢复时，异步恢复功能可减少请求的tail latency（少量响应的延迟高于均值，我们把这些响应称为尾延迟）。</li>
+<li>scrub时OSD冲突请求抢占tail latency减少。</li>
+</ul>
+</li>
+<li><p>RGW</p>
+<ul>
+<li>RGW可以将zone （或subset of buckets）复制到外部云存储服务（例如S3）。</li>
+<li>RGW在versioned buckets功能上支持S3 multi-factor authentication API。<ul>
+<li>AWS Multi-Factor Authentication（MFA）它在用户名和密码的基础上增加了一层额外的保护。启用MFA后，当用户登录AWS网站时，系统将提示他们输入用户名和密码以及来自其AWS MFA设备的身份验证代码。这些因素综合在一起，为您的AWS账户设置和资源提供了更高的安全性。</li>
+</ul>
+</li>
+<li>版本控制是在相同的存储桶中保留对象的多个变量的方法。对于 Amazon S3 桶中存储的每个对象，您可以使用版本控制功能来保存、检索和还原它们的各个版本。使用版本控制能够轻松从用户意外操作和应用程序故障中恢复数据。</li>
+<li>Beast frontend不再进行实验，被认为是稳定的并可以使用。</li>
+</ul>
+</li>
+<li><p>CephFS</p>
+<ul>
+<li>Snapshots与多个MDS daemons结合使用时，现在稳定。</li>
+</ul>
+</li>
+<li><p>RBD</p>
+<ul>
+<li>Image clones不再需要明确的protect和unprotect步骤。</li>
+<li>可以将Images deep-copied（包括与parent image和associated snapshots的任何克隆链接）到新pool或修改data layouts。</li>
+</ul>
+</li>
+<li><p>Misc</p>
+<ul>
+<li>由于在Stretch中缺少GCC 8，我们已删除了Mimic的Debian构建。我们希望Debian的构建将在2019年初发布Buster后回归，并希望在Buster可用后构建最终的Luminous发行版（以及以后的Mimic point发行版）。</li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/" rel="next" title="AUTOSCALING PLACEMENT GROUPS">
+                <i class="fa fa-chevron-left"></i> AUTOSCALING PLACEMENT GROUPS
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/21/Ceph-DEVICE-MANAGEMENT/" rel="prev" title="Ceph DEVICE MANAGEMENT">
+                Ceph DEVICE MANAGEMENT <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC"><span class="nav-number">1.</span> <span class="nav-text">V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><span class="nav-number">2.</span> <span class="nav-text">V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

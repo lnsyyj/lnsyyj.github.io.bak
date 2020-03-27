@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="prometheus,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="截止2019-05-24 ceph_exporter监控项整理    Metrics Chinese   explanation English   explanation     ceph_active_pgs 处于active状态的PG数 # HELP   ceph_active_pgs No. of active PGs in the cluster   ceph_backfill_wait">
+<meta name="keywords" content="prometheus">
+<meta property="og:type" content="article">
+<meta property="og:title" content="prometheus ceph_exporter 监控项">
+<meta property="og:url" content="http://yoursite.com/2019/05/24/prometheus-ceph-exporter-监控项/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="截止2019-05-24 ceph_exporter监控项整理    Metrics Chinese   explanation English   explanation     ceph_active_pgs 处于active状态的PG数 # HELP   ceph_active_pgs No. of active PGs in the cluster   ceph_backfill_wait">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-03-22T08:16:36.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="prometheus ceph_exporter 监控项">
+<meta name="twitter:description" content="截止2019-05-24 ceph_exporter监控项整理    Metrics Chinese   explanation English   explanation     ceph_active_pgs 处于active状态的PG数 # HELP   ceph_active_pgs No. of active PGs in the cluster   ceph_backfill_wait">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/24/prometheus-ceph-exporter-监控项/">
+
+
+
+
+
+  <title>prometheus ceph_exporter 监控项 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/24/prometheus-ceph-exporter-监控项/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">prometheus ceph_exporter 监控项</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-24T22:15:29+08:00">
+                2019-05-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <p>截止2019-05-24 ceph_exporter监控项整理</p>
+<table>
+<thead>
+<tr>
+<th>Metrics</th>
+<th>Chinese   explanation</th>
+<th>English   explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ceph_active_pgs</td>
+<td>处于active状态的PG数</td>
+<td># HELP   ceph_active_pgs No. of active PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_backfill_wait_pgs</td>
+<td>处于backfill_wait状态的PG数</td>
+<td># HELP   ceph_backfill_wait_pgs No. of PGs in the cluster with backfill_wait state</td>
+</tr>
+<tr>
+<td>ceph_backfilling_pgs</td>
+<td>处于backfilling状态的PG数</td>
+<td># HELP   ceph_backfilling_pgs No. of backfilling PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_cache_evict_io_bytes</td>
+<td>每秒从cache   pool（缓存池）中evicted（逐出）的字节数</td>
+<td># HELP   ceph_cache_evict_io_bytes Rate of bytes being evicted from the cache pool per   second</td>
+</tr>
+<tr>
+<td>ceph_cache_flush_io_bytes</td>
+<td>每秒从cache   pool（缓存池）中flushed（刷新）的字节数</td>
+<td># HELP   ceph_cache_flush_io_bytes Rate of bytes being flushed from the cache pool per   second</td>
+</tr>
+<tr>
+<td>ceph_cache_promote_io_ops</td>
+<td>每秒cache promote操作的总数</td>
+<td># HELP   ceph_cache_promote_io_ops Total cache promote operations measured per second</td>
+</tr>
+<tr>
+<td>ceph_client_io_ops</td>
+<td>客户端每秒操作总数</td>
+<td># HELP   ceph_client_io_ops Total client ops on the cluster measured per second</td>
+</tr>
+<tr>
+<td>ceph_client_io_read_bytes</td>
+<td>客户端每秒read字节数</td>
+<td># HELP   ceph_client_io_read_bytes Rate of bytes being read by all clients per second</td>
+</tr>
+<tr>
+<td>ceph_client_io_read_ops</td>
+<td>客户端每秒read总I/O操作数</td>
+<td># HELP   ceph_client_io_read_ops Total client read I/O ops on the cluster measured per   second</td>
+</tr>
+<tr>
+<td>ceph_client_io_write_bytes</td>
+<td>客户端每秒write字节数</td>
+<td># HELP   ceph_client_io_write_bytes Rate of bytes being written by all clients per   second</td>
+</tr>
+<tr>
+<td>ceph_client_io_write_ops</td>
+<td>客户端每秒write总I/O操作数</td>
+<td># HELP   ceph_client_io_write_ops Total client write I/O ops on the cluster measured   per second</td>
+</tr>
+<tr>
+<td>ceph_cluster_available_bytes</td>
+<td>群集中的可用空间</td>
+<td># HELP   ceph_cluster_available_bytes Available space within the cluster</td>
+</tr>
+<tr>
+<td>ceph_cluster_capacity_bytes</td>
+<td>群集的总容量</td>
+<td># HELP   ceph_cluster_capacity_bytes Total capacity of the cluster</td>
+</tr>
+<tr>
+<td>ceph_cluster_objects</td>
+<td>集群中的rados object数</td>
+<td># HELP   ceph_cluster_objects No. of rados objects within the cluster</td>
+</tr>
+<tr>
+<td>ceph_cluster_used_bytes</td>
+<td>集群已使用的容量</td>
+<td># HELP   ceph_cluster_used_bytes Capacity of the cluster currently in use</td>
+</tr>
+<tr>
+<td>ceph_deep_scrubbing_pgs</td>
+<td>deep scrubbing状态的PG数量</td>
+<td># HELP   ceph_deep_scrubbing_pgs No. of deep scrubbing PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_degraded_objects</td>
+<td>所有PG中degraded   objects的数量，包括副本</td>
+<td># HELP   ceph_degraded_objects No. of degraded objects across all PGs, includes   replicas</td>
+</tr>
+<tr>
+<td>ceph_degraded_pgs</td>
+<td>处于degraded状态的PG数</td>
+<td># HELP   ceph_degraded_pgs No. of PGs in a degraded state</td>
+</tr>
+<tr>
+<td>ceph_down_pgs</td>
+<td>处于down状态的PG数</td>
+<td># HELP ceph_down_pgs   No. of PGs in the cluster in down state</td>
+</tr>
+<tr>
+<td>ceph_forced_backfill_pgs</td>
+<td>处于forced_backfill状态的PG数</td>
+<td># HELP   ceph_forced_backfill_pgs No. of PGs in the cluster with forced_backfill state</td>
+</tr>
+<tr>
+<td>ceph_forced_recovery_pgs</td>
+<td>处于forced_recovery状态的PG数</td>
+<td># HELP   ceph_forced_recovery_pgs No. of PGs in the cluster with forced_recovery state</td>
+</tr>
+<tr>
+<td>ceph_health_status</td>
+<td>群集的health状态，只能在3种状态之间变化(err:2,   warn:1, ok:0)</td>
+<td># HELP   ceph_health_status Health status of Cluster, can vary only between 3 states   (err:2, warn:1, ok:0)</td>
+</tr>
+<tr>
+<td>ceph_misplaced_objects</td>
+<td>所有PG中misplaced   object的数量，包括副本</td>
+<td># HELP   ceph_misplaced_objects No. of misplaced objects across all PGs, includes   replicas</td>
+</tr>
+<tr>
+<td>ceph_monitor_quorum_count</td>
+<td>monitor quorum的总数</td>
+<td># HELP   ceph_monitor_quorum_count The total size of the monitor quorum</td>
+</tr>
+<tr>
+<td>ceph_osd_avail_bytes</td>
+<td>OSD可用存储字节数</td>
+<td># HELP   ceph_osd_avail_bytes OSD Available Storage in Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_average_utilization</td>
+<td>OSD平均利用率</td>
+<td># HELP   ceph_osd_average_utilization OSD Average Utilization</td>
+</tr>
+<tr>
+<td>ceph_osd_bytes</td>
+<td>OSD总字节数</td>
+<td># HELP ceph_osd_bytes   OSD Total Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_crush_weight</td>
+<td>OSD Crush Weight</td>
+<td># HELP   ceph_osd_crush_weight OSD Crush Weight</td>
+</tr>
+<tr>
+<td>ceph_osd_depth</td>
+<td>OSD 深度</td>
+<td># HELP ceph_osd_depth   OSD Depth</td>
+</tr>
+<tr>
+<td>ceph_osd_in</td>
+<td>OSD In状态</td>
+<td># HELP ceph_osd_in   OSD In Status</td>
+</tr>
+<tr>
+<td>ceph_osd_perf_apply_latency_seconds</td>
+<td>OSD Perf Apply延迟</td>
+<td># HELP   ceph_osd_perf_apply_latency_seconds OSD Perf Apply Latency</td>
+</tr>
+<tr>
+<td>ceph_osd_perf_commit_latency_seconds</td>
+<td>OSD Perf Commit延迟</td>
+<td># HELP   ceph_osd_perf_commit_latency_seconds OSD Perf Commit Latency</td>
+</tr>
+<tr>
+<td>ceph_osd_pgs</td>
+<td>OSD Placement Group计数</td>
+<td># HELP ceph_osd_pgs   OSD Placement Group Count</td>
+</tr>
+<tr>
+<td>ceph_osd_reweight</td>
+<td>OSD Reweight</td>
+<td># HELP   ceph_osd_reweight OSD Reweight</td>
+</tr>
+<tr>
+<td>ceph_osd_total_avail_bytes</td>
+<td>OSD可用存储总字节数</td>
+<td># HELP   ceph_osd_total_avail_bytes OSD Total Available Storage Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_total_bytes</td>
+<td>OSD总存储字节数</td>
+<td># HELP   ceph_osd_total_bytes OSD Total Storage Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_total_used_bytes</td>
+<td>OSD已使用总的存储字节数</td>
+<td># HELP   ceph_osd_total_used_bytes OSD Total Used Storage Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_up</td>
+<td>OSD Up状态</td>
+<td># HELP ceph_osd_up   OSD Up Status</td>
+</tr>
+<tr>
+<td>ceph_osd_used_bytes</td>
+<td>OSD已使用的存储空间字节</td>
+<td># HELP   ceph_osd_used_bytes OSD Used Storage in Bytes</td>
+</tr>
+<tr>
+<td>ceph_osd_utilization</td>
+<td>OSD利用率</td>
+<td># HELP   ceph_osd_utilization OSD Utilization</td>
+</tr>
+<tr>
+<td>ceph_osd_variance</td>
+<td>OSD方差</td>
+<td># HELP   ceph_osd_variance OSD Variance</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_full</td>
+<td>群集标记为已满，无法提供写入服务</td>
+<td># HELP   ceph_osdmap_flag_full The cluster is flagged as full and cannot service   writes</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_nobackfill</td>
+<td>OSD不会被backfill</td>
+<td># HELP   ceph_osdmap_flag_nobackfill OSDs will not be backfilled</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_nodeep_scrub</td>
+<td>禁用Deep scrubbing</td>
+<td># HELP   ceph_osdmap_flag_nodeep_scrub Deep scrubbing is disabled</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_nodown</td>
+<td>忽略OSD失败报告，OSD不会被标记为down</td>
+<td># HELP   ceph_osdmap_flag_nodown OSD failure reports are ignored, OSDs will not be   marked as down</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noin</td>
+<td>不会自动标记out的OSD</td>
+<td># HELP   ceph_osdmap_flag_noin OSDs that are out will not be automatically marked in</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noout</td>
+<td>在配置的间隔后，OSD不会自动标记out</td>
+<td># HELP   ceph_osdmap_flag_noout OSDs will not be automatically marked out after the   configured interval</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_norebalance</td>
+<td>数据rebalancing暂停</td>
+<td># HELP   ceph_osdmap_flag_norebalance Data rebalancing is suspended</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_norecover</td>
+<td>Recovery暂停</td>
+<td># HELP   ceph_osdmap_flag_norecover Recovery is suspended</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noscrub</td>
+<td>禁用Scrubbing</td>
+<td># HELP   ceph_osdmap_flag_noscrub Scrubbing is disabled</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_notieragent</td>
+<td>Cache tiering   activity已暂停</td>
+<td># HELP   ceph_osdmap_flag_notieragent Cache tiering activity is suspended</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_noup</td>
+<td>不允许OSD start</td>
+<td># HELP   ceph_osdmap_flag_noup OSDs are not allowed to start</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_pauserd</td>
+<td>Reads暂停</td>
+<td># HELP   ceph_osdmap_flag_pauserd Reads are paused</td>
+</tr>
+<tr>
+<td>ceph_osdmap_flag_pausewr</td>
+<td>Writes暂停</td>
+<td># HELP   ceph_osdmap_flag_pausewr Writes are paused</td>
+</tr>
+<tr>
+<td>ceph_osds</td>
+<td>群集中总OSD数量</td>
+<td># HELP ceph_osds   Count of total OSDs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_osds_down</td>
+<td>处于DOWN状态的OSD数量</td>
+<td># HELP ceph_osds_down   Count of OSDs that are in DOWN state</td>
+</tr>
+<tr>
+<td>ceph_osds_in</td>
+<td>处于IN状态并可用于处理请求的OSD数量</td>
+<td># HELP ceph_osds_in   Count of OSDs that are in IN state and available to serve requests</td>
+</tr>
+<tr>
+<td>ceph_osds_up</td>
+<td>处于UP状态的OSD数量</td>
+<td># HELP ceph_osds_up   Count of OSDs that are in UP state</td>
+</tr>
+<tr>
+<td>ceph_peering_pgs</td>
+<td>群集中peering状态的PG数量</td>
+<td># HELP   ceph_peering_pgs No. of peering PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_pgs_remapped</td>
+<td>remapped并引起cluster-wide（群集范围）移动的PG数量</td>
+<td># HELP   ceph_pgs_remapped No. of PGs that are remapped and incurring cluster-wide   movement</td>
+</tr>
+<tr>
+<td>ceph_recovering_pgs</td>
+<td>群集中recovering状态的PG数量</td>
+<td># HELP   ceph_recovering_pgs No. of recovering PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_recovery_io_bytes</td>
+<td>每秒recovery的字节数</td>
+<td># HELP   ceph_recovery_io_bytes Rate of bytes being recovered in cluster per second</td>
+</tr>
+<tr>
+<td>ceph_recovery_io_keys</td>
+<td>每秒恢复的keys数率</td>
+<td># HELP   ceph_recovery_io_keys Rate of keys being recovered in cluster per second</td>
+</tr>
+<tr>
+<td>ceph_recovery_io_objects</td>
+<td>每秒恢复的object的速率</td>
+<td># HELP   ceph_recovery_io_objects Rate of objects being recovered in cluster per   second</td>
+</tr>
+<tr>
+<td>ceph_recovery_wait_pgs</td>
+<td>处于recovery_wait状态的PG数</td>
+<td># HELP   ceph_recovery_wait_pgs No. of PGs in the cluster with recovery_wait state</td>
+</tr>
+<tr>
+<td>ceph_scrubbing_pgs</td>
+<td>处于scrubbing状态的PG数</td>
+<td># HELP   ceph_scrubbing_pgs No. of scrubbing PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_slow_requests</td>
+<td>慢速请求数</td>
+<td># HELP   ceph_slow_requests No. of slow requests</td>
+</tr>
+<tr>
+<td>ceph_stale_pgs</td>
+<td>处于stale状态的PG数</td>
+<td># HELP ceph_stale_pgs   No. of stale PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_stuck_degraded_pgs</td>
+<td>处于degraded状态的PG数</td>
+<td># HELP   ceph_stuck_degraded_pgs No. of PGs stuck in a degraded state</td>
+</tr>
+<tr>
+<td>ceph_stuck_requests</td>
+<td>stuck（卡住）的请求数</td>
+<td># HELP   ceph_stuck_requests No. of stuck requests</td>
+</tr>
+<tr>
+<td>ceph_stuck_stale_pgs</td>
+<td>处于stale状态的PG数</td>
+<td># HELP   ceph_stuck_stale_pgs No. of stuck stale PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_stuck_unclean_pgs</td>
+<td>处于unclean状态的PG数</td>
+<td># HELP   ceph_stuck_unclean_pgs No. of PGs stuck in an unclean state</td>
+</tr>
+<tr>
+<td>ceph_stuck_undersized_pgs</td>
+<td>处于undersized状态的PG数</td>
+<td># HELP   ceph_stuck_undersized_pgs No. of stuck undersized PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_total_pgs</td>
+<td>集群中总的PG数</td>
+<td># HELP ceph_total_pgs   Total no. of PGs in the cluster</td>
+</tr>
+<tr>
+<td>ceph_unclean_pgs</td>
+<td>处于unclean状态的PG数</td>
+<td># HELP   ceph_unclean_pgs No. of PGs in an unclean state</td>
+</tr>
+<tr>
+<td>ceph_undersized_pgs</td>
+<td>处于undersized状态的PG数</td>
+<td># HELP   ceph_undersized_pgs No. of undersized PGs in the cluster</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/prometheus/" rel="tag"># prometheus</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/08/LVM逻辑卷基本概念/" rel="next" title="LVM逻辑卷基本概念">
+                <i class="fa fa-chevron-left"></i> LVM逻辑卷基本概念
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/27/prometheus-node-exporter-监控项/" rel="prev" title="prometheus node_exporter 监控项">
+                prometheus node_exporter 监控项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
