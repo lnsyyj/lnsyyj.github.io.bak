@@ -47,6 +47,12 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
+Python安装.whl文件
+
+```
+pip install some-package.whl
+```
+
 安装python3
 
 ```
