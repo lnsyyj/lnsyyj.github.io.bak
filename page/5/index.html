@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/27/Ceph-iSCIS-gateway-监控/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/27/Ceph-iSCSI-gateway-安装和配置/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/11/27/Ceph-iSCIS-gateway-监控/" itemprop="url">Ceph iSCIS gateway 监控</a></h1>
+                <a class="post-title-link" href="/2019/11/27/Ceph-iSCSI-gateway-安装和配置/" itemprop="url">Ceph iSCSI gateway 安装和配置</a></h1>
         
 
         <div class="post-meta">
@@ -318,7 +318,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-27T23:27:23+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-27T21:07:15+08:00">
                 2019-11-27
               </time>
             
@@ -358,26 +358,229 @@
       
         
           
-            <h1 id="监控ISCSI-GATEWAYS"><a href="#监控ISCSI-GATEWAYS" class="headerlink" title="监控ISCSI GATEWAYS"></a>监控ISCSI GATEWAYS</h1><p>Ceph为iSCSI gateway环境提供了一个附加工具，以监视导出的RADOS Block Device (RBD) images的性能。</p>
-<p>gwtop工具是一个类似top的工具，用于显示通过iSCSI导出到客户端的RBD images的聚合性能指标。 这些指标来自Performance Metrics Domain Agent（PMDA）。 来自Linux-IO target (LIO) PMDA的信息用于列出每个已导出的RBD image以及所连接的客户端及其相关的I/O指标。</p>
+            <h1 id="使用ANSI配置ISCSI-TARGET"><a href="#使用ANSI配置ISCSI-TARGET" class="headerlink" title="使用ANSI配置ISCSI TARGET"></a>使用ANSI配置ISCSI TARGET</h1><p>Ceph iSCSI gateway是iSCSI target node，也是Ceph client node。 Ceph iSCSI gateway可以是独立节点，也可以位于Ceph Object Store Disk (OSD) node上。 完成以下步骤，将安装Ceph iSCSI gateway并将其配置为基本操作。</p>
+<p><strong>要求：</strong></p>
+<ul>
+<li>正在运行的Ceph Luminous（12.2.x）集群或更高版本</li>
+<li>Red Hat Enterprise Linux/CentOS 7.5（或更高版本）； Linux内核v4.16（或更高版本）</li>
+<li>在所有iSCSI gateway节点上安装ceph-iscsi package</li>
+</ul>
+<p><strong>安装：</strong></p>
+<p>在Ansible installer节点（可以是管理节点也可以是专用部署节点）上，执行以下步骤：</p>
+<p>1、以root用户身份安装ceph-ansible package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-ansible</span><br></pre></td></tr></table></figure>
+<p>2、在/etc/ansible/hosts文件中为gateway group添加一个entry：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[iscsigws]</span><br><span class="line">ceph-igw-1</span><br><span class="line">ceph-igw-2</span><br></pre></td></tr></table></figure>
+<p>注意如果将iSCSI gateway与OSD部署同一节点，则将OSD节点添加到[iscsigws] section。</p>
+<p><strong>配置：</strong></p>
+<p>ceph-ansible package在/usr/share/ceph-ansible/group_vars/目录中放置了一个名为iscsigws.yml.sample的文件。 创建此示例文件的副本iscsigws.yml。 查看以下Ansible变量和说明，并进行相应更新。 有关高级变量的完整列表，请参见iscsigws.yml.sample。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Variable（变量）</th>
+<th style="text-align:left">Meaning/Purpose（含义/目的）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>seed_monitor</code></td>
+<td style="text-align:left">每个gateway都需要访问ceph集群以进行rados和rbd calls。 这意味着iSCSI gateway必须已定义适当的<code>/etc/ceph/</code>目录。 <code>seed_monitor</code> host用于填充iSCSI gateway的<code>/etc/ceph/</code>目录。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>cluster_name</code></td>
+<td style="text-align:left">自定义存储集群名称（默认为ceph）</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>gateway_keyring</code></td>
+<td style="text-align:left">Define a custom keyring name.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>deploy_settings</code></td>
+<td style="text-align:left">如果设置为<code>true</code>，则在运行playbook时deploy the settings。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>perform_system_checks</code></td>
+<td style="text-align:left">这是一个布尔值，用于检查每个gateway上的multipath和lvm configuration settings。 必须至少在第一次运行时将其设置为true，以确保正确配置了multipathd和lvm。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>api_user</code></td>
+<td style="text-align:left">API的用户名。 默认值为admin。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>api_password</code></td>
+<td style="text-align:left">使用API的密码。 默认值为admin。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>api_port</code></td>
+<td style="text-align:left">使用API的TCP端口号。 默认值为5000。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>api_secure</code></td>
+<td style="text-align:left">如果必须使用TLS，则为True。 默认为false。 如果为true，则用户必须创建必要的certificate和key files。 有关详细信息，请参见gwcli man文件。</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>trusted_ip_list</code></td>
+<td style="text-align:left">有权访问API的IPv4或IPv6地址的列表。 默认情况下，只有iSCSI gateway节点可以访问。</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Deploying:</strong></p>
+<p>在Ansible installer节点上，执行以下步骤。</p>
+<p>1、以root用户身份执行Ansible playbook：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># cd /usr/share/ceph-ansible</span><br><span class="line"># ansible-playbook site.yml --limit iscsigws</span><br></pre></td></tr></table></figure>
+<p>注意Ansible playbook将处理RPM dependencies，设置daemons并安装gwcli，因此可用于创建iSCSI targets并将RBD images导出为LUN。 在以前的版本中，iscsigws.yml可以定义iSCSI target和其他objects，如clients, images和LUNs, 但现在不再支持该功能。</p>
+<p>2、从iSCSI gateway节点验证配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gwcli ls</span><br></pre></td></tr></table></figure>
+<p>请参阅<a href="https://docs.ceph.com/docs/master/rbd/iscsi-target-cli" target="_blank" rel="noopener">Configuring the iSCSI Target using the Command Line Interface</a>，使用gwcli工具创建gateways, LUNs和clients。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要提示尝试使用targetcli工具更改配置将导致以下问题，例如ALUA配置错误和路径故障转移问题。 可能会损坏数据，configuration across iSCSI gateways不匹配，WWN information不匹配，这将导致client multipath问题。</span><br></pre></td></tr></table></figure>
+<p><strong>Service Management:</strong></p>
+<p>ceph-iscsi package安装configuration management logic和一个名为rbd-target-api的Systemd service。启用Systemd service后，rbd-target-api将在引导时启动，并将恢复Linux IO状态。Ansible playbook会在部署期间禁用target service。以下是与rbd-target-api Systemd服务交互命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># systemctl &lt;start|stop|restart|reload&gt; rbd-target-api</span><br></pre></td></tr></table></figure>
+<ul>
+<li>reload</li>
+</ul>
+<p>reload request将强制rbd-target-api重新读取配置并将其应用于当前正在运行的环境。 通常不需要这样做，因为changes是从Ansible并行部署到所有iSCSI gateway节点的。</p>
+<ul>
+<li>stop</li>
+</ul>
+<p>stop request将关闭gateway的portal interfaces，断开与客户端的连接，并从内核中清除当前的LIO配置。这将使iSCSI gateway返回到clean状态。 当客户端断开连接时，客户端multipathing layer会将active I/O（活动的I/O）重新安排到其他iSCSI gateways。</p>
+<p><strong>Removing the Configuration:</strong></p>
+<p>ceph-ansible package提供了Ansible手册，可删除iSCSI gateway配置和相关的RBD images。 Ansible playbook是/usr/share/ceph-ansible/purge_gateways.yml。 运行此Ansible playbook时，系统会提示您执行清除的类型：</p>
+<p><em>lio</em> :</p>
+<p>在此模式下，将在已定义的所有iSCSI gateways上清除LIO配置。 在Ceph storage集群中，创建的Disks保持不变。</p>
+<p><em>all</em> :</p>
+<p>选择all后，将删除LIO配置以及在iSCSI gateway环境中定义的所有RBD images，其他不相关的RBD images将不会删除。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">警告清除操作是对iSCSI gateway环境的破坏性操作。</span><br><span class="line"></span><br><span class="line">警告如果RBD images具有snapshots或clones并通过Ceph iSCSI gateway导出，则清除操作将失败。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[root@rh7-iscsi-client ceph-ansible]# ansible-playbook purge_gateways.yml</span><br><span class="line">Which configuration elements should be purged? (all, lio or abort) [abort]: all</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PLAY [Confirm removal of the iSCSI gateway configuration] *********************</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">GATHERING FACTS ***************************************************************</span><br><span class="line">ok: [localhost]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [Exit playbook if user aborted the purge] *******************************</span><br><span class="line">skipping: [localhost]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [set_fact ] *************************************************************</span><br><span class="line">ok: [localhost]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PLAY [Removing the gateway configuration] *************************************</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">GATHERING FACTS ***************************************************************</span><br><span class="line">ok: [ceph-igw-1]</span><br><span class="line">ok: [ceph-igw-2]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [igw_purge | purging the gateway configuration] *************************</span><br><span class="line">changed: [ceph-igw-1]</span><br><span class="line">changed: [ceph-igw-2]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">TASK: [igw_purge | deleting configured rbd devices] ***************************</span><br><span class="line">changed: [ceph-igw-1]</span><br><span class="line">changed: [ceph-igw-2]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">PLAY RECAP ********************************************************************</span><br><span class="line">ceph-igw-1                 : ok=3    changed=2    unreachable=0    failed=0</span><br><span class="line">ceph-igw-2                 : ok=3    changed=2    unreachable=0    failed=0</span><br><span class="line">localhost                  : ok=2    changed=0    unreachable=0    failed=0</span><br></pre></td></tr></table></figure>
+<h1 id="使用COMMAND-LINE-INTERFACE配置ISCSI-TARGET"><a href="#使用COMMAND-LINE-INTERFACE配置ISCSI-TARGET" class="headerlink" title="使用COMMAND LINE INTERFACE配置ISCSI TARGET"></a>使用COMMAND LINE INTERFACE配置ISCSI TARGET</h1><p>Ceph iSCSI gateway是iSCSI target节点，也是Ceph client节点。 Ceph iSCSI gateway可以是独立节点，也可以位于Ceph Object Store Disk (OSD)节点上。 完成以下步骤，将安装Ceph iSCSI gateway并将其配置为基本操作。</p>
 <p><strong>Requirements:</strong></p>
-<p>正在运行的Ceph iSCSI gateway</p>
+<ul>
+<li>正在运行的Ceph Luminous（12.2.x）集群或更高版本</li>
+<li>Red Hat Enterprise Linux/CentOS 7.5（或更高版本）； Linux内核v4.16（或更高版本）</li>
+<li>必须从Linux发行版的软件repository中安装以下软件包：<ul>
+<li>targetcli-2.1.fb47 or newer package</li>
+<li>python-rtslib-2.1.fb68 or newer package</li>
+<li>tcmu-runner-1.4.0 or newer package</li>
+<li>ceph-iscsi-3.2 or newer package</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要说明：如果存在这些packages的先前版本，则必须在安装较新版本之前首先将其删除。</span><br></pre></td></tr></table></figure>
+<p>在继续Installing section之前，请在Ceph iSCSI gateway节点上执行以下步骤：</p>
+<p>1、如果Ceph iSCSI gateway未在OSD节点上，则将/etc/ceph/中的Ceph配置文件复制到iSCSI gateway 节点。 Ceph配置文件必须存在于/etc/ceph/下的iSCSI gateway节点上。</p>
+<p>2、安装和配置<a href="http://docs.ceph.com/docs/master/start/quick-rbd/#install-ceph" target="_blank" rel="noopener">Ceph Command-line Interface</a></p>
+<p>3、请在防火墙上打开TCP端口3260和5000。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意对端口5000的访问应仅限于受信任的内部网络或仅使用gwcli或正在运行ceph-mgr daemons的单个主机。</span><br></pre></td></tr></table></figure>
+<p>4、创建一个新的或使用现有的RADOS Block Device (RBD)。</p>
 <p><strong>Installing:</strong></p>
-<p>1、以root用户身份在每个iSCSI gateway节点上安装ceph-iscsi-tools package：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-iscsi-tools</span><br></pre></td></tr></table></figure>
-<p>2、以root用户身份在每个iSCSI gateway节点上安装performance co-pilot package：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp</span><br></pre></td></tr></table></figure>
-<p>3、以root用户身份在每个iSCSI gateway节点上安装LIO PMDA package：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp-pmda-lio</span><br></pre></td></tr></table></figure>
-<p>4、以root用户身份，在每个iSCSI gateway节点上启用并启动performance co-pilot service：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl enable pmcd</span><br><span class="line"># systemctl start pmcd</span><br></pre></td></tr></table></figure>
-<p>5、以root用户身份注册pcp-pmda-lio agent：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /var/lib/pcp/pmdas/lio</span><br><span class="line">./Install</span><br></pre></td></tr></table></figure>
-<p>默认情况下，gwtop假定iSCSI gateway configuration object存储在rbd pool中的一个名为gateway.conf的RADOS object中。 此configuration定义了收集性能统计信息的iSCSI gateways。 可以使用-g或-c标志将其覆盖。 有关更多详细信息，请参见gwtop –help。</p>
-<p>LIO configuration决定要从performance co-pilot提取的性能统计信息的类型。 gwtop启动时，它会查看LIO configuration，如果找到user-space disks，则gwtop会自动选择LIO collector。</p>
-<p>示例<code>gwtop</code>输出</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gwtop  2/2 Gateways   CPU% MIN:  4 MAX:  5    Network Total In:    2M  Out:    3M   10:20:00</span><br><span class="line">Capacity:   8G    Disks:   8   IOPS:  503   Clients:  1   Ceph: HEALTH_OK          OSDs:   3</span><br><span class="line">Pool.Image       Src    Size     iops     rMB/s     wMB/s   Client</span><br><span class="line">iscsi.t1703             500M        0      0.00      0.00</span><br><span class="line">iscsi.testme1           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme2           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme3           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme5           500M        0      0.00      0.00</span><br><span class="line">rbd.myhost_1      T       4G      504      1.95      0.00   rh460p(CON)</span><br><span class="line">rbd.test_2                1G        0      0.00      0.00</span><br><span class="line">rbd.testme              500M        0      0.00      0.00</span><br></pre></td></tr></table></figure>
-<p>在Client列中，(CON)表示iSCSI initiator (client)当前已登录iSCSI gateway。 如果显示-multi-，则多个clients映射到单个RBD image。</p>
+<p>如果您使用upstream ceph-iscsi package，请遵循 <a href="https://docs.ceph.com/docs/master/rbd/iscsi-target-cli-manual-install" target="_blank" rel="noopener">manual install instructions</a>。</p>
+<p>对于基于rpm的指令，请执行以下命令：</p>
+<p>1、以root用户身份，在所有iSCSI gateway节点上，安装ceph-iscsi package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-iscsi</span><br></pre></td></tr></table></figure>
+<p>2、以root用户身份，在所有iSCSI gateway节点上，安装tcmu-runner package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install tcmu-runner</span><br></pre></td></tr></table></figure>
+<p><strong>Setup:</strong></p>
+<p>1、gwcli需要一个名称为rbd的pool，因此它可以存储iSCSI配置之类的元数据。 要检查是否已创建此pool，请运行：  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># ceph osd lspools</span><br></pre></td></tr></table></figure>
+<p>如果不存在，则可以在<a href="http://docs.ceph.com/docs/master/rados/operations/pools/" target="_blank" rel="noopener">RADOS pool operations page</a>上找到创建pool的说明。</p>
+<p>2、在iSCSI gateway节点上，以root身份在/etc/ceph/目录中创建一个名为iscsi-gateway.cfg的文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># touch /etc/ceph/iscsi-gateway.cfg</span><br></pre></td></tr></table></figure>
+<p>2.1、编辑iscsi-gateway.cfg文件并添加以下行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">[config]</span><br><span class="line"># Name of the Ceph storage cluster. A suitable Ceph configuration file allowing</span><br><span class="line"># access to the Ceph storage cluster from the gateway node is required, if not</span><br><span class="line"># colocated on an OSD node.</span><br><span class="line">cluster_name = ceph</span><br><span class="line"></span><br><span class="line"># Place a copy of the ceph cluster&apos;s admin keyring in the gateway&apos;s /etc/ceph</span><br><span class="line"># drectory and reference the filename here</span><br><span class="line">gateway_keyring = ceph.client.admin.keyring</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># API settings.</span><br><span class="line"># The API supports a number of options that allow you to tailor it to your</span><br><span class="line"># local environment. If you want to run the API under https, you will need to</span><br><span class="line"># create cert/key files that are compatible for each iSCSI gateway node, that is</span><br><span class="line"># not locked to a specific node. SSL cert and key files *must* be called</span><br><span class="line"># &apos;iscsi-gateway.crt&apos; and &apos;iscsi-gateway.key&apos; and placed in the &apos;/etc/ceph/&apos; directory</span><br><span class="line"># on *each* gateway node. With the SSL files in place, you can use &apos;api_secure = true&apos;</span><br><span class="line"># to switch to https mode.</span><br><span class="line"></span><br><span class="line"># To support the API, the bear minimum settings are:</span><br><span class="line">api_secure = false</span><br><span class="line"></span><br><span class="line"># Additional API configuration options are as follows, defaults shown.</span><br><span class="line"># api_user = admin</span><br><span class="line"># api_password = admin</span><br><span class="line"># api_port = 5001</span><br><span class="line"># trusted_ip_list = 192.168.0.10,192.168.0.11</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># ------------------------------------------------------</span><br><span class="line"># 翻译如下</span><br><span class="line">[config]</span><br><span class="line">＃Ceph存储集群的名称。如果不位于OSD节点上，则需要一个合适的Ceph配置文件，该文件允许从gateway节点访问Ceph存储群集。</span><br><span class="line">cluster_name = ceph</span><br><span class="line"></span><br><span class="line">＃将ceph集群的admin keyring的副本放置在gateway的/etc/ceph文件夹中，并在此处引用filename</span><br><span class="line">gateway_keyring = ceph.client.admin.keyring</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">＃API设置。</span><br><span class="line">＃API支持许多选项，可让您根据本地环境进行定制。如果要在https下运行API，则需要为每个iSCSI gateway节点创建兼容的cert/key文件，该节点未锁定到特定节点。必须将SSL cert和key文件命名为&apos;iscsi-gateway.crt&apos;和&apos;iscsi-gateway.key&apos;，并放置在每个gateway节点上的&apos;/etc/ceph/&apos;目录中。放置好SSL文件后，您可以使用&apos;api_secure = true&apos;切换到https模式。</span><br><span class="line"></span><br><span class="line">＃为了支持API，至少需要配置如下：</span><br><span class="line">api_secure = false</span><br><span class="line"></span><br><span class="line">＃其他API配置选项如下，显示的默认值。（trusted翻译为信任）</span><br><span class="line"># api_user = admin</span><br><span class="line"># api_password = admin</span><br><span class="line"># api_port = 5001</span><br><span class="line"># trusted_ip_list = 192.168.0.10,192.168.0.11</span><br></pre></td></tr></table></figure>
+<p>注意trusted_ip_list是每个iscsi gateway上IP地址的列表，将用于管理操作，如创建target，lun导出等。该IP可以与用于iSCSI data的IP相同，例如与RBD image之间的READ/WRITE命令，但建议使用单独的IP。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要说明：在所有iSCSI gateway节点上，iscsi-gateway.cfg文件必须相同。</span><br></pre></td></tr></table></figure>
+<p>2.2、以root用户身份将iscsi-gateway.cfg文件复制到所有iSCSI gateway节点。</p>
+<p>2.3、以root用户身份，在所有iSCSI gateway节点上，启用并启动API服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># systemctl daemon-reload</span><br><span class="line"># systemctl enable rbd-target-api</span><br><span class="line"># systemctl start rbd-target-api</span><br></pre></td></tr></table></figure>
+<p><strong>Configuring:</strong></p>
+<p>gwcli将创建和配置iSCSI target和RBD images，并在上一部分中的gateways设置之间复制配置。 较低级别的工具（例如targetcli和rbd）可用于查询本地配置，但不应用于对其进行修改。 下一节将演示如何创建iSCSI target并将RBD image导出为LUN 0。</p>
+<p>1、以root用户身份，在iSCSI gateway节点上，启动iSCSI gateway command-line interface：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># gwcli</span><br></pre></td></tr></table></figure>
+<p>2、转到iscsi-targets并创建名为iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw的目标：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; /&gt; cd /iscsi-target</span><br><span class="line">&gt; /iscsi-target&gt;  create iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw</span><br></pre></td></tr></table></figure>
+<p>3、创建iSCSI gateways。 下面使用的IP是用于iSCSI data（如READ和WRITE命令）的IP。 它们可以是trusted_ip_list中列出的用于管理操作相同的IP，但是建议使用不同的IP。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; /iscsi-target&gt; cd iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw/gateways</span><br><span class="line">&gt; /iscsi-target...-igw/gateways&gt;  create ceph-gw-1 10.172.19.21</span><br><span class="line">&gt; /iscsi-target...-igw/gateways&gt;  create ceph-gw-2 10.172.19.22</span><br></pre></td></tr></table></figure>
+<p>如果不使用RHEL/CentOS或使用upstream或ceph-iscsi-test kernel，则必须使用skipchecks=true参数。 这将避免Red Hat kernel和rpm checks：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; /iscsi-target&gt; cd iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw/gateways</span><br><span class="line">&gt; /iscsi-target...-igw/gateways&gt;  create ceph-gw-1 10.172.19.21 skipchecks=true</span><br><span class="line">&gt; /iscsi-target...-igw/gateways&gt;  create ceph-gw-2 10.172.19.22 skipchecks=true</span><br></pre></td></tr></table></figure>
+<p>4、在rbd pool中添加名称为disk_1的RBD image：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; /iscsi-target...-igw/gateways&gt; cd /disks</span><br><span class="line">&gt; /disks&gt; create pool=rbd image=disk_1 size=90G</span><br></pre></td></tr></table></figure>
+<p>5、创建一个客户端，使用initiator名称iqn.1994-05.com.redhat:rh7-client：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; /disks&gt; cd /iscsi-target/iqn.2003-01.com.redhat.iscsi-gw:iscsi-igw/hosts</span><br><span class="line">&gt; /iscsi-target...eph-igw/hosts&gt;  create iqn.1994-05.com.redhat:rh7-client</span><br></pre></td></tr></table></figure>
+<p>6、将客户端的CHAP用户名设置为myiscsiusername，将密码设置为myiscsipassword：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; /iscsi-target...at:rh7-client&gt;  auth username=myiscsiusername password=myiscsipassword</span><br></pre></td></tr></table></figure>
+<p>警告必须始终配置CHAP。 如果没有CHAP，target将拒绝任何登录请求。</p>
+<p>7、将disk添加到客户端：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; /iscsi-target...at:rh7-client&gt; disk add rbd/disk_1</span><br></pre></td></tr></table></figure>
+<p>下一步是配置iSCSI initiators。</p>
+<h1 id="手动安装CEPH-ISCSI"><a href="#手动安装CEPH-ISCSI" class="headerlink" title="手动安装CEPH-ISCSI"></a>手动安装CEPH-ISCSI</h1><p><strong>Requirements</strong></p>
+<p>要完成ceph-iscsi的安装，有4个步骤：</p>
+<p>1、从Linux发行版的软件repository安装common packages</p>
+<p>2、安装Git以直接从其Git repositories中获取其余packages</p>
+<p>3、确保使用兼容的kernel</p>
+<p>4、安装ceph-iscsi的所有组件并启动相关的daemons：</p>
+<ul>
+<li>tcmu-runner</li>
+<li>rtslib-fb</li>
+<li>configshell-fb</li>
+<li>targetcli-fb</li>
+<li>ceph-iscsi</li>
+</ul>
+<h3 id="1、安装COMMON-PACKAGES"><a href="#1、安装COMMON-PACKAGES" class="headerlink" title="1、安装COMMON PACKAGES"></a>1、安装COMMON PACKAGES</h3><p>ceph-iscsi和target工具将使用以下packages。 必须从Linux发行版的软件repository中将它们安装在将成为iSCSI gateway的每台计算机上：</p>
+<ul>
+<li>libnl3</li>
+<li>libkmod</li>
+<li>librbd1</li>
+<li>pyparsing</li>
+<li>python kmod</li>
+<li>python pyudev</li>
+<li>python gobject</li>
+<li>python urwid</li>
+<li>python pyparsing</li>
+<li>python rados</li>
+<li>python rbd</li>
+<li>python netifaces</li>
+<li>python crypto</li>
+<li>python requests</li>
+<li>python flask</li>
+<li>pyOpenSSL</li>
+</ul>
+<h3 id="2、安装GIT"><a href="#2、安装GIT" class="headerlink" title="2、安装GIT"></a>2、安装GIT</h3><p>为了安装使用Ceph运行iSCSI所需的所有packages，您需要使用Git直接从其repository中下载它们。 在CentOS/RHEL上执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo yum install git</span><br></pre></td></tr></table></figure>
+<p>在Debian/Ubuntu上执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; sudo apt install git</span><br></pre></td></tr></table></figure>
+<p>要了解有关Git及其工作方式的更多信息，请访问<a href="https://git-scm.com" target="_blank" rel="noopener">https://git-scm.com</a></p>
+<h3 id="3、确保使用了兼容的KERNEL"><a href="#3、确保使用了兼容的KERNEL" class="headerlink" title="3、确保使用了兼容的KERNEL"></a>3、确保使用了兼容的KERNEL</h3><p>确保使用支持Ceph iSCSI patches的kernel：</p>
+<ul>
+<li>具有内核v4.16或更高版本的所有Linux发行版</li>
+<li>Red Hat Enterprise Linux或CentOS 7.5更高版本</li>
+</ul>
+<p>如果您已经在使用兼容的kernel，则可以转到下一步。 但是，如果您不使用兼容的kernel，请查看发行版的文档以获取有关如何构建此kernel的特定说明。 唯一的Ceph iSCSI特定要求是必须启用以下构建选项：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_TARGET_CORE=m</span><br><span class="line">CONFIG_TCM_USER2=m</span><br><span class="line">CONFIG_ISCSI_TARGET=m</span><br></pre></td></tr></table></figure>
+<h3 id="4、安装CEPH-ISCSI"><a href="#4、安装CEPH-ISCSI" class="headerlink" title="4、安装CEPH-ISCSI"></a>4、安装CEPH-ISCSI</h3><p>最后，可以直接从其Git repositories中获取其余工具，并启动其相关服务</p>
+<p><strong>TCMU-RUNNER</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https://github.com/open-iscsi/tcmu-runner</span><br><span class="line">&gt; cd tcmu-runner</span><br></pre></td></tr></table></figure>
+<p>运行以下命令以安装所有必需的依赖项：</p>
+  <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&gt; ./extra/install_dep.sh</span><br></pre></td></tr></table></figure>
+<p>现在，您可以构建tcmu-runner。 为此，请使用以下构建命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; cmake -Dwith-glfs=false -Dwith-qcow=false -DSUPPORT_SYSTEMD=ON -DCMAKE_INSTALL_PREFIX=/usr</span><br><span class="line">&gt; make install</span><br></pre></td></tr></table></figure>
+<p>启用并启动守护程序：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; systemctl daemon-reload</span><br><span class="line">&gt; systemctl enable tcmu-runner</span><br><span class="line">&gt; systemctl start tcmu-runner</span><br></pre></td></tr></table></figure>
+<p><strong>RTSLIB-FB</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https://github.com/open-iscsi/rtslib-fb.git</span><br><span class="line">&gt; cd rtslib-fb</span><br><span class="line">&gt; python setup.py install</span><br></pre></td></tr></table></figure>
+<p><strong>CONFIGSHELL-FB</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https://github.com/open-iscsi/configshell-fb.git</span><br><span class="line">&gt; cd configshell-fb</span><br><span class="line">&gt; python setup.py install</span><br></pre></td></tr></table></figure>
+<p><strong>TARGETCLI-FB</strong></p>
+<p>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https://github.com/open-iscsi/targetcli-fb.git</span><br><span class="line">&gt; cd targetcli-fb</span><br><span class="line">&gt; python setup.py install</span><br><span class="line">&gt; mkdir /etc/target</span><br><span class="line">&gt; mkdir /var/target</span><br></pre></td></tr></table></figure>
+<p>警告ceph-iscsi工具假定它们正在管理系统上的所有targets。 如果已设置targets并由targetcli管理，则必须禁用targets服务。</p>
+<p><strong>CEPH-ISCSI</strong><br>Installation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; git clone https://github.com/ceph/ceph-iscsi.git</span><br><span class="line">&gt; cd ceph-iscsi</span><br><span class="line">&gt; python setup.py install --install-scripts=/usr/bin</span><br><span class="line">&gt; cp usr/lib/systemd/system/rbd-target-gw.service /lib/systemd/system</span><br><span class="line">&gt; cp usr/lib/systemd/system/rbd-target-api.service /lib/systemd/system</span><br></pre></td></tr></table></figure>
+<p>启用并启动daemon：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt; systemctl daemon-reload</span><br><span class="line">&gt; systemctl enable rbd-target-gw</span><br><span class="line">&gt; systemctl start rbd-target-gw</span><br><span class="line">&gt; systemctl enable rbd-target-api</span><br><span class="line">&gt; systemctl start rbd-target-api</span><br></pre></td></tr></table></figure>
+<p>安装完成。 进入<a href="https://docs.ceph.com/docs/master/rbd/iscsi-target-cli" target="_blank" rel="noopener">main ceph-iscsi CLI page</a>上的setup部分。</p>
 
           
         
@@ -422,7 +625,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -468,7 +671,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

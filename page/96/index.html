@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/vdbench-文件系统测试/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/RocksDB介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/12/vdbench-文件系统测试/" itemprop="url">vdbench 文件系统测试</a></h1>
+                <a class="post-title-link" href="/2018/04/12/RocksDB介绍/" itemprop="url">RocksDB介绍</a></h1>
         
 
         <div class="post-meta">
@@ -318,7 +318,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T18:49:34+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T14:53:12+08:00">
                 2018-04-12
               </time>
             
@@ -358,52 +358,19 @@
       
         
           
-            <h2 id="Centos-7-安装vdbench"><a href="#Centos-7-安装vdbench" class="headerlink" title="Centos 7 安装vdbench"></a>Centos 7 安装vdbench</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1、首先安装Java JDK和一些工具包，这里使用的是java-1.7.0</span><br><span class="line">[root@cephL ~]# sudo yum install -y java-1.7.0-openjdk java-1.7.0-openjdk-devel unzip</span><br><span class="line">[root@cephL ~]# mkdir vdbench &amp;&amp; cd vdbench</span><br><span class="line">2、把下载后的vdbench拷贝到该目录并解压，这里使用的是vdbench50406</span><br><span class="line">[root@cephL vdbench]# unzip vdbench50406.zip</span><br><span class="line">3、测试是否可以运行</span><br><span class="line">[root@cephL vdbench]# ./vdbench -t</span><br></pre></td></tr></table></figure>
-<h2 id="运行测试"><a href="#运行测试" class="headerlink" title="运行测试"></a>运行测试</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">1、准备测试目录</span><br><span class="line">[root@cephL node-1]# pwd</span><br><span class="line">/root/node-1</span><br><span class="line">2、到vdbench目录准备配置文件</span><br><span class="line">[root@cephL ~]# cd /root/vdbench/</span><br><span class="line">[root@cephL vdbench]# vi filesystem.conf</span><br><span class="line">fsd=fsd1,anchor=/root/node-1,depth=2,width=2,files=2,size=128k</span><br><span class="line">fwd=fwd1,fsd=fsd1,operation=read,xfersize=4k,fileio=sequential,fileselect=random,threads=2</span><br><span class="line">rd=rd1,fwd=fwd1,fwdrate=max,format=yes,elapsed=10,interval=1</span><br><span class="line"></span><br><span class="line">该配置文件表示：</span><br><span class="line">第一行：</span><br><span class="line">fsd、fwd、rd：是唯一标识</span><br><span class="line">depth：从/root/node-1目录开始，在其中创建2层深度的目录（深度）</span><br><span class="line">width：从/root/node-1目录开始，每层目录创建2个平级目录（广度）</span><br><span class="line">files：在使用depth和width创建的目录中，最深层每个目录创建2个文件</span><br><span class="line">size：每个文件大小为128k</span><br><span class="line">openflags：</span><br><span class="line">第二行：</span><br><span class="line">operation：值为read，表示每个线程，根据fileselect的值（这里是随机）选择一个文件后，打开该文件进行读取</span><br><span class="line">xfersize：连续读取4k blocks(xfersize=4k)直到文件结束(size=128k)，关闭文件并随机选择另一个文件</span><br><span class="line">fileio：表示文件IO的方式，random或者sequential</span><br><span class="line">fileselect：值为random，表示每个线程随机选择一个文件</span><br><span class="line">threads：值为2，表示启动2个线程（线程默认值为1）</span><br><span class="line">第三行：</span><br><span class="line">fwdrate：每秒有多少file system operations，max为无限制</span><br><span class="line">format：值为yes，表示创建完整的目录结构，包括所有文件初始化到所需的128k大小</span><br><span class="line">elapsed：持续运行时间，默认设置为30（以秒为单位）。注意：至少是interval的2倍，</span><br><span class="line">interval：该参数指定每个报告间隔时间（以秒为单位）</span><br><span class="line"></span><br><span class="line">3、开始一个简单的测试</span><br><span class="line">[root@cephL vdbench]# ./vdbench -f filesystem.conf</span><br><span class="line">4、查看被测目录中生成的测试文件</span><br><span class="line">[root@cephL ~]# tree /root/node-1/ -h</span><br><span class="line">/root/node-1/                         --- depth 0</span><br><span class="line">├── [  68]  no_dismount.txt</span><br><span class="line">├── [  44]  vdb.1_1.dir               --- depth 1  width 1</span><br><span class="line">│   ├── [  50]  vdb.2_1.dir           --- depth 2  width 1</span><br><span class="line">│   │   ├── [128K]  vdb_f0001.file    --- depth 2  width 1  files 1</span><br><span class="line">│   │   └── [128K]  vdb_f0002.file    --- depth 2  width 1  files 2</span><br><span class="line">│   └── [  50]  vdb.2_2.dir           --- depth 2  width 2</span><br><span class="line">│       ├── [128K]  vdb_f0001.file    --- depth 2  width 2  files 1</span><br><span class="line">│       └── [128K]  vdb_f0002.file    --- depth 2  width 2  files 2</span><br><span class="line">├── [  44]  vdb.1_2.dir               --- depth 1  width 2</span><br><span class="line">│   ├── [  50]  vdb.2_1.dir           --- depth 2  width 1</span><br><span class="line">│   │   ├── [128K]  vdb_f0001.file    --- depth 2  width 1  files 1</span><br><span class="line">│   │   └── [128K]  vdb_f0002.file    --- depth 2  width 1  files 2</span><br><span class="line">│   └── [  50]  vdb.2_2.dir           --- depth 2  width 2</span><br><span class="line">│       ├── [128K]  vdb_f0001.file    --- depth 2  width 2  files 1</span><br><span class="line">│       └── [128K]  vdb_f0002.file    --- depth 2  width 2  files 2</span><br><span class="line">└── [ 159]  vdb_control.file</span><br><span class="line"></span><br><span class="line">6 directories, 10 files</span><br></pre></td></tr></table></figure>
-<h2 id="其他常用参数"><a href="#其他常用参数" class="headerlink" title="其他常用参数"></a>其他常用参数</h2><p>openflags<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">这个参数可以指定在SD, WD, FSD, FWD, RD中</span><br><span class="line">可用</span><br></pre></td></tr></table></figure></p>
-<p>sizes（注意这里有s）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">这个参数可以指定在FSD中</span><br><span class="line">该参数指定文件的大小（size），可以指定一个或一组文件的大小（size）。</span><br><span class="line">例如：sizes=(32k,50,64k,50)，其中第一个数字表示文件大小（size），第二个数字表示必须具有此大小（size）的文件的百分比。如果指定一组文件，百分比加起来必须为100。</span><br><span class="line">当您指定sizes=(nnn,0)时，vdbench将创建平均大小（size）为&apos;nnn&apos;字节的文件</span><br><span class="line"></span><br><span class="line">以上标出（size）可能与下面的规则有关，所以保留原文。以下规则个人理解为，如果大于某个size规则（如果有小数点），那么必须是某个规则的倍数。</span><br><span class="line">有一些规则与最终使用的文件大小（size）有关：</span><br><span class="line">如果size &gt; 10m，size将为1m的倍数。（个人理解，size为10.1m是不行的，必须是1m的倍数）</span><br><span class="line">如果size &gt; 1m，size将为100k的倍数。</span><br><span class="line">如果size &gt; 100k，size将为10k的倍数。</span><br><span class="line">如果size &lt; 100k，size将为1k的倍数。</span><br><span class="line"></span><br><span class="line">关于百分比的实验：</span><br><span class="line">实验1</span><br><span class="line">在8个文件中，4个1k的文件，4个2k的文件</span><br><span class="line">[root@cephL vdbench]# vi filesystem.conf</span><br><span class="line">fsd=fsd1,anchor=/root/node-1,depth=2,width=2,files=2,sizes=(1k,50,2k,50)</span><br><span class="line">fwd=fwd1,fsd=fsd1,operation=read,xfersize=4k,fileio=sequential,fileselect=random,threads=2</span><br><span class="line">rd=rd1,fwd=fwd1,fwdrate=max,format=yes,elapsed=10,interval=1</span><br><span class="line"></span><br><span class="line">[root@cephL vdbench]# ./vdbench -f filesystem.conf</span><br><span class="line">[root@cephL ~]# tree node-1/ -h</span><br><span class="line">node-1/</span><br><span class="line">├── [  68]  no_dismount.txt</span><br><span class="line">├── [  44]  vdb.1_1.dir</span><br><span class="line">│   ├── [  50]  vdb.2_1.dir</span><br><span class="line">│   │   ├── [2.0K]  vdb_f0001.file</span><br><span class="line">│   │   └── [1.0K]  vdb_f0002.file</span><br><span class="line">│   └── [  50]  vdb.2_2.dir</span><br><span class="line">│       ├── [1.0K]  vdb_f0001.file</span><br><span class="line">│       └── [2.0K]  vdb_f0002.file</span><br><span class="line">├── [  44]  vdb.1_2.dir</span><br><span class="line">│   ├── [  50]  vdb.2_1.dir</span><br><span class="line">│   │   ├── [1.0K]  vdb_f0001.file</span><br><span class="line">│   │   └── [1.0K]  vdb_f0002.file</span><br><span class="line">│   └── [  50]  vdb.2_2.dir</span><br><span class="line">│       ├── [2.0K]  vdb_f0001.file</span><br><span class="line">│       └── [2.0K]  vdb_f0002.file</span><br><span class="line">└── [ 194]  vdb_control.file</span><br><span class="line"></span><br><span class="line">6 directories, 10 files</span><br><span class="line"></span><br><span class="line">实验2</span><br><span class="line">在8个文件中，1个1k的文件，3个2k的文件，3个3k的文件，1个4k的文件。不知道为什么。。。。。。。。</span><br><span class="line">[root@cephL vdbench]# vi filesystem.conf</span><br><span class="line">fsd=fsd1,anchor=/root/node-1,depth=2,width=2,files=2,sizes=(1k,25,2k,25,3k,25,4k,25)</span><br><span class="line">fwd=fwd1,fsd=fsd1,operation=read,xfersize=4k,fileio=sequential,fileselect=random,threads=2</span><br><span class="line">rd=rd1,fwd=fwd1,fwdrate=max,format=yes,elapsed=10,interval=1</span><br><span class="line"></span><br><span class="line">[root@cephL vdbench]# ./vdbench -f filesystem.conf</span><br><span class="line">[root@cephL ~]# tree node-1/ -h</span><br><span class="line">node-1/</span><br><span class="line">├── [  68]  no_dismount.txt</span><br><span class="line">├── [  44]  vdb.1_1.dir</span><br><span class="line">│   ├── [  50]  vdb.2_1.dir</span><br><span class="line">│   │   ├── [3.0K]  vdb_f0001.file</span><br><span class="line">│   │   └── [2.0K]  vdb_f0002.file</span><br><span class="line">│   └── [  50]  vdb.2_2.dir</span><br><span class="line">│       ├── [1.0K]  vdb_f0001.file</span><br><span class="line">│       └── [3.0K]  vdb_f0002.file</span><br><span class="line">├── [  44]  vdb.1_2.dir</span><br><span class="line">│   ├── [  50]  vdb.2_1.dir</span><br><span class="line">│   │   ├── [2.0K]  vdb_f0001.file</span><br><span class="line">│   │   └── [2.0K]  vdb_f0002.file</span><br><span class="line">│   └── [  50]  vdb.2_2.dir</span><br><span class="line">│       ├── [4.0K]  vdb_f0001.file</span><br><span class="line">│       └── [3.0K]  vdb_f0002.file</span><br><span class="line">└── [ 234]  vdb_control.file</span><br><span class="line"></span><br><span class="line">6 directories, 10 files</span><br></pre></td></tr></table></figure></p>
-<h1 id="多机测试"><a href="#多机测试" class="headerlink" title="多机测试"></a>多机测试</h1><p>应用场景为多个NFS Client挂在相同NFS Server的读写。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">hd=default,vdbench=/home/vdbench,user=root,shell=ssh</span><br><span class="line">hd=hd1,system=node1</span><br><span class="line">hd=hd2,system=node2</span><br><span class="line">hd=hd3,system=node3</span><br><span class="line"></span><br><span class="line">fsd=fsd1,anchor=/mnt/test863,depth=1,width=10,files=10000,size=20m,shared=yes</span><br><span class="line">fwd=format,threads=6,xfersize=1m</span><br><span class="line">fwd=default,xfersize=1m,fileio=random,fileselect=random,rdpct=100,threads=6</span><br><span class="line">fwd=fwd1,fsd=fsd1,host=hd1</span><br><span class="line">fwd=fwd2,fsd=fsd1,host=hd2</span><br><span class="line">fwd=fwd3,fsd=fsd1,host=hd3</span><br><span class="line"></span><br><span class="line">rd=rd1,fwd=fwd*,fwdrate=max,format=(restart,only),elapsed=600,interval=1</span><br></pre></td></tr></table></figure>
-<p>参数解析：</p>
-<p>有3台测试节点node1、node2、node3。每台测试节点的/home/vdbench/目录都存在可执行vdbench二进制文件（位置必须相同），使用root用户通过ssh方式连接（节点间需要做ssh免密），每台测试节点的测试目录为/mnt/test863，目录深度为1，最深层目录中的目录宽度为10，最深层每个目录中有10000个文件，每个文件大小20mb</p>
-<p><code>关于shared=yes</code></p>
-<p>随着Vdbench运行多个slaves和可选的多个hosts，slaves和hosts之间关于文件状态的通信变得困难。使所有这些slaves设备相互通信所涉及的开销变得过于昂贵。您不希望一个slave删除另一个slave当前正在读取或写入的文件。因此，Vdbench不允许您跨slaves和hosts共享FSD。</p>
-<p>当然，在你开始使用庞大的文件系统之前，这一切听起来都很棒。 您刚刚填满了500 TB的磁盘文件，然后您决定要与一个或多个远程主机共享该数据。 从头开始重新创建整个文件结构需要很长时间。 该怎么办？</p>
-<p>指定’shared = yes’时，Vdbench将允许您共享文件系统定义（FSD）。 它通过允许每个slave设备仅使用FSD文件结构中定义的每个“第n”文件来实现这一点，其中“n”等于slave数量。（It does this by allowing each slave to use only every ‘nth’ file as is defined in the FSD file structure, where ‘n’ equals the amount of slaves.）</p>
-<p>这意味着不同的host不会互相踩到脚趾，但有一个例外：当您指定’format = yes’时，Vdbench首先删除已存在的文件结构。由于这可能是一个旧的文件结构，Vdbench无法传播文件删除周围，让每个slave删除他的’第n’文件。因此，每个slave设备都会尝试删除所有文件，但如果删除失败则不会生成错误消息（因为不同的slave设备只是删除了它）。这些失败的删除将被计算并报告在“Miscellaneous statistics”中的“FILE_DELETE_SHARED”计数器下。但是，“FILE_DELETES”计数器可以包含高于存在的文件数量的计数。我已经看到多个slaves设备能够同时删除同一个文件而没有操作系统将任何错误传递给Java的情况。</p>
-<p><code>关于rdpct（Read Percentage）</code></p>
-<p>此参数允许您混合读取和写入。 使用operation=read只允许你做read，operation=write只允许你做write。 但是，指定rdpct=，您将能够在同一个选定文件中混合读取和写入。请注意，对于sequential（顺序），这没有多大意义。您可以以读取块1，写入块2，读取块3等。对于随机I/O，这非常有意义。</p>
-<p><code>关于format=</code></p>
-<ul>
-<li><p>no</p>
-<p>不需要任何格式,但现有文件结构必须与 FSD 定义的结构相匹配。</p>
-</li>
-<li><p>yes</p>
-<p>Vdbench 将首先删除当前文件结构,然后再次创建文件结构。然后,它将执行您在 RD 中的请求。</p>
-</li>
-<li><p>restart</p>
-<p>Vdbench将仅创建尚未创建的文件，并且还将扩展未达到其正确大小的文件。 （这是totalsize和workingsetsize可以发挥作用的地方）。</p>
-</li>
-<li><p>only</p>
-<p>与’yes’相同，但Vdbench不会执行当前的RD。</p>
-</li>
-<li><p>dir(ectories)</p>
-<p>与‘yes’相同，但它只会创建目录。</p>
-</li>
-<li><p>clean</p>
-<p>Vdbench只会删除当前的文件结构，而不会执行当前的RD。</p>
-</li>
-<li><p>once</p>
-<p>这将覆盖每个forxxx参数循环完成format的默认行为。</p>
-</li>
-<li><p>limited</p>
-<p>format将在elapsed=seconds之后终止，而不是所有文件或为totalsize=选择的文件已格式化之后终止。</p>
-</li>
-<li><p>complete</p>
-<p>只能与’format=no’一起使用，并且会告诉Vdbench format已经完成，但是Vdbench不应该尝试通过目录搜索来验证每个目录和文件的状态。 当然，如果一个或多个目录或文件丢失或文件未达到其预期大小，结果不可预测。在测试期间删除或创建目录或文件时非常危险。</p>
-</li>
+            <h2 id="Welcome-to-RocksDB"><a href="#Welcome-to-RocksDB" class="headerlink" title="Welcome to RocksDB"></a>Welcome to RocksDB</h2><p>RocksDB：A Persistent Key-Value Store for Flash and RAM Storage</p>
+<p>RocksDB是一个嵌入式key-value store C ++库，其中keys和values是任意byte streams。RocksDB由Facebook Database Engineering Team开发和维护，基于LevelDB二次开发，并对LevelDB API提供向后兼容。它支持原子读取和写入。RocksDB借鉴了开源leveldb项目中的重要代码以及Apache HBase的重要思想。最初的代码是从开源的leveldb 1.5中分离出来的。它还建立在Facebook之前在RocksDB开发的代码和想法之上。</p>
+<p>RocksDB针对Flash进行了优化，延迟极低。RocksDB使用Log Structured Database Engine进行存储，完全用C ++编写。一个名为RocksJava的Java版本目前正在开发中。</p>
+<p>RocksDB具有高度灵活的配置选项，可以调整以运行在各种生产环境上的不同设备之上，包括pure memory，Flash，hard disks或HDFS。它支持各种压缩算法并且为production support和debugging提供良好的工具。</p>
+<h2 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h2><ul>
+<li>专门希望存储在本地Flash drives或RAM中，高达几TB数据的应用程序服务器而设计</li>
+<li>针对fast storage设备，存储small到medium size key-values进行了优化( flash devices 或 in-memory )</li>
+<li><p>与CPU数量线性扩展，以便在具有多核的处理器上运行良好</p>
+<h2 id="Features-Not-in-LevelDB"><a href="#Features-Not-in-LevelDB" class="headerlink" title="Features Not in LevelDB"></a>Features Not in LevelDB</h2></li>
 </ul>
-
+<p>RocksDB引入了几十个新的主要features。不在LevelDB中的feature<a href="https://github.com/facebook/rocksdb/wiki/Features-Not-in-LevelDB" target="_blank" rel="noopener">列表</a></p>
+<h2 id="Assumptions-and-Goals"><a href="#Assumptions-and-Goals" class="headerlink" title="Assumptions and Goals"></a>Assumptions and Goals</h2><h3 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h3><p>RocksDB设计主要专注于fast storage和server workloads。它应该利用Flash或RAM子系统提供的高速率读/写全部潜力。它应该支持高效的point lookups以及range scans。它应该可配置为支持high random-read workloads，high update workloads或两者的组合（最优解）。其架构应易于调整Read Amplification, Write Amplification 和 Space Amplification。</p>
+<h3 id="Production-Support"><a href="#Production-Support" class="headerlink" title="Production Support"></a>Production Support</h3><h3 id="Compatibility"><a href="#Compatibility" class="headerlink" title="Compatibility"></a>Compatibility</h3>
           
         
       
@@ -447,7 +414,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/95/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/95/">95</a><span class="page-number current">96</span><a class="page-number" href="/page/97/">97</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/97/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/95/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/95/">95</a><span class="page-number current">96</span><a class="page-number" href="/page/97/">97</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/97/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -493,7 +460,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

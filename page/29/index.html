@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/20/centos创建内部mirror/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/16/ceph社区为什么要使用ceph-volume代替ceph-disk/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/08/20/centos创建内部mirror/" itemprop="url">centos创建内部mirror</a></h1>
+                <a class="post-title-link" href="/2019/08/16/ceph社区为什么要使用ceph-volume代替ceph-disk/" itemprop="url">ceph社区为什么要使用ceph-volume代替ceph-disk</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-20T11:10:09+08:00">
-                2019-08-20
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-16T16:35:15+08:00">
+                2019-08-16
               </time>
             
 
@@ -358,26 +358,27 @@
       
         
           
-            <p>公司内部搭建mirror的好处：可以节省大量时间、控制版本、节省公司外网带宽（尤其是国内很多公司基于开源软件搞定制化二次开发），同时也可以纳入发布流程当中。</p>
-<p>yum可以通过FTP或HTTP传输文件，这里只实验HTTP方式。</p>
-<h1 id="server端（搭建的mirror端）"><a href="#server端（搭建的mirror端）" class="headerlink" title="server端（搭建的mirror端）"></a>server端（搭建的mirror端）</h1><p>1、首先安装Nginx</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y epel-release &amp;&amp; sudo yum install -y nginx</span><br></pre></td></tr></table></figure>
-<p>2、安装createrepo工具（负责将.rpm放到repomd repository）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y createrepo yum-utils</span><br></pre></td></tr></table></figure>
-<p>3、在本地创建目录，存储repositories</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mkdir -p /usr/share/nginx/repos/ceph/rpm-nautilus/el7/&#123;SRPMS,aarch64,noarch,x86_64&#125;</span><br></pre></td></tr></table></figure>
-<p>4、修改centos源</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/yum.repos.d/ceph_163.repo </span><br><span class="line"></span><br><span class="line"># $basearch is x86_64, can be modified</span><br><span class="line">[ceph]</span><br><span class="line">baseurl = http://mirrors.163.com/ceph/rpm-nautilus/el7/$basearch</span><br><span class="line">gpgcheck = 0</span><br><span class="line">gpgkey = http://mirrors.163.com/ceph/keys/release.asc</span><br><span class="line">name = Ceph Stable $basearch repo</span><br><span class="line">priority = 2</span><br><span class="line"></span><br><span class="line">[noarch]</span><br><span class="line">baseurl = http://mirrors.163.com/ceph/rpm-nautilus/el7/noarch</span><br><span class="line">gpgcheck = 0</span><br><span class="line">gpgkey = http://mirrors.163.com/ceph/keys/release.asc</span><br><span class="line">name = Ceph Stable noarch repo</span><br><span class="line">priority = 2</span><br></pre></td></tr></table></figure>
-<p>5、导入GPG Key</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl https://mirrors.163.com/ceph/keys/release.asc | gpg --import -</span><br></pre></td></tr></table></figure>
-<p>6、下载官方repositories到本地服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo reposync -g -l -d -m --repoid=ceph --newest-only --download-metadata --download_path=/usr/share/nginx/repos/ceph/rpm-nautilus/el7/x86_64/</span><br><span class="line">sudo reposync -g -l -d -m --repoid=noarch --newest-only --download-metadata --download_path=/usr/share/nginx/repos/ceph/rpm-nautilus/el7/noarch/</span><br><span class="line"></span><br><span class="line">同步后，目录层级会不同，在download_path后面会自动加一层repoid指定的名字，需要自行调整。</span><br></pre></td></tr></table></figure>
-<p>7、创建new repository</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo createrepo /usr/share/nginx/repos/ceph/rpm-nautilus/el7/x86_64/</span><br><span class="line">sudo createrepo /usr/share/nginx/repos/ceph/rpm-nautilus/el7/noarch/</span><br><span class="line"></span><br><span class="line">这时会在相应的目录中生成repodata</span><br></pre></td></tr></table></figure>
-<p>8、修改Nginx配置</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">server &#123; </span><br><span class="line">	# 修改</span><br><span class="line">	autoindex on;</span><br><span class="line">	root         /usr/share/nginx/repos/;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">启动nginx</span><br><span class="line">systemctl start nginx &amp;&amp; systemctl enable nginx</span><br></pre></td></tr></table></figure>
-<h1 id="client端（使用mirror端）"><a href="#client端（使用mirror端）" class="headerlink" title="client端（使用mirror端）"></a>client端（使用mirror端）</h1><p>在/etc/yum.repos.d/中增加新的源</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# cat /etc/yum.repos.d/ceph_stable.repo </span><br><span class="line">[ceph_stable]</span><br><span class="line">baseurl = http://10.121.9.103/ceph/rpm-nautilus/el7/$basearch</span><br><span class="line">gpgcheck = 1</span><br><span class="line">gpgkey = https://download.ceph.com/keys/release.asc</span><br><span class="line">name = Ceph Stable $basearch repo</span><br><span class="line">priority = 2</span><br><span class="line"></span><br><span class="line">[ceph_stable_noarch]</span><br><span class="line">baseurl = http://10.121.9.103/ceph/rpm-nautilus/el7/noarch</span><br><span class="line">gpgcheck = 1</span><br><span class="line">gpgkey = https://download.ceph.com/keys/release.asc</span><br><span class="line">name = Ceph Stable noarch repo</span><br><span class="line">priority = 2</span><br></pre></td></tr></table></figure>
+            <p><a href="https://docs.ceph.com/docs/master/ceph-volume/intro/#ceph-disk-replaced" target="_blank" rel="noopener">原文地址</a></p>
+<h1 id="OVERVIEW"><a href="#OVERVIEW" class="headerlink" title="OVERVIEW"></a>OVERVIEW</h1><p>ceph-volume旨在成为一个单一用途的命令行工具，将logical volumes部署为OSDs，在preparing, activating, 和creating OSDs时，试图维护与ceph-disk类似的API。</p>
+<p>因为它不依赖于为CEPH安装的UDEV规则且没有交互，因此它背离了ceph-disk。这些rules允许自动检测先前设置的devices，这些devices又被送入ceph-disk以activate它们。</p>
+<h1 id="REPLACING-CEPH-DISK"><a href="#REPLACING-CEPH-DISK" class="headerlink" title="REPLACING CEPH-DISK"></a>REPLACING <code>CEPH-DISK</code></h1><p>ceph-disk工具是在项目需要支持许多不同类型的init系统（upstart, sysvinit, etc…）时创建的，同时能够发现devices。这导致工具最初（以及后来）专注于GPT分区上。特别是在GPT GUID上，它以独特的方式标记device，以回答以下问题：</p>
+<ul>
+<li>device是否是Journal？</li>
+<li>是否是encrypted data partition（加密数据分区）？</li>
+<li>device是否已部分准备就绪？</li>
+</ul>
+<p><code>为了解决这些问题，它使用UDEV规则来匹配GUID，这些GUID将调用ceph-disk，最后在ceph-disk systemd unit和ceph-disk可执行文件之间来回切换。该过程非常不可靠且耗时（必须为每个OSD设置接近3小时的超时），并且会导致OSD 在节点的boot过程中根本不出现。</code></p>
+<p>考虑到UDEV的异步行为，很难调试甚至复现这些问题。</p>
+<p>由于ceph-disk的world-view必须是专门的GPT分区，这意味着它无法与其他技术（如LVM或类似的device mapper devices）一起使用。它最终决定创建一些模块化的东西，从LVM支持开始，并根据需要扩展其他技术。</p>
+<h1 id="GPT-PARTITIONS-ARE-SIMPLE"><a href="#GPT-PARTITIONS-ARE-SIMPLE" class="headerlink" title="GPT PARTITIONS ARE SIMPLE?"></a>GPT PARTITIONS ARE SIMPLE?</h1><p>尽管分区通常很容易理解，但ceph-disk分区并不简单。它需要大量特殊标志才能使它们与device discovery工作流程一起正常工作。以下是创建数据分区的示例调用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sgdisk --largest-new=1 --change-name=1:ceph data --partition-guid=1:f0fc39fd-eeb2-49f1-b922-a11939cf8a0f --typecode=1:89c57f98-2fe5-4dc0-89c1-f3ad0ceff2be --mbrtogpt -- /dev/sdb</span><br></pre></td></tr></table></figure>
+<p>创建这些不仅很难，而且这些分区要求device由 Ceph 独占。例如，在某些情况下，在device加密时将创建一个特殊分区，其中包含未加密的密钥。这是ceph-disk领域的知识，它不会转变对”GPT partitions are simple”的理解。下面是正在创建的特殊分区的示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sgdisk --new=5:0:+10M --change-name=5:ceph lockbox --partition-guid=5:None --typecode=5:fb3aabf9-d25f-47cc-bf5e-721d181642be --mbrtogpt -- /dev/sdad</span><br></pre></td></tr></table></figure>
+<h1 id="MODULARITY"><a href="#MODULARITY" class="headerlink" title="MODULARITY"></a>MODULARITY</h1><p>ceph-volume被设计成一个模块化工具，因为我们预计人们会使用多种方式来配置硬件设备。目前已有两个情况：传统的ceph-disk devices仍然在使用并且有GPT分区（handled by <a href="https://docs.ceph.com/docs/master/ceph-volume/simple/#ceph-volume-simple" target="_blank" rel="noopener">simple</a>）和lvm。</p>
+<p>我们直接从用户空间管理NVMe devices的SPDK devices即将出现，LVM将无法在那里工作，因为根本不涉及内核。</p>
+<h1 id="CEPH-VOLUME-LVM"><a href="#CEPH-VOLUME-LVM" class="headerlink" title="CEPH-VOLUME LVM"></a>CEPH-VOLUME LVM</h1><p>通过使用<a href="https://docs.ceph.com/docs/master/glossary/#term-lvm-tags" target="_blank" rel="noopener">LVM tags</a>，<a href="https://docs.ceph.com/docs/master/ceph-volume/lvm/#ceph-volume-lvm" target="_blank" rel="noopener">lvm</a>子命令能够保存并随后重新发现和查询与OSD相关联的devices，以便可以激活（activate）它们。 这包括对基于LVM的技术（如dm-cache）的支持。</p>
+<p>对于ceph-volume，dm-cache的使用是透明的，对于工具没有区别，它将dm-cache视为普通logical volume。</p>
+<h1 id="LVM-PERFORMANCE-PENALTY"><a href="#LVM-PERFORMANCE-PENALTY" class="headerlink" title="LVM PERFORMANCE PENALTY"></a>LVM PERFORMANCE PENALTY</h1><p>简而言之：我们未能注意到与LVM更改相关的任何重大性能损失。 通过与LVM合作，可以使用其他device mapper技术（例如dmcache）：处理任何位于Logical Volume以下的事情没有技术困难。</p>
 
           
         
@@ -422,7 +423,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/28/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><span class="page-number current">29</span><a class="page-number" href="/page/30/">30</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/30/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/28/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/28/">28</a><span class="page-number current">29</span><a class="page-number" href="/page/30/">30</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/30/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -468,7 +469,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

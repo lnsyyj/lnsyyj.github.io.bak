@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/18/jenkins安装/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/18/jenkins安装/" itemprop="url">jenkins安装</a></h1>
+                <a class="post-title-link" href="/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/" itemprop="url">Repo for Microsoft Windows and Linux</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-18T23:52:49+08:00">
-                2018-06-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-15T22:28:18+08:00">
+                2018-06-15
               </time>
             
 
@@ -358,14 +358,56 @@
       
         
           
-            <h1 id="centos-install"><a href="#centos-install" class="headerlink" title="centos install"></a>centos install</h1><p>安装文档</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://pkg.jenkins.io/redhat-stable/</span><br><span class="line">https://www.vultr.com/docs/how-to-install-jenkins-on-centos-7</span><br></pre></td></tr></table></figure>
-<p>启动jenkins</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">systemctl start jenkins.service</span><br><span class="line">systemctl enable jenkins.service</span><br></pre></td></tr></table></figure>
-<p>中文插件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Locale plugin</span><br></pre></td></tr></table></figure>
-<p> 多任务插件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Multijob plugin</span><br></pre></td></tr></table></figure>
+            <p>这是E.S.R.Labs Repo —— 就像Google Repo，但它也可以在Microsoft Windows运行。Repo是Google建立在Git之上的repository管理工具。必要时，Repo会统一许多Git repositories上传到版本控制系统，并使部分开发工作流程自动化。Repo并不意味着取代Git，只是为了更容易在多个repositories的环境中使用Git。repo command是一个可执行的Python脚本，您可以将其放在任何路径。在处理源文件时，您将使用Repo进行跨网络操作。例如，使用Repo命令，可以将多个repositories中的文件下载到本地工作目录中。</p>
+<h2 id="Setup-steps-for-Microsoft-Windows"><a href="#Setup-steps-for-Microsoft-Windows" class="headerlink" title="Setup steps for Microsoft Windows"></a>Setup steps for Microsoft Windows</h2><p>修复权限以允许创建符号链接</p>
+<p>如果您是Administrators group的member，则必须关闭<a href="https://support.microsoft.com/en-us/products/windows?os=windows-10" target="_blank" rel="noopener">User Access Control</a> (UAC)，然后重新启动计算机。</p>
+<p>否则，您必须调整您的用户权限才能获得<a href="https://stackoverflow.com/questions/6722589/using-windows-mklink-for-linking-2-files" target="_blank" rel="noopener">SeCreateSymbolicLinkPrivilege</a>权限。editrights工具是作为Microsoft Windows的git-repo的一部分提供的。</p>
+<p>Highly experimental（除开发此功能外，请勿使用！）：如果您不想使用符号链接，而是文件夹和文件的硬链接（hardlinks），则必须在<code>~/.gitconfig</code>中设置以下内容:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[portable]</span><br><span class="line">      windowsNoSymlinks = true</span><br></pre></td></tr></table></figure>
+<p>这不需要上述所说的设置权限。</p>
+<p>已知问题：硬链接被git销毁，例如，当你删除一个branch时（breaks .git/config）。这会破坏project workspace！</p>
+<h3 id="Download-and-install-Git"><a href="#Download-and-install-Git" class="headerlink" title="Download and install Git"></a>Download and install Git</h3><p>下载Git（<a href="http://git-scm.com/downloads）" target="_blank" rel="noopener">http://git-scm.com/downloads）</a></p>
+<p>将Git添加到path环境变量中：例如C:\Program Files (x86)\Git\cmd;</p>
+<p>将MinGW添加到path环境变量中：例如C:\Program Files (x86)\Git\bin;</p>
+<h3 id="Download-and-install-Python"><a href="#Download-and-install-Python" class="headerlink" title="Download and install Python"></a>Download and install Python</h3><p>下载Python 2.7+（<a href="https://www.python.org/downloads/）" target="_blank" rel="noopener">https://www.python.org/downloads/）</a></p>
+<p>将Python添加到path环境变量中：例如C:\Python27;</p>
+<p>注意：git-repo在实验环境支持Python 3.x</p>
+<h3 id="使用Windows-Command-Shell或Git-Bash下载并安装Repo"><a href="#使用Windows-Command-Shell或Git-Bash下载并安装Repo" class="headerlink" title="使用Windows Command Shell或Git Bash下载并安装Repo"></a>使用Windows Command Shell或Git Bash下载并安装Repo</h3><p>Windows Command Shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">md %USERPROFILE%\bin</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; %USERPROFILE%/bin/repo</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo.cmd &gt; %USERPROFILE%/bin/repo.cmd</span><br></pre></td></tr></table></figure>
+<p>Windows PowerShell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">md $env:USERPROFILE\bin</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; $env:USERPROFILE/bin/repo</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo.cmd &gt; $env:USERPROFILE/bin/repo.cmd</span><br></pre></td></tr></table></figure>
+<p>Git Bash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/bin</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; ~/bin/repo</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo.cmd &gt; ~/bin/repo.cmd</span><br></pre></td></tr></table></figure>
+<p>将Repo添加path环境变量：%USERPROFILE%\bin;</p>
+<p>创建一个指向％USERPROFILE％的HOME环境变量（OpenSSH需要找到它的.ssh目录）。</p>
+<p>创建一个GIT_EDITOR环境变量，其中包含一个editor可执行文件作为值。为此，首先将editor可执行文件的主目录添加到path环境变量中。例如，GIT_EDITOR可以设置为”notepad++.exe”，”gvim.exe”。</p>
+<h3 id="Setup-steps-for-Linux"><a href="#Setup-steps-for-Linux" class="headerlink" title="Setup steps for Linux"></a>Setup steps for Linux</h3><p>下载并安装Git和Python</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git-core</span><br><span class="line">sudo apt-get install python</span><br></pre></td></tr></table></figure>
+<p>下载并安装Repo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir ~/bin</span><br><span class="line">$ PATH=~/bin:$PATH</span><br><span class="line">$ curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; ~/bin/repo</span><br><span class="line">$ chmod a+x ~/bin/repo</span><br></pre></td></tr></table></figure>
+<h3 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h3><p>有关git-repo用法的更多详细说明，请访问<a href="http://source.android.com/source/using-repo.html" target="_blank" rel="noopener">git</a>-repo。</p>
+<h3 id="常见问题解答"><a href="#常见问题解答" class="headerlink" title="常见问题解答"></a>常见问题解答</h3><ul>
+<li>我无法看到repo状态的任何颜色</li>
+</ul>
+<p>用于repo状态的pager默认设置为less，除非另外配置，否则将忽略转义序列。您可以将环境变量LESS设置为-FRSX以减少处理颜色。 （您可能还想将LESSCHARSET设置为utf-8）</p>
+<p>它仍然不起作用！</p>
+<p>对pager有更多的选择。它的行为并不像less一样，但它对你来说可能已经足够了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.pager more</span><br></pre></td></tr></table></figure>
+<p>或者，环境变量GIT_PAGER可以设置为more。</p>
+<ul>
+<li>在使用repo init初始化我的repo时，我在Windows Command Shell中遇到WindowsError</li>
+</ul>
+<p>如果在输出开始时出现警告，表示GPG不可用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">warning: gpg (GnuPG) is not available.</span><br><span class="line">warning: Installing it is strongly encouraged.</span><br></pre></td></tr></table></figure>
+<p>你必须添加gpg.exe到你的PATH变量。可执行文件可以在Git安装文件夹<code>$GIT\usr\bin</code>中找到。当你使用Git Bash时，<code>$Git\usr\bin</code>文件夹已经被添加到你的PATH中。</p>
+<h3 id="Developer-Information"><a href="#Developer-Information" class="headerlink" title="Developer Information"></a>Developer Information</h3><p>与official google repo同步</p>
+<p>为了与official google repo git同步，这里是与official google repo的tag v1.12.33同步的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># add google git-repo remote with tag</span><br><span class="line">git remote add googlesource https://android.googlesource.com/tools/repo/</span><br><span class="line">git checkout v1.12.33 -b google-latest</span><br><span class="line"></span><br><span class="line"># checkout basis for resync</span><br><span class="line">git checkout google-git-repo-base -b update</span><br><span class="line">git merge --allow-unrelated-histories -Xtheirs --squash google-latest</span><br><span class="line">git commit -m &quot;Update: google git-repo v1.12.33&quot;</span><br><span class="line">git rebase stable</span><br><span class="line"></span><br><span class="line"># solve conflicts; keep portability in mind</span><br><span class="line"></span><br><span class="line">git checkout stable</span><br><span class="line">git rebase update</span><br><span class="line"></span><br><span class="line"># cleanup</span><br><span class="line">git branch -D update</span><br><span class="line">git branch -D google-latest</span><br></pre></td></tr></table></figure>
+<h3 id="创建一个新的签名版本"><a href="#创建一个新的签名版本" class="headerlink" title="创建一个新的签名版本"></a>创建一个新的签名版本</h3><p>用于创建新版本repo的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git tag -s -u KEYID v0.4.16 -m &quot;COMMENT&quot;</span><br><span class="line">git push origin stable:stable</span><br><span class="line">git push origin v0.4.16</span><br></pre></td></tr></table></figure>
+<p>替换KEYID（类似0x ..）</p>
+<p>v0.4.16（两次）</p>
+<p>用更多的解释替换COMMENT</p>
 
           
         
@@ -410,7 +452,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/74/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/74/">74</a><span class="page-number current">75</span><a class="page-number" href="/page/76/">76</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/76/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/74/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/74/">74</a><span class="page-number current">75</span><a class="page-number" href="/page/76/">76</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/76/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -456,7 +498,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

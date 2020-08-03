@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/24/prometheus-ceph-exporter-监控项/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/08/LVM逻辑卷基本概念/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/05/24/prometheus-ceph-exporter-监控项/" itemprop="url">prometheus ceph_exporter 监控项</a></h1>
+                <a class="post-title-link" href="/2019/04/08/LVM逻辑卷基本概念/" itemprop="url">LVM逻辑卷基本概念</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-24T22:15:29+08:00">
-                2019-05-24
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-08T10:06:35+08:00">
+                2019-04-08
               </time>
             
 
@@ -358,398 +358,28 @@
       
         
           
-            <p>截止2019-05-24 ceph_exporter监控项整理</p>
-<table>
-<thead>
-<tr>
-<th>Metrics</th>
-<th>Chinese   explanation</th>
-<th>English   explanation</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ceph_active_pgs</td>
-<td>处于active状态的PG数</td>
-<td># HELP   ceph_active_pgs No. of active PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_backfill_wait_pgs</td>
-<td>处于backfill_wait状态的PG数</td>
-<td># HELP   ceph_backfill_wait_pgs No. of PGs in the cluster with backfill_wait state</td>
-</tr>
-<tr>
-<td>ceph_backfilling_pgs</td>
-<td>处于backfilling状态的PG数</td>
-<td># HELP   ceph_backfilling_pgs No. of backfilling PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_cache_evict_io_bytes</td>
-<td>每秒从cache   pool（缓存池）中evicted（逐出）的字节数</td>
-<td># HELP   ceph_cache_evict_io_bytes Rate of bytes being evicted from the cache pool per   second</td>
-</tr>
-<tr>
-<td>ceph_cache_flush_io_bytes</td>
-<td>每秒从cache   pool（缓存池）中flushed（刷新）的字节数</td>
-<td># HELP   ceph_cache_flush_io_bytes Rate of bytes being flushed from the cache pool per   second</td>
-</tr>
-<tr>
-<td>ceph_cache_promote_io_ops</td>
-<td>每秒cache promote操作的总数</td>
-<td># HELP   ceph_cache_promote_io_ops Total cache promote operations measured per second</td>
-</tr>
-<tr>
-<td>ceph_client_io_ops</td>
-<td>客户端每秒操作总数</td>
-<td># HELP   ceph_client_io_ops Total client ops on the cluster measured per second</td>
-</tr>
-<tr>
-<td>ceph_client_io_read_bytes</td>
-<td>客户端每秒read字节数</td>
-<td># HELP   ceph_client_io_read_bytes Rate of bytes being read by all clients per second</td>
-</tr>
-<tr>
-<td>ceph_client_io_read_ops</td>
-<td>客户端每秒read总I/O操作数</td>
-<td># HELP   ceph_client_io_read_ops Total client read I/O ops on the cluster measured per   second</td>
-</tr>
-<tr>
-<td>ceph_client_io_write_bytes</td>
-<td>客户端每秒write字节数</td>
-<td># HELP   ceph_client_io_write_bytes Rate of bytes being written by all clients per   second</td>
-</tr>
-<tr>
-<td>ceph_client_io_write_ops</td>
-<td>客户端每秒write总I/O操作数</td>
-<td># HELP   ceph_client_io_write_ops Total client write I/O ops on the cluster measured   per second</td>
-</tr>
-<tr>
-<td>ceph_cluster_available_bytes</td>
-<td>群集中的可用空间</td>
-<td># HELP   ceph_cluster_available_bytes Available space within the cluster</td>
-</tr>
-<tr>
-<td>ceph_cluster_capacity_bytes</td>
-<td>群集的总容量</td>
-<td># HELP   ceph_cluster_capacity_bytes Total capacity of the cluster</td>
-</tr>
-<tr>
-<td>ceph_cluster_objects</td>
-<td>集群中的rados object数</td>
-<td># HELP   ceph_cluster_objects No. of rados objects within the cluster</td>
-</tr>
-<tr>
-<td>ceph_cluster_used_bytes</td>
-<td>集群已使用的容量</td>
-<td># HELP   ceph_cluster_used_bytes Capacity of the cluster currently in use</td>
-</tr>
-<tr>
-<td>ceph_deep_scrubbing_pgs</td>
-<td>deep scrubbing状态的PG数量</td>
-<td># HELP   ceph_deep_scrubbing_pgs No. of deep scrubbing PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_degraded_objects</td>
-<td>所有PG中degraded   objects的数量，包括副本</td>
-<td># HELP   ceph_degraded_objects No. of degraded objects across all PGs, includes   replicas</td>
-</tr>
-<tr>
-<td>ceph_degraded_pgs</td>
-<td>处于degraded状态的PG数</td>
-<td># HELP   ceph_degraded_pgs No. of PGs in a degraded state</td>
-</tr>
-<tr>
-<td>ceph_down_pgs</td>
-<td>处于down状态的PG数</td>
-<td># HELP ceph_down_pgs   No. of PGs in the cluster in down state</td>
-</tr>
-<tr>
-<td>ceph_forced_backfill_pgs</td>
-<td>处于forced_backfill状态的PG数</td>
-<td># HELP   ceph_forced_backfill_pgs No. of PGs in the cluster with forced_backfill state</td>
-</tr>
-<tr>
-<td>ceph_forced_recovery_pgs</td>
-<td>处于forced_recovery状态的PG数</td>
-<td># HELP   ceph_forced_recovery_pgs No. of PGs in the cluster with forced_recovery state</td>
-</tr>
-<tr>
-<td>ceph_health_status</td>
-<td>群集的health状态，只能在3种状态之间变化(err:2,   warn:1, ok:0)</td>
-<td># HELP   ceph_health_status Health status of Cluster, can vary only between 3 states   (err:2, warn:1, ok:0)</td>
-</tr>
-<tr>
-<td>ceph_misplaced_objects</td>
-<td>所有PG中misplaced   object的数量，包括副本</td>
-<td># HELP   ceph_misplaced_objects No. of misplaced objects across all PGs, includes   replicas</td>
-</tr>
-<tr>
-<td>ceph_monitor_quorum_count</td>
-<td>monitor quorum的总数</td>
-<td># HELP   ceph_monitor_quorum_count The total size of the monitor quorum</td>
-</tr>
-<tr>
-<td>ceph_osd_avail_bytes</td>
-<td>OSD可用存储字节数</td>
-<td># HELP   ceph_osd_avail_bytes OSD Available Storage in Bytes</td>
-</tr>
-<tr>
-<td>ceph_osd_average_utilization</td>
-<td>OSD平均利用率</td>
-<td># HELP   ceph_osd_average_utilization OSD Average Utilization</td>
-</tr>
-<tr>
-<td>ceph_osd_bytes</td>
-<td>OSD总字节数</td>
-<td># HELP ceph_osd_bytes   OSD Total Bytes</td>
-</tr>
-<tr>
-<td>ceph_osd_crush_weight</td>
-<td>OSD Crush Weight</td>
-<td># HELP   ceph_osd_crush_weight OSD Crush Weight</td>
-</tr>
-<tr>
-<td>ceph_osd_depth</td>
-<td>OSD 深度</td>
-<td># HELP ceph_osd_depth   OSD Depth</td>
-</tr>
-<tr>
-<td>ceph_osd_in</td>
-<td>OSD In状态</td>
-<td># HELP ceph_osd_in   OSD In Status</td>
-</tr>
-<tr>
-<td>ceph_osd_perf_apply_latency_seconds</td>
-<td>OSD Perf Apply延迟</td>
-<td># HELP   ceph_osd_perf_apply_latency_seconds OSD Perf Apply Latency</td>
-</tr>
-<tr>
-<td>ceph_osd_perf_commit_latency_seconds</td>
-<td>OSD Perf Commit延迟</td>
-<td># HELP   ceph_osd_perf_commit_latency_seconds OSD Perf Commit Latency</td>
-</tr>
-<tr>
-<td>ceph_osd_pgs</td>
-<td>OSD Placement Group计数</td>
-<td># HELP ceph_osd_pgs   OSD Placement Group Count</td>
-</tr>
-<tr>
-<td>ceph_osd_reweight</td>
-<td>OSD Reweight</td>
-<td># HELP   ceph_osd_reweight OSD Reweight</td>
-</tr>
-<tr>
-<td>ceph_osd_total_avail_bytes</td>
-<td>OSD可用存储总字节数</td>
-<td># HELP   ceph_osd_total_avail_bytes OSD Total Available Storage Bytes</td>
-</tr>
-<tr>
-<td>ceph_osd_total_bytes</td>
-<td>OSD总存储字节数</td>
-<td># HELP   ceph_osd_total_bytes OSD Total Storage Bytes</td>
-</tr>
-<tr>
-<td>ceph_osd_total_used_bytes</td>
-<td>OSD已使用总的存储字节数</td>
-<td># HELP   ceph_osd_total_used_bytes OSD Total Used Storage Bytes</td>
-</tr>
-<tr>
-<td>ceph_osd_up</td>
-<td>OSD Up状态</td>
-<td># HELP ceph_osd_up   OSD Up Status</td>
-</tr>
-<tr>
-<td>ceph_osd_used_bytes</td>
-<td>OSD已使用的存储空间字节</td>
-<td># HELP   ceph_osd_used_bytes OSD Used Storage in Bytes</td>
-</tr>
-<tr>
-<td>ceph_osd_utilization</td>
-<td>OSD利用率</td>
-<td># HELP   ceph_osd_utilization OSD Utilization</td>
-</tr>
-<tr>
-<td>ceph_osd_variance</td>
-<td>OSD方差</td>
-<td># HELP   ceph_osd_variance OSD Variance</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_full</td>
-<td>群集标记为已满，无法提供写入服务</td>
-<td># HELP   ceph_osdmap_flag_full The cluster is flagged as full and cannot service   writes</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_nobackfill</td>
-<td>OSD不会被backfill</td>
-<td># HELP   ceph_osdmap_flag_nobackfill OSDs will not be backfilled</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_nodeep_scrub</td>
-<td>禁用Deep scrubbing</td>
-<td># HELP   ceph_osdmap_flag_nodeep_scrub Deep scrubbing is disabled</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_nodown</td>
-<td>忽略OSD失败报告，OSD不会被标记为down</td>
-<td># HELP   ceph_osdmap_flag_nodown OSD failure reports are ignored, OSDs will not be   marked as down</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_noin</td>
-<td>不会自动标记out的OSD</td>
-<td># HELP   ceph_osdmap_flag_noin OSDs that are out will not be automatically marked in</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_noout</td>
-<td>在配置的间隔后，OSD不会自动标记out</td>
-<td># HELP   ceph_osdmap_flag_noout OSDs will not be automatically marked out after the   configured interval</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_norebalance</td>
-<td>数据rebalancing暂停</td>
-<td># HELP   ceph_osdmap_flag_norebalance Data rebalancing is suspended</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_norecover</td>
-<td>Recovery暂停</td>
-<td># HELP   ceph_osdmap_flag_norecover Recovery is suspended</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_noscrub</td>
-<td>禁用Scrubbing</td>
-<td># HELP   ceph_osdmap_flag_noscrub Scrubbing is disabled</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_notieragent</td>
-<td>Cache tiering   activity已暂停</td>
-<td># HELP   ceph_osdmap_flag_notieragent Cache tiering activity is suspended</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_noup</td>
-<td>不允许OSD start</td>
-<td># HELP   ceph_osdmap_flag_noup OSDs are not allowed to start</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_pauserd</td>
-<td>Reads暂停</td>
-<td># HELP   ceph_osdmap_flag_pauserd Reads are paused</td>
-</tr>
-<tr>
-<td>ceph_osdmap_flag_pausewr</td>
-<td>Writes暂停</td>
-<td># HELP   ceph_osdmap_flag_pausewr Writes are paused</td>
-</tr>
-<tr>
-<td>ceph_osds</td>
-<td>群集中总OSD数量</td>
-<td># HELP ceph_osds   Count of total OSDs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_osds_down</td>
-<td>处于DOWN状态的OSD数量</td>
-<td># HELP ceph_osds_down   Count of OSDs that are in DOWN state</td>
-</tr>
-<tr>
-<td>ceph_osds_in</td>
-<td>处于IN状态并可用于处理请求的OSD数量</td>
-<td># HELP ceph_osds_in   Count of OSDs that are in IN state and available to serve requests</td>
-</tr>
-<tr>
-<td>ceph_osds_up</td>
-<td>处于UP状态的OSD数量</td>
-<td># HELP ceph_osds_up   Count of OSDs that are in UP state</td>
-</tr>
-<tr>
-<td>ceph_peering_pgs</td>
-<td>群集中peering状态的PG数量</td>
-<td># HELP   ceph_peering_pgs No. of peering PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_pgs_remapped</td>
-<td>remapped并引起cluster-wide（群集范围）移动的PG数量</td>
-<td># HELP   ceph_pgs_remapped No. of PGs that are remapped and incurring cluster-wide   movement</td>
-</tr>
-<tr>
-<td>ceph_recovering_pgs</td>
-<td>群集中recovering状态的PG数量</td>
-<td># HELP   ceph_recovering_pgs No. of recovering PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_recovery_io_bytes</td>
-<td>每秒recovery的字节数</td>
-<td># HELP   ceph_recovery_io_bytes Rate of bytes being recovered in cluster per second</td>
-</tr>
-<tr>
-<td>ceph_recovery_io_keys</td>
-<td>每秒恢复的keys数率</td>
-<td># HELP   ceph_recovery_io_keys Rate of keys being recovered in cluster per second</td>
-</tr>
-<tr>
-<td>ceph_recovery_io_objects</td>
-<td>每秒恢复的object的速率</td>
-<td># HELP   ceph_recovery_io_objects Rate of objects being recovered in cluster per   second</td>
-</tr>
-<tr>
-<td>ceph_recovery_wait_pgs</td>
-<td>处于recovery_wait状态的PG数</td>
-<td># HELP   ceph_recovery_wait_pgs No. of PGs in the cluster with recovery_wait state</td>
-</tr>
-<tr>
-<td>ceph_scrubbing_pgs</td>
-<td>处于scrubbing状态的PG数</td>
-<td># HELP   ceph_scrubbing_pgs No. of scrubbing PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_slow_requests</td>
-<td>慢速请求数</td>
-<td># HELP   ceph_slow_requests No. of slow requests</td>
-</tr>
-<tr>
-<td>ceph_stale_pgs</td>
-<td>处于stale状态的PG数</td>
-<td># HELP ceph_stale_pgs   No. of stale PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_stuck_degraded_pgs</td>
-<td>处于degraded状态的PG数</td>
-<td># HELP   ceph_stuck_degraded_pgs No. of PGs stuck in a degraded state</td>
-</tr>
-<tr>
-<td>ceph_stuck_requests</td>
-<td>stuck（卡住）的请求数</td>
-<td># HELP   ceph_stuck_requests No. of stuck requests</td>
-</tr>
-<tr>
-<td>ceph_stuck_stale_pgs</td>
-<td>处于stale状态的PG数</td>
-<td># HELP   ceph_stuck_stale_pgs No. of stuck stale PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_stuck_unclean_pgs</td>
-<td>处于unclean状态的PG数</td>
-<td># HELP   ceph_stuck_unclean_pgs No. of PGs stuck in an unclean state</td>
-</tr>
-<tr>
-<td>ceph_stuck_undersized_pgs</td>
-<td>处于undersized状态的PG数</td>
-<td># HELP   ceph_stuck_undersized_pgs No. of stuck undersized PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_total_pgs</td>
-<td>集群中总的PG数</td>
-<td># HELP ceph_total_pgs   Total no. of PGs in the cluster</td>
-</tr>
-<tr>
-<td>ceph_unclean_pgs</td>
-<td>处于unclean状态的PG数</td>
-<td># HELP   ceph_unclean_pgs No. of PGs in an unclean state</td>
-</tr>
-<tr>
-<td>ceph_undersized_pgs</td>
-<td>处于undersized状态的PG数</td>
-<td># HELP   ceph_undersized_pgs No. of undersized PGs in the cluster</td>
-</tr>
-</tbody>
-</table>
+            <p>LinuxCast视频教程笔记</p>
+<h1 id="传统磁盘管理的问题"><a href="#传统磁盘管理的问题" class="headerlink" title="传统磁盘管理的问题"></a>传统磁盘管理的问题</h1><p>当分区大小不够用时无法扩展其大小，只能通过添加硬盘、创建新的分区来扩展空间，但是新添加进来的硬盘是作为独立文件系统存在的，原有的文件系统并未得到扩充，上层应用很多时候只能访问一个文件系统。只能让现有磁盘下线，换上新的磁盘之后，再将原始数据导入。</p>
+<h1 id="LVM"><a href="#LVM" class="headerlink" title="LVM"></a>LVM</h1><p>LVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象封装起来，以逻辑卷的形式表现给上层系统，逻辑卷的大小可以动态调整，而且不会丢失现有数据。新加入的硬盘也不会改变现有上层的逻辑卷。</p>
+<p>作为一种动态磁盘管理机制，逻辑卷技术大大提高了磁盘管理的灵活性。</p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-1.png" alt></p>
+<p>上图黄色为：VG    橙色为：LV</p>
+<p>（1）首先把物理硬盘格式化（存储里面叫条带化）为物理卷（PV），格式化为物理卷的过程实际上是把硬盘空间化成一个一个的PE（PE是逻辑卷空间管理的最基本单位，默认4M）</p>
+<p>（2）第二步我们要创建一个VG，VG的作用是用来装PE的，就像一个空间池。我们可以把一个或者多个PV加到VG当中。加入多少个PV，我们的VG容量就是这些PV大小之和。（当创建VG以后，在/dev目录下会多出一个目录）</p>
+<p>（3）最后创建LV（每个LV的空间可能来自不同的物理硬盘）</p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-2.png?raw=true" alt></p>
+<h1 id="创建LVM"><a href="#创建LVM" class="headerlink" title="创建LVM"></a>创建LVM</h1><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-3.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-4.png" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-5.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  200G  0 disk </span><br><span class="line">├─vda1 253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  195G  0 part /</span><br><span class="line">vdb    253:16   0  100G  0 disk </span><br><span class="line">vdc    253:32   0  100G  0 disk</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdb /dev/vdc</span><br><span class="line">  Physical volume &quot;/dev/vdb&quot; successfully created.</span><br><span class="line">  Physical volume &quot;/dev/vdc&quot; successfully created.</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG Fmt  Attr PSize   PFree  </span><br><span class="line">  /dev/vdb      lvm2 ---  100.00g 100.00g</span><br><span class="line">  /dev/vdc      lvm2 ---  100.00g 100.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgcreate linuxcast /dev/vdb /dev/vdc </span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully created</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   0   0 wz--n- 199.99g 199.99g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mylv -L 2G linuxcast</span><br><span class="line">  Logical volume &quot;mylv&quot; created.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 2.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mynewlv -L 2G linuxcast</span><br><span class="line">  Logical volume &quot;mynewlv&quot; created.</span><br><span class="line">[root@teuthology ~]# ll /dev/linuxcast/</span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx 1 root root 7 Apr  8 14:59 mylv -&gt; ../dm-0</span><br><span class="line">lrwxrwxrwx 1 root root 7 Apr  8 15:03 mynewlv -&gt; ../dm-1</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mkfs.ext4 /dev/linuxcast/mylv</span><br><span class="line">[root@teuthology ~]# mount /dev/linuxcast/mylv /mnt/</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">Filesystem                 Type      Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G   2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G   0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G   0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G   1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G   0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M  17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M   0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.0G  6.0M  1.8G   1% /mnt</span><br><span class="line"></span><br><span class="line">#删除LVM</span><br><span class="line">[root@teuthology ~]# umount  /mnt/</span><br><span class="line">[root@teuthology ~]# lvremove /dev/linuxcast/mylv </span><br><span class="line">Do you really want to remove active logical volume linuxcast/mylv? [y/n]: y</span><br><span class="line">  Logical volume &quot;mylv&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# lvremove /dev/linuxcast/mynewlv </span><br><span class="line">Do you really want to remove active logical volume linuxcast/mynewlv? [y/n]: y</span><br><span class="line">  Logical volume &quot;mynewlv&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">[root@teuthology ~]# vgremove linuxcast</span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdb </span><br><span class="line">  Labels on physical volume &quot;/dev/vdb&quot; successfully wiped.</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdc</span><br><span class="line">  Labels on physical volume &quot;/dev/vdc&quot; successfully wiped.</span><br></pre></td></tr></table></figure>
+<h1 id="LVM逻辑卷的拉伸与缩小"><a href="#LVM逻辑卷的拉伸与缩小" class="headerlink" title="LVM逻辑卷的拉伸与缩小"></a>LVM逻辑卷的拉伸与缩小</h1><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-6.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  200G  0 disk </span><br><span class="line">├─vda1 253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  195G  0 part /</span><br><span class="line">vdb    253:16   0  100G  0 disk </span><br><span class="line">vdc    253:32   0  100G  0 disk </span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdb /dev/vdc</span><br><span class="line">  Physical volume &quot;/dev/vdb&quot; successfully created.</span><br><span class="line">  Physical volume &quot;/dev/vdc&quot; successfully created.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG Fmt  Attr PSize   PFree  </span><br><span class="line">  /dev/vdb      lvm2 ---  100.00g 100.00g</span><br><span class="line">  /dev/vdc      lvm2 ---  100.00g 100.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgcreate linuxcast /dev/vdb /dev/vdc</span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully created</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mylv -L 2G linuxcast</span><br><span class="line">WARNING: ext4 signature detected on /dev/linuxcast/mylv at offset 1080. Wipe it? [y/n]: y</span><br><span class="line">  Wiping ext4 signature on /dev/linuxcast/mylv.</span><br><span class="line">  Logical volume &quot;mylv&quot; created.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mkfs.ext4 /dev/linuxcast/mylv</span><br><span class="line">mke2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">文件系统标签=</span><br><span class="line">OS type: Linux</span><br><span class="line">块大小=4096 (log=2)</span><br><span class="line">分块大小=4096 (log=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">131072 inodes, 524288 blocks</span><br><span class="line">26214 blocks (5.00%) reserved for the super user</span><br><span class="line">第一个数据块=0</span><br><span class="line">Maximum filesystem blocks=536870912</span><br><span class="line">16 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks: </span><br><span class="line">	32768, 98304, 163840, 229376, 294912</span><br><span class="line"></span><br><span class="line">Allocating group tables: 完成                            </span><br><span class="line">正在写入inode表: 完成                            </span><br><span class="line">Creating journal (16384 blocks): 完成</span><br><span class="line">Writing superblocks and filesystem accounting information: 完成 </span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mount /dev/linuxcast/mylv /mnt/</span><br><span class="line">[root@teuthology ~]# df -TH</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       210G  2.8G  207G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  4.1G     0  4.1G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     4.2G     0  4.2G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     4.2G  9.0M  4.1G    1% /run</span><br><span class="line">tmpfs                      tmpfs     4.2G     0  4.2G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs       1.1G  180M  884M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     821M     0  821M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.1G  6.3M  2.0G    1% /mnt</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 197.99g</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-ao---- 2.00g</span><br><span class="line">[root@teuthology ~]# lvextend -L +1G /dev/linuxcast/mylv </span><br><span class="line">  Size of logical volume linuxcast/mylv changed from 2.00 GiB (512 extents) to 3.00 GiB (768 extents).</span><br><span class="line">  Logical volume linuxcast/mylv successfully resized.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-ao---- 3.00g</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.0G  6.0M  1.8G    1% /mnt</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv </span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem at /dev/linuxcast/mylv is mounted on /mnt; on-line resizing required</span><br><span class="line">old_desc_blocks = 1, new_desc_blocks = 1</span><br><span class="line">The filesystem on /dev/linuxcast/mylv is now 786432 blocks long.</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.9G  6.0M  2.8G    1% /mnt</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-7.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME             MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda              253:0    0  200G  0 disk </span><br><span class="line">├─vda1           253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2           253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3           253:3    0  195G  0 part /</span><br><span class="line">vdb              253:16   0  100G  0 disk </span><br><span class="line">└─linuxcast-mylv 252:0    0    3G  0 lvm  /mnt</span><br><span class="line">vdc              253:32   0  100G  0 disk </span><br><span class="line">vdd              253:48   0  100G  0 disk </span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vd</span><br><span class="line">vda   vda1  vda2  vda3  vdb   vdc   vdd   </span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdd </span><br><span class="line">  Physical volume &quot;/dev/vdd&quot; successfully created.</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 196.99g</span><br><span class="line">[root@teuthology ~]# vgextend linuxcast /dev/vdd </span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully extended</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize    VFree   </span><br><span class="line">  linuxcast   3   1   0 wz--n- &lt;299.99g &lt;296.99g</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-8.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# umount /mnt/</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统       类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3      xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs       devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs          tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs          tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs          tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1      xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs          tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 3.00g                                                    </span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G</span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">请先运行 &apos;e2fsck -f /dev/linuxcast/mylv&apos;.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# e2fsck -f /dev/linuxcast/mylv</span><br><span class="line">e2fsck 1.42.9 (28-Dec-2013)</span><br><span class="line">第一步: 检查inode,块,和大小</span><br><span class="line">第二步: 检查目录结构</span><br><span class="line">第3步: 检查目录连接性</span><br><span class="line">Pass 4: Checking reference counts</span><br><span class="line">第5步: 检查簇概要信息</span><br><span class="line">/dev/linuxcast/mylv: 11/196608 files (0.0% non-contiguous), 30268/786432 blocks</span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G</span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Resizing the filesystem on /dev/linuxcast/mylv to 524288 (4k) blocks.</span><br><span class="line">The filesystem on /dev/linuxcast/mylv is now 524288 blocks long.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvreduce -L -1G /dev/linuxcast/mylv </span><br><span class="line">  WARNING: Reducing active logical volume to 2.00 GiB.</span><br><span class="line">  THIS MAY DESTROY YOUR DATA (filesystem etc.)</span><br><span class="line">Do you really want to reduce linuxcast/mylv? [y/n]: y</span><br><span class="line">  Size of logical volume linuxcast/mylv changed from 3.00 GiB (768 extents) to 2.00 GiB (512 extents).</span><br><span class="line">  Logical volume linuxcast/mylv successfully resized.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 2.00g</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-9.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize    VFree   </span><br><span class="line">  linuxcast   3   1   0 wz--n- &lt;299.99g &lt;296.99g</span><br><span class="line">[root@teuthology ~]# vgreduce linuxcast /dev/vdd </span><br><span class="line">  Removed &quot;/dev/vdd&quot; from volume group &quot;linuxcast&quot;</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 197.99g</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG        Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/vdb   linuxcast lvm2 a--  &lt;100.00g  &lt;98.00g</span><br><span class="line">  /dev/vdc   linuxcast lvm2 a--  &lt;100.00g &lt;100.00g</span><br><span class="line">  /dev/vdd             lvm2 ---   100.00g  100.00g</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdd </span><br><span class="line">  Labels on physical volume &quot;/dev/vdd&quot; successfully wiped.</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG        Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/vdb   linuxcast lvm2 a--  &lt;100.00g  &lt;98.00g</span><br><span class="line">  /dev/vdc   linuxcast lvm2 a--  &lt;100.00g &lt;100.00g</span><br></pre></td></tr></table></figure>
 
           
         
@@ -794,7 +424,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/37/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/37/">37</a><span class="page-number current">38</span><a class="page-number" href="/page/39/">39</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/39/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/37/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/37/">37</a><span class="page-number current">38</span><a class="page-number" href="/page/39/">39</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/39/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -840,7 +470,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-count">109</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
