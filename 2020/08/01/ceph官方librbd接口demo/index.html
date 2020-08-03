@@ -76,7 +76,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="ceph,">
 
 
 
@@ -87,13 +87,18 @@
 
 
 
-<meta property="og:type" content="website">
-<meta property="og:title" content="Jiang&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="以下代码来自ceph master分支，examples/librbd/hello_world.cc目录，该目录中有操作librbd接口的demo。 实验使用ceph-14.2.10 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph官方librbd接口demo">
+<meta property="og:url" content="http://yoursite.com/2020/08/01/ceph官方librbd接口demo/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="以下代码来自ceph master分支，examples/librbd/hello_world.cc目录，该目录中有操作librbd接口的demo。 实验使用ceph-14.2.10 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-08-03T05:28:16.727Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Jiang&#39;s Blog">
+<meta name="twitter:title" content="ceph官方librbd接口demo">
+<meta name="twitter:description" content="以下代码来自ceph master分支，examples/librbd/hello_world.cc目录，该目录中有操作librbd接口的demo。 实验使用ceph-14.2.10 123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -122,13 +127,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/">
+  <link rel="canonical" href="http://yoursite.com/2020/08/01/ceph官方librbd接口demo/">
 
 
 
 
 
-  <title>Jiang's Blog</title>
+  <title>ceph官方librbd接口demo | Jiang's Blog</title>
   
 
 
@@ -147,8 +152,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -272,9 +276,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -304,9 +308,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2020/08/01/ceph官方librbd接口demo/" itemprop="url">ceph官方librbd接口demo</a></h1>
+          <h1 class="post-title" itemprop="name headline">ceph官方librbd接口demo</h1>
         
 
         <div class="post-meta">
@@ -356,9 +358,12 @@
       
 
       
-        
-          
-            <p>以下代码来自ceph master分支，examples/librbd/hello_world.cc目录，该目录中有操作librbd接口的demo。</p>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <p>以下代码来自ceph master分支，examples/librbd/hello_world.cc目录，该目录中有操作librbd接口的demo。</p>
 <p>实验使用ceph-14.2.10</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br></pre></td><td class="code"><pre><span class="line">// -*- mode:C++; tab-width:8; c-basic-offset:2; indent-tabs-mode:t -*-</span><br><span class="line">// vim: ts=8 sw=2 smarttab</span><br><span class="line">/*</span><br><span class="line"> * Ceph - scalable distributed file system</span><br><span class="line"> *</span><br><span class="line"> * This is free software; you can redistribute it and/or</span><br><span class="line"> * modify it under the terms of the GNU Lesser General Public</span><br><span class="line"> * License version 2.1, as published by the Free Software</span><br><span class="line"> * Foundation. See file COPYING.</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">// ceph 14.2.10需要安装libradospp-dev，否则无法找到rados/librados.hpp</span><br><span class="line">// 安装librados-dev 和librbd-dev package，便可include rados/librados.hpp与rbd/librbd.hpp头文件</span><br><span class="line">#include &lt;rados/librados.hpp&gt;</span><br><span class="line">#include &lt;rbd/librbd.hpp&gt;</span><br><span class="line">#include &lt;iostream&gt;</span><br><span class="line">#include &lt;string&gt;</span><br><span class="line">#include &lt;sstream&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, const char **argv) &#123;</span><br><span class="line"></span><br><span class="line">    int ret = 0;</span><br><span class="line"></span><br><span class="line">    // 我们将在下面使用这些变量</span><br><span class="line">    const char *pool_name = &quot;hello_world_pool&quot;;</span><br><span class="line">    std::string hello(&quot;hello world!&quot;);</span><br><span class="line">    std::string object_name(&quot;hello_object&quot;);</span><br><span class="line">    librados::IoCtx io_ctx;</span><br><span class="line"></span><br><span class="line">    // 首先，我们创建一个Rados对象并对其进行初始化</span><br><span class="line">    librados::Rados rados;</span><br><span class="line">    &#123;</span><br><span class="line">        ret = rados.init(&quot;admin&quot;); // 只需使用 client.admin keyring</span><br><span class="line">        if (ret &lt; 0) &#123; // 让我们处理可能出现的任何错误</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t initialize rados! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just set up a rados cluster object&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     * 现在我们需要获取rados对象的config info.</span><br><span class="line">     * 它可以为我们解析argv来找到ID，monitors等，因此我们就使用它。</span><br><span class="line">     */</span><br><span class="line">    &#123;</span><br><span class="line">        ret = rados.conf_parse_argv(argc, argv);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            // 这不太可能发生，但是我们需要努力成为一个好公民。</span><br><span class="line">            std::cerr &lt;&lt; &quot;failed to parse config options! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just parsed our config options&quot; &lt;&lt; std::endl;</span><br><span class="line">            // 如果用户指定了config file，我们也想使用它，而conf_parse_argv不会为我们这样做。</span><br><span class="line">            for (int i = 0; i &lt; argc; ++i) &#123;</span><br><span class="line">                if ((strcmp(argv[i], &quot;-c&quot;) == 0) || (strcmp(argv[i], &quot;--conf&quot;) == 0)) &#123;</span><br><span class="line">                    ret = rados.conf_read_file(argv[i + 1]);</span><br><span class="line">                    if (ret &lt; 0) &#123;</span><br><span class="line">                        // 如果config file格式错误，这可能会失败</span><br><span class="line">                        std::cerr &lt;&lt; &quot;failed to parse config file &quot; &lt;&lt; argv[i + 1]</span><br><span class="line">                                  &lt;&lt; &quot;! error&quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">                        ret = EXIT_FAILURE;</span><br><span class="line">                        goto out;</span><br><span class="line">                    &#125;</span><br><span class="line">                    break;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     * 接下来，我们connect到cluster</span><br><span class="line">     */</span><br><span class="line">    &#123;</span><br><span class="line">        ret = rados.connect();</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t connect to cluster! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just connected to the rados cluster&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     * 让我们创建自己的pool</span><br><span class="line">     * 请注意，此命令将创建默认PG数的pool（PG数由monitors指定），这可能不适合生产使用，但可以进行测试。</span><br><span class="line">     */</span><br><span class="line">    &#123;</span><br><span class="line">        ret = rados.pool_create(pool_name);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t create pool! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            return EXIT_FAILURE;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just created a new pool named &quot; &lt;&lt; pool_name &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     * 创建一个IoCtx，用于对pool进行IO</span><br><span class="line">     */</span><br><span class="line">    &#123;</span><br><span class="line">        ret = rados.ioctx_create(pool_name, io_ctx);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t set up ioctx! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just created an ioctx for our pool&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /*</span><br><span class="line">     * 创建一个rbd image并向其写入数据</span><br><span class="line">     */</span><br><span class="line">    &#123;</span><br><span class="line">        std::string name = &quot;librbd_test&quot;;</span><br><span class="line">        uint64_t size = 2 &lt;&lt; 20;</span><br><span class="line">        int order = 0;</span><br><span class="line">        librbd::RBD rbd;</span><br><span class="line">        librbd::Image image;</span><br><span class="line"></span><br><span class="line">        ret = rbd.create(io_ctx, name.c_str(), size, &amp;order);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t create an rbd image! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just created an rbd image&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ret = rbd.open(io_ctx, image, name.c_str(), NULL);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t open the rbd image! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just opened the rbd image&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        int TEST_IO_SIZE = 512;</span><br><span class="line">        char test_data[TEST_IO_SIZE + 1];</span><br><span class="line">        int i;</span><br><span class="line"></span><br><span class="line">        for (i = 0; i &lt; TEST_IO_SIZE; ++i) &#123;</span><br><span class="line">            test_data[i] = (char) (rand() % (126 - 33) + 33);</span><br><span class="line">        &#125;</span><br><span class="line">        test_data[TEST_IO_SIZE] = &apos;\0&apos;;</span><br><span class="line"></span><br><span class="line">        size_t len = strlen(test_data);</span><br><span class="line">        ceph::bufferlist bl;</span><br><span class="line">        bl.append(test_data, len);</span><br><span class="line"></span><br><span class="line">        ret = image.write(0, len, bl);</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;couldn&apos;t write to the rbd image! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just wrote data to our rbd image &quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        /*</span><br><span class="line">         * 读取image并将其与我们编写的数据进行比较</span><br><span class="line">         */</span><br><span class="line">        ceph::bufferlist bl_r;</span><br><span class="line">        int read;</span><br><span class="line">        read = image.read(0, TEST_IO_SIZE, bl_r);</span><br><span class="line">        if (read &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;we couldn&apos;t read data from the image! error&quot; &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        std::string bl_res(bl_r.c_str(), read);</span><br><span class="line"></span><br><span class="line">        int res = memcmp(bl_res.c_str(), test_data, TEST_IO_SIZE);</span><br><span class="line">        if (res != 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;what we read didn&apos;t match expected! error&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we read our data on the image successfully&quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        image.close();</span><br><span class="line"></span><br><span class="line">        /*</span><br><span class="line">         * 现在删除image</span><br><span class="line">         */</span><br><span class="line">        ret = rbd.remove(io_ctx, name.c_str());</span><br><span class="line">        if (ret &lt; 0) &#123;</span><br><span class="line">            std::cerr &lt;&lt; &quot;failed to delete rbd image! error &quot; &lt;&lt; ret &lt;&lt; std::endl;</span><br><span class="line">            ret = EXIT_FAILURE;</span><br><span class="line">            goto out;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            std::cout &lt;&lt; &quot;we just deleted our rbd image &quot; &lt;&lt; std::endl;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ret = EXIT_SUCCESS;</span><br><span class="line">    out:</span><br><span class="line">    /*</span><br><span class="line">     * 现在我们已经完成了，因此让我们删除pool，然后正常关闭connection。</span><br><span class="line">     */</span><br><span class="line">    int delete_ret = rados.pool_delete(pool_name);</span><br><span class="line">    if (delete_ret &lt; 0) &#123;</span><br><span class="line">        // be careful not to</span><br><span class="line">        std::cerr &lt;&lt; &quot;We failed to delete our test pool!&quot; &lt;&lt; std::endl;</span><br><span class="line">        ret = EXIT_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    rados.shutdown();</span><br><span class="line"></span><br><span class="line">    return ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>examples/librbd/Makefile文件</p>
@@ -367,8 +372,6 @@
 <p>编译并使用gdb调试</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">make -d</span><br><span class="line"></span><br><span class="line">gdb ./hello_world_cpp</span><br><span class="line">(gdb) b main</span><br><span class="line">(gdb) r -c /etc/ceph/ceph.conf </span><br><span class="line"></span><br><span class="line">### 66 break;</span><br><span class="line">(gdb) p argv[0]</span><br><span class="line">$2 = 0x7fffffffe77b &quot;/root/codes/hello_world_cpp&quot;</span><br><span class="line">(gdb) p argv[1]</span><br><span class="line">$3 = 0x7fffffffe797 &quot;-c&quot;</span><br><span class="line">(gdb) p argv[2]</span><br><span class="line">$4 = 0x7fffffffe79a &quot;/etc/ceph/ceph.conf&quot;</span><br><span class="line"></span><br><span class="line">### 119             uint64_t size = 2 &lt;&lt; 20;</span><br><span class="line">(gdb) p size</span><br><span class="line">$7 = 2097152</span><br><span class="line"></span><br><span class="line">### gdb跳出循环方法   until NUM</span><br><span class="line">### gdb跳出函数方法   finish</span><br><span class="line">(gdb) until 149</span><br><span class="line">main (argc=3, argv=0x7fffffffe528) at hello_world.cc:149</span><br></pre></td></tr></table></figure>
 
-          
-        
       
     </div>
     
@@ -377,6 +380,35 @@
 
     
 
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
     
 
     
@@ -388,14 +420,36 @@
 
 
       
-
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
       
 
       
+      
+      
 
       
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/27/ceph-pg-状态/" rel="next" title="ceph pg 状态">
+                <i class="fa fa-chevron-left"></i> ceph pg 状态
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
       
-        <div class="post-eof"></div>
+
+      
       
     </footer>
   </div>
@@ -405,14 +459,11 @@
   </article>
 
 
-    
-  </section>
 
-  
-  <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
-  </nav>
-
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -420,6 +471,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -440,8 +495,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -492,6 +556,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装调试包"><span class="nav-number">1.</span> <span class="nav-text">安装调试包</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -625,6 +705,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
