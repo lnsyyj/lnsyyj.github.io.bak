@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/07/ceph中的单元测试/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/15/redis笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/01/07/ceph中的单元测试/" itemprop="url">ceph中的单元测试</a></h1>
+                <a class="post-title-link" href="/2019/01/15/redis笔记/" itemprop="url">redis笔记</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-07T16:31:08+08:00">
-                2019-01-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-15T01:16:51+08:00">
+                2019-01-15
               </time>
             
 
@@ -358,15 +358,39 @@
       
         
           
-            <p>Ceph中的单元测试使用的是Google Test，嵌入到Ceph源码中。Google Test的使用这里有一篇<a href="http://www.yeolar.com/note/2014/12/21/gtest/#id15" target="_blank" rel="noopener">入门文章</a>，大体思路讲的很清晰。我们主要重心是如何在Ceph源码中添加单元测试。</p>
-<p>在添加之前我们先读一下已经存在的单元测试，在代码中不同的单元测试实现方式不同，可能按照以下Demo无法完全复制，但是慢慢看代码总会理解的。我们挑一个最简单的，不讲解详细测试内容（因为涉及知识较多，目前我还无法完全理解）。</p>
-<p>下面我们以<code>ceph_test_filejournal</code>为例，它存在于ceph-test*.rpm包中，在打社区版Ceph rpm包时（根据ceph.spec）会生成出来《<a href="https://lnsyyj.github.io/2018/09/13/ceph-build-rpm/" target="_blank" rel="noopener">ceph build rpm</a>》，在我们的被测Ceph节点上安装该rpm，会在<code>/usr/bin/</code>目录中找到<code>ceph_test_filejournal</code>（其实会有很多类似<code>ceph_test_</code>的二进制文件，这些都是Ceph的单元测试）。</p>
-<h1 id="CMakeLists"><a href="#CMakeLists" class="headerlink" title="CMakeLists"></a>CMakeLists</h1><p>单元测试总CMakeLists文件位置在<code>src/test/CMakeLists.txt</code>，如果想自己编写测试代码添加到测试集中，需要修改这个CMakeLists。在社区Ceph我们编译出来可执行测试二进制<code>ceph_test_*</code>，都是在这里通过CMakeLists <code>add_executable</code>定义的。</p>
-<h1 id="单元测试代码位置"><a href="#单元测试代码位置" class="headerlink" title="单元测试代码位置"></a>单元测试代码位置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add_executable(ceph_test_filejournal</span><br><span class="line">  test_filejournal.cc</span><br><span class="line">  )</span><br></pre></td></tr></table></figure>
-<p>在<code>add_executable</code>中同时定义了测试代码源文件<code>test_filejournal.cc</code>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">::testing::InitGoogleTest(&amp;argc, argv);</span><br></pre></td></tr></table></figure>
-<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>【1】<a href="http://www.yeolar.com/note/2014/12/21/gtest/#id15" target="_blank" rel="noopener">http://www.yeolar.com/note/2014/12/21/gtest/#id15</a></p>
-<p>【2】<a href="https://www.ibm.com/developerworks/cn/aix/library/au-googletestingframework.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/aix/library/au-googletestingframework.html</a></p>
+            <p>对于redis的用处不必多说，互联网上有很多资料。文章只做为笔记使用，记录redis操作与学习过程。</p>
+<h1 id="redis安装"><a href="#redis安装" class="headerlink" title="redis安装"></a>redis安装</h1><p>安装redis很简单，<code>https://redis.io/download</code>官方文档有教程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# wget http://download.redis.io/releases/redis-5.0.3.tar.gz &amp;&amp; tar xzf redis-5.0.3.tar.gz &amp;&amp; cd redis-5.0.3 &amp;&amp; make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h1 id="redis启动方式"><a href="#redis启动方式" class="headerlink" title="redis启动方式"></a>redis启动方式</h1><p>非守护进程启动方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# redis-server</span><br><span class="line"></span><br><span class="line">或者传递一些配置参数</span><br><span class="line">[root@centos ~]# redis-server --port 6380</span><br></pre></td></tr></table></figure>
+<p>守护进程启动方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">配置文件中开启daemonize yes</span><br><span class="line">[root@centos ~]# redis-server &lt;configPath&gt;</span><br><span class="line"></span><br><span class="line">[root@centos ~]# mkdir -p /var/log/redis</span><br><span class="line">[root@centos redis-5.0.3]# vim myredis.conf </span><br><span class="line">port 6379</span><br><span class="line">daemonize yes</span><br><span class="line">logfile &quot;redis.log&quot;</span><br><span class="line">dir &quot;/var/log/redis&quot;</span><br><span class="line"></span><br><span class="line">[root@centos redis-5.0.3]# redis-server ./myredis.conf </span><br><span class="line">[root@centos ~]# ps -ef | grep redis</span><br><span class="line">root      2447     1  0 11:01 ?        00:00:00 redis-server *:6379</span><br></pre></td></tr></table></figure>
+<h1 id="redis常用配置"><a href="#redis常用配置" class="headerlink" title="redis常用配置"></a>redis常用配置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">daemonize	是否是守护进程(no|yes)</span><br><span class="line">port		redis对外端口号</span><br><span class="line">logfile		redis系统日志</span><br><span class="line">dir			redis工作目录</span><br><span class="line"></span><br><span class="line">redis默认端口是6379</span><br></pre></td></tr></table></figure>
+<p>从默认配置文件中导出常用的配置项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">去掉&quot;#&quot;，去掉空格</span><br><span class="line">[root@centos redis-5.0.3]# cat redis.conf | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; myredis.conf</span><br></pre></td></tr></table></figure>
+<h1 id="redis-API"><a href="#redis-API" class="headerlink" title="redis API"></a>redis API</h1><p>通过<code>redis-cli</code>命令进入客户端，测试API</p>
+<h2 id="通用命令"><a href="#通用命令" class="headerlink" title="通用命令"></a>通用命令</h2><h3 id="通用命令-1"><a href="#通用命令-1" class="headerlink" title="通用命令"></a>通用命令</h3><p>keys [pattern]（一般不在生产环境使用，O(n)，redis单线程会阻塞其他命令）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set hello world</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set php good</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set java best</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys *</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;java&quot;</span><br><span class="line">3) &quot;php&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; mset 1 1 2 2 3 3 4 4 5 5 12 12 13 13 123 123 1234 1234</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys 1*</span><br><span class="line">1) &quot;1&quot;</span><br><span class="line">2) &quot;12&quot;</span><br><span class="line">3) &quot;13&quot;</span><br><span class="line">4) &quot;123&quot;</span><br><span class="line">5) &quot;1234&quot;</span><br><span class="line">127.0.0.1:6379&gt; keys 1[2-3]*</span><br><span class="line">1) &quot;12&quot;</span><br><span class="line">2) &quot;13&quot;</span><br><span class="line">3) &quot;123&quot;</span><br><span class="line">4) &quot;1234&quot;</span><br><span class="line">127.0.0.1:6379&gt; keys 12?</span><br><span class="line">1) &quot;123&quot;</span><br></pre></td></tr></table></figure>
+<p>dbsize</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set hello world</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set php good</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set java best</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys *</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;java&quot;</span><br><span class="line">3) &quot;php&quot;</span><br><span class="line">127.0.0.1:6379&gt; dbsize</span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure>
+<p>exists key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>del key [key …]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>expire key seconds</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>type key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="数据结构和内部编码"><a href="#数据结构和内部编码" class="headerlink" title="数据结构和内部编码"></a>数据结构和内部编码</h3><h3 id="单线程架构"><a href="#单线程架构" class="headerlink" title="单线程架构"></a>单线程架构</h3><p>字符串类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>哈希类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>列表类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>集合类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>有序集合类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
           
         
@@ -411,7 +435,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/41/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/41/">41</a><span class="page-number current">42</span><a class="page-number" href="/page/43/">43</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/43/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/41/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/41/">41</a><span class="page-number current">42</span><a class="page-number" href="/page/43/">43</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/43/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -457,7 +481,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/22/Ubuntu-常用操作/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/27/Ceph-iSCIS-gateway-监控/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/11/22/Ubuntu-常用操作/" itemprop="url">Ubuntu 常用操作</a></h1>
+                <a class="post-title-link" href="/2019/11/27/Ceph-iSCIS-gateway-监控/" itemprop="url">Ceph iSCIS gateway 监控</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-22T11:19:55+08:00">
-                2019-11-22
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-27T23:27:23+08:00">
+                2019-11-27
               </time>
             
 
@@ -358,17 +358,26 @@
       
         
           
-            <p>Ubuntu版本</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">NAME=&quot;Ubuntu&quot;</span><br><span class="line">VERSION=&quot;18.04.3 LTS (Bionic Beaver)&quot;</span><br><span class="line">ID=ubuntu</span><br><span class="line">ID_LIKE=debian</span><br><span class="line">PRETTY_NAME=&quot;Ubuntu 18.04.3 LTS&quot;</span><br><span class="line">VERSION_ID=&quot;18.04&quot;</span><br><span class="line">HOME_URL=&quot;https://www.ubuntu.com/&quot;</span><br><span class="line">SUPPORT_URL=&quot;https://help.ubuntu.com/&quot;</span><br><span class="line">BUG_REPORT_URL=&quot;https://bugs.launchpad.net/ubuntu/&quot;</span><br><span class="line">PRIVACY_POLICY_URL=&quot;https://www.ubuntu.com/legal/terms-and-policies/privacy-policy&quot;</span><br><span class="line">VERSION_CODENAME=bionic</span><br><span class="line">UBUNTU_CODENAME=bionic</span><br></pre></td></tr></table></figure>
-<h1 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h1><p>1、add-apt-repository</p>
-<p>add-apt-repository是用于添加apt source.list条目的脚本。它可用于添加任何repository，还提供用于添加Launchpad PPA repository的简写语法（Personal Package Archive，个人软件包存档）。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo add-apt-repository ppa:g2p/storage</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install bcache-tools</span><br><span class="line"></span><br><span class="line">sudo apt-get install -y software-properties-common</span><br><span class="line">sudo add-apt-repository ppa:ansible/ansible-2.8</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get -y install ansible</span><br></pre></td></tr></table></figure>
-<p>2、vim 粘贴串行问题</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">在粘贴前设置（粘贴前不会自动缩进）</span><br><span class="line">set paste</span><br><span class="line"></span><br><span class="line">在粘贴后恢复</span><br><span class="line">set nopaste</span><br></pre></td></tr></table></figure>
-<p>3、安装package常用操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt clean   #清空缓存</span><br><span class="line">sudo apt install -d software_name   #只下载不安装，缓存位置 /var/cache/apt/archives</span><br><span class="line">sudo dpkg -i *.deb</span><br><span class="line"></span><br><span class="line">apt-get install -f   修复损坏的软件包，尝试卸载出错的包，重新安装正确版本</span><br></pre></td></tr></table></figure>
-<h3 id="设置网络"><a href="#设置网络" class="headerlink" title="设置网络"></a>设置网络</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">root@yujiang-ceph-1:~# cat /etc/netplan/50-cloud-init.yaml </span><br><span class="line"># This file is generated from information provided by</span><br><span class="line"># the datasource.  Changes to it will not persist across an instance.</span><br><span class="line"># To disable cloud-init&apos;s network configuration capabilities, write a file</span><br><span class="line"># /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:</span><br><span class="line"># network: &#123;config: disabled&#125;</span><br><span class="line">network:</span><br><span class="line">    ethernets:</span><br><span class="line">        ens160:</span><br><span class="line">            dhcp4: false</span><br><span class="line">            addresses: [192.168.1.127/24]</span><br><span class="line">            gateway4: 192.168.1.1</span><br><span class="line">            nameservers:</span><br><span class="line">                    addresses: [192.168.1.1, 114.114.114.114]</span><br><span class="line">    version: 2</span><br></pre></td></tr></table></figure>
-<h3 id="编译deb"><a href="#编译deb" class="headerlink" title="编译deb"></a>编译deb</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">解压xz文件</span><br><span class="line">xz -d prometheus_2.1.0+ds-1.debian.tar.xz</span><br><span class="line">tar -xvf prometheus_2.1.0+ds-1.debian.tar</span><br><span class="line"></span><br><span class="line">压缩xz文件</span><br><span class="line">tar cvf prometheus_2.1.0+ds-1.debian.tar debian/</span><br><span class="line">xz -z prometheus_2.1.0+ds-1.debian.tar</span><br><span class="line"></span><br><span class="line">apt-get install debhelper dh-golang golang-github-aws-aws-sdk-go-dev golang-github-azure-azure-sdk-for-go-dev golang-github-azure-go-autorest-dev golang-github-cespare-xxhash-dev golang-github-cockroachdb-cmux-dev golang-github-fsnotify-fsnotify-dev golang-github-go-kit-kit-dev golang-github-gogo-protobuf-dev golang-github-golang-snappy-dev golang-github-gophercloud-gophercloud-dev golang-github-grpc-ecosystem-grpc-gateway-dev golang-github-hashicorp-go-cleanhttp-dev golang-github-hashicorp-serf-dev golang-github-miekg-dns-dev golang-github-mwitkow-go-conntrack-dev golang-github-opentracing-contrib-go-stdlib-dev golang-github-opentracing-opentracing-go-dev golang-github-pkg-errors-dev golang-github-prometheus-client-golang-dev golang-github-prometheus-client-model-dev golang-github-prometheus-common-dev golang-github-prometheus-tsdb-dev golang-github-samuel-go-zookeeper-dev golang-go golang-golang-x-net-dev golang-golang-x-oauth2-google-dev golang-golang-x-time-dev golang-google-api-dev golang-google-genproto-dev golang-google-grpc-dev golang-gopkg-alecthomas-kingpin.v2-dev golang-gopkg-yaml.v2-dev</span><br><span class="line"></span><br><span class="line">    dpkg-buildpackage -uc -us</span><br><span class="line"></span><br><span class="line">dpkg-buildpackage -rfakeroot -Tclean</span><br></pre></td></tr></table></figure>
+            <h1 id="监控ISCSI-GATEWAYS"><a href="#监控ISCSI-GATEWAYS" class="headerlink" title="监控ISCSI GATEWAYS"></a>监控ISCSI GATEWAYS</h1><p>Ceph为iSCSI gateway环境提供了一个附加工具，以监视导出的RADOS Block Device (RBD) images的性能。</p>
+<p>gwtop工具是一个类似top的工具，用于显示通过iSCSI导出到客户端的RBD images的聚合性能指标。 这些指标来自Performance Metrics Domain Agent（PMDA）。 来自Linux-IO target (LIO) PMDA的信息用于列出每个已导出的RBD image以及所连接的客户端及其相关的I/O指标。</p>
+<p><strong>Requirements:</strong></p>
+<p>正在运行的Ceph iSCSI gateway</p>
+<p><strong>Installing:</strong></p>
+<p>1、以root用户身份在每个iSCSI gateway节点上安装ceph-iscsi-tools package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-iscsi-tools</span><br></pre></td></tr></table></figure>
+<p>2、以root用户身份在每个iSCSI gateway节点上安装performance co-pilot package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp</span><br></pre></td></tr></table></figure>
+<p>3、以root用户身份在每个iSCSI gateway节点上安装LIO PMDA package：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp-pmda-lio</span><br></pre></td></tr></table></figure>
+<p>4、以root用户身份，在每个iSCSI gateway节点上启用并启动performance co-pilot service：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl enable pmcd</span><br><span class="line"># systemctl start pmcd</span><br></pre></td></tr></table></figure>
+<p>5、以root用户身份注册pcp-pmda-lio agent：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /var/lib/pcp/pmdas/lio</span><br><span class="line">./Install</span><br></pre></td></tr></table></figure>
+<p>默认情况下，gwtop假定iSCSI gateway configuration object存储在rbd pool中的一个名为gateway.conf的RADOS object中。 此configuration定义了收集性能统计信息的iSCSI gateways。 可以使用-g或-c标志将其覆盖。 有关更多详细信息，请参见gwtop –help。</p>
+<p>LIO configuration决定要从performance co-pilot提取的性能统计信息的类型。 gwtop启动时，它会查看LIO configuration，如果找到user-space disks，则gwtop会自动选择LIO collector。</p>
+<p>示例<code>gwtop</code>输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gwtop  2/2 Gateways   CPU% MIN:  4 MAX:  5    Network Total In:    2M  Out:    3M   10:20:00</span><br><span class="line">Capacity:   8G    Disks:   8   IOPS:  503   Clients:  1   Ceph: HEALTH_OK          OSDs:   3</span><br><span class="line">Pool.Image       Src    Size     iops     rMB/s     wMB/s   Client</span><br><span class="line">iscsi.t1703             500M        0      0.00      0.00</span><br><span class="line">iscsi.testme1           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme2           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme3           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme5           500M        0      0.00      0.00</span><br><span class="line">rbd.myhost_1      T       4G      504      1.95      0.00   rh460p(CON)</span><br><span class="line">rbd.test_2                1G        0      0.00      0.00</span><br><span class="line">rbd.testme              500M        0      0.00      0.00</span><br></pre></td></tr></table></figure>
+<p>在Client列中，(CON)表示iSCSI initiator (client)当前已登录iSCSI gateway。 如果显示-multi-，则多个clients映射到单个RBD image。</p>
 
           
         
@@ -413,7 +422,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/4/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/6/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -459,7 +468,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

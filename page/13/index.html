@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/21/Ceph-DISKPREDICTION-MODULE/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/25/ceph-L-to-N-升级总结/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/21/Ceph-DISKPREDICTION-MODULE/" itemprop="url">Ceph DISKPREDICTION MODULE</a></h1>
+                <a class="post-title-link" href="/2019/10/25/ceph-L-to-N-升级总结/" itemprop="url">ceph L to N 升级总结</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-21T14:41:49+08:00">
-                2019-10-21
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-25T10:07:08+08:00">
+                2019-10-25
               </time>
             
 
@@ -358,425 +358,63 @@
       
         
           
-            <h3 id="DISKPREDICTION-MODULE"><a href="#DISKPREDICTION-MODULE" class="headerlink" title="DISKPREDICTION MODULE"></a>DISKPREDICTION MODULE</h3><p>磁盘预测模块支持两种模式：cloud mode和local mode。 在cloud mode下，磁盘和Ceph操作状态信息是从Ceph群集中收集的，并通过Internet发送到基于云的DiskPrediction服务器。 DiskPrediction服务器分析数据，并提供Ceph群集的性能和磁盘运行状况的分析和预测结果。</p>
-<p>local mode不需要任何外部服务器即可进行数据分析和输出结果。 在local mode下，磁盘<em>diskprediction</em> module将内部predictor module用于磁盘预测服务，然后将磁盘预测结果返回给Ceph系统。</p>
-<p>Local predictor: 70% 的准确性</p>
-<p>Cloud predictor for free: 95% 的准确性</p>
-<h1 id="ENABLING"><a href="#ENABLING" class="headerlink" title="ENABLING"></a>ENABLING</h1><p>运行以下命令以在Ceph环境中启用磁盘预测模块：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph mgr module enable diskprediction_cloud</span><br><span class="line">ceph mgr module enable diskprediction_local</span><br></pre></td></tr></table></figure>
-<p>选择预测模式：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode local</span><br></pre></td></tr></table></figure>
-<p>或</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode cloud</span><br></pre></td></tr></table></figure>
-<p>要禁用预测，请执行以下操作：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode none</span><br></pre></td></tr></table></figure>
-<h1 id="CONNECTION-SETTINGS"><a href="#CONNECTION-SETTINGS" class="headerlink" title="CONNECTION SETTINGS"></a>CONNECTION SETTINGS</h1><p>connection settings用于Ceph和DiskPrediction服务器之间的连接。</p>
-<h3 id="LOCAL-MODE"><a href="#LOCAL-MODE" class="headerlink" title="LOCAL MODE"></a>LOCAL MODE</h3><p>diskprediction module利用Ceph设备运行状况检查来收集磁盘运行状况指标，并使用内部predictor module来生成磁盘故障预测并返回Ceph。 因此，在local mode下不需要连接设置。 local predictor module至少需要六个设备健康状况数据集才能实施预测。</p>
-<p>运行以下命令以使用本地预测变量预测设备的预期寿命。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph device predict-life-expectancy &lt;device id&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device predict-life-expectancy 0d2a946c-413f-43f4-b</span><br><span class="line">unknown</span><br></pre></td></tr></table></figure>
-<h3 id="CLOUD-MODE"><a href="#CLOUD-MODE" class="headerlink" title="CLOUD MODE"></a>CLOUD MODE</h3><p>在cloud mode下，需要用户注册。 用户必须在<a href="https://www.diskprophet.com/#/上注册其帐户，以接收以下DiskPrediction服务器信息以进行连接设置。" target="_blank" rel="noopener">https://www.diskprophet.com/#/上注册其帐户，以接收以下DiskPrediction服务器信息以进行连接设置。</a></p>
-<p>Certificate file path: 确认用户注册后，系统将发送一封确认电子邮件，其中包括证书文件下载链接。 下载证书文件并将其保存到Ceph系统。 运行以下命令来验证文件。 如果没有证书文件验证，则无法完成连接设置。</p>
-<p>DiskPrediction server: DiskPrediction服务器名称。 如果需要，它可以是IP地址。</p>
-<p>Connection account: 用于在Ceph和DiskPrediction服务器之间建立连接的帐户名</p>
-<p>Connection password: 用于在Ceph和DiskPrediction服务器之间建立连接的密码</p>
-<p>运行以下命令以完成连接设置。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device set-cloud-prediction-config &lt;diskprediction_server&gt; &lt;connection_account&gt; &lt;connection_password&gt; &lt;certificate file path&gt;</span><br></pre></td></tr></table></figure>
-<p>您可以使用以下命令显示连接设置：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device show-prediction-config</span><br></pre></td></tr></table></figure>
-<p>其他可选配置设置如下：</p>
-<p>diskprediction_upload_metrics_interval: 指示定期将Ceph性能指标发送到DiskPrediction服务器的频率。 默认值为10分钟。</p>
-<p>diskprediction_upload_smart_interval: 指示定期将Ceph物理设备信息发送到DiskPrediction服务器的频率。 默认值为12小时。</p>
-<p>diskprediction_retrieve_prediction_interval: 指示Ceph有时会定期从DiskPrediction服务器检索物理设备预测数据。 默认值为12小时。</p>
-<h1 id="DISKPREDICTION-DATA"><a href="#DISKPREDICTION-DATA" class="headerlink" title="DISKPREDICTION DATA"></a>DISKPREDICTION DATA</h1><p>diskprediction module主动向/从DiskPrediction服务器发送/检索以下数据。</p>
-<h3 id="METRICS-DATA"><a href="#METRICS-DATA" class="headerlink" title="METRICS DATA"></a>METRICS DATA</h3><ul>
-<li>Ceph cluster status</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">key</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">cluster_health</td>
-<td style="text-align:left">Ceph health check status</td>
-</tr>
-<tr>
-<td style="text-align:left">num_mon</td>
-<td style="text-align:left">Number of monitor node</td>
-</tr>
-<tr>
-<td style="text-align:left">num_mon_quorum</td>
-<td style="text-align:left">Number of monitors in quorum</td>
-</tr>
-<tr>
-<td style="text-align:left">num_osd</td>
-<td style="text-align:left">Total number of OSD</td>
-</tr>
-<tr>
-<td style="text-align:left">num_osd_up</td>
-<td style="text-align:left">Number of OSDs that are up</td>
-</tr>
-<tr>
-<td style="text-align:left">num_osd_in</td>
-<td style="text-align:left">Number of OSDs that are in cluster</td>
-</tr>
-<tr>
-<td style="text-align:left">osd_epoch</td>
-<td style="text-align:left">Current epoch of OSD map</td>
-</tr>
-<tr>
-<td style="text-align:left">osd_bytes</td>
-<td style="text-align:left">Total capacity of cluster in bytes</td>
-</tr>
-<tr>
-<td style="text-align:left">osd_bytes_used</td>
-<td style="text-align:left">Number of used bytes on cluster</td>
-</tr>
-<tr>
-<td style="text-align:left">osd_bytes_avail</td>
-<td style="text-align:left">Number of available bytes on cluster</td>
-</tr>
-<tr>
-<td style="text-align:left">num_pool</td>
-<td style="text-align:left">Number of pools</td>
-</tr>
-<tr>
-<td style="text-align:left">num_pg</td>
-<td style="text-align:left">Total number of placement groups</td>
-</tr>
-<tr>
-<td style="text-align:left">num_pg_active_clean</td>
-<td style="text-align:left">Number of placement groups in active+clean state</td>
-</tr>
-<tr>
-<td style="text-align:left">num_pg_active</td>
-<td style="text-align:left">Number of placement groups in active state</td>
-</tr>
-<tr>
-<td style="text-align:left">num_pg_peering</td>
-<td style="text-align:left">Number of placement groups in peering state</td>
-</tr>
-<tr>
-<td style="text-align:left">num_object</td>
-<td style="text-align:left">Total number of objects on cluster</td>
-</tr>
-<tr>
-<td style="text-align:left">num_object_degraded</td>
-<td style="text-align:left">Number of degraded (missing replicas) objects</td>
-</tr>
-<tr>
-<td style="text-align:left">num_object_misplaced</td>
-<td style="text-align:left">Number of misplaced (wrong location in the cluster) objects</td>
-</tr>
-<tr>
-<td style="text-align:left">num_object_unfound</td>
-<td style="text-align:left">Number of unfound objects</td>
-</tr>
-<tr>
-<td style="text-align:left">num_bytes</td>
-<td style="text-align:left">Total number of bytes of all objects</td>
-</tr>
-<tr>
-<td style="text-align:left">num_mds_up</td>
-<td style="text-align:left">Number of MDSs that are up</td>
-</tr>
-<tr>
-<td style="text-align:left">num_mds_in</td>
-<td style="text-align:left">Number of MDS that are in cluster</td>
-</tr>
-<tr>
-<td style="text-align:left">num_mds_failed</td>
-<td style="text-align:left">Number of failed MDS</td>
-</tr>
-<tr>
-<td style="text-align:left">mds_epoch</td>
-<td style="text-align:left">Current epoch of MDS map</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>Ceph mon/osd performance counts  </li>
-</ul>
-<p>Mon:</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">key</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">num_sessions</td>
-<td style="text-align:left">Current number of opened monitor sessions</td>
-</tr>
-<tr>
-<td style="text-align:left">session_add</td>
-<td style="text-align:left">Number of created monitor sessions</td>
-</tr>
-<tr>
-<td style="text-align:left">session_rm</td>
-<td style="text-align:left">Number of remove_session calls in monitor</td>
-</tr>
-<tr>
-<td style="text-align:left">session_trim</td>
-<td style="text-align:left">Number of trimed monitor sessions</td>
-</tr>
-<tr>
-<td style="text-align:left">num_elections</td>
-<td style="text-align:left">Number of elections monitor took part in</td>
-</tr>
-<tr>
-<td style="text-align:left">election_call</td>
-<td style="text-align:left">Number of elections started by monitor</td>
-</tr>
-<tr>
-<td style="text-align:left">election_win</td>
-<td style="text-align:left">Number of elections won by monitor</td>
-</tr>
-<tr>
-<td style="text-align:left">election_lose</td>
-<td style="text-align:left">Number of elections lost by monitor</td>
-</tr>
-</tbody>
-</table>
-<p>Osd:</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">key</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">op_wip</td>
-<td style="text-align:left">Replication operations currently being processed (primary)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_in_bytes</td>
-<td style="text-align:left">Client operations total write size</td>
-</tr>
-<tr>
-<td style="text-align:left">op_r</td>
-<td style="text-align:left">Client read operations</td>
-</tr>
-<tr>
-<td style="text-align:left">op_out_bytes</td>
-<td style="text-align:left">Client operations total read size</td>
-</tr>
-<tr>
-<td style="text-align:left">op_w</td>
-<td style="text-align:left">Client write operations</td>
-</tr>
-<tr>
-<td style="text-align:left">op_latency</td>
-<td style="text-align:left">Latency of client operations (including queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_process_latency</td>
-<td style="text-align:left">Latency of client operations (excluding queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_r_latency</td>
-<td style="text-align:left">Latency of read operation (including queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_r_process_latency</td>
-<td style="text-align:left">Latency of read operation (excluding queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_w_in_bytes</td>
-<td style="text-align:left">Client data written</td>
-</tr>
-<tr>
-<td style="text-align:left">op_w_latency</td>
-<td style="text-align:left">Latency of write operation (including queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_w_process_latency</td>
-<td style="text-align:left">Latency of write operation (excluding queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_rw</td>
-<td style="text-align:left">Client read-modify-write operations</td>
-</tr>
-<tr>
-<td style="text-align:left">op_rw_in_bytes</td>
-<td style="text-align:left">Client read-modify-write operations write in</td>
-</tr>
-<tr>
-<td style="text-align:left">op_rw_out_bytes</td>
-<td style="text-align:left">Client read-modify-write operations read out</td>
-</tr>
-<tr>
-<td style="text-align:left">op_rw_latency</td>
-<td style="text-align:left">Latency of read-modify-write operation (including queue time)</td>
-</tr>
-<tr>
-<td style="text-align:left">op_rw_process_latency</td>
-<td style="text-align:left">Latency of read-modify-write operation (excluding queue time)</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>Ceph pool statistics</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">key</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">bytes_used</td>
-<td style="text-align:left">Per pool bytes used</td>
-</tr>
-<tr>
-<td style="text-align:left">max_avail</td>
-<td style="text-align:left">Max available number of bytes in the pool</td>
-</tr>
-<tr>
-<td style="text-align:left">objects</td>
-<td style="text-align:left">Number of objects in the pool</td>
-</tr>
-<tr>
-<td style="text-align:left">wr_bytes</td>
-<td style="text-align:left">Number of bytes written in the pool</td>
-</tr>
-<tr>
-<td style="text-align:left">dirty</td>
-<td style="text-align:left">Number of bytes dirty in the pool</td>
-</tr>
-<tr>
-<td style="text-align:left">rd_bytes</td>
-<td style="text-align:left">Number of bytes read in the pool</td>
-</tr>
-<tr>
-<td style="text-align:left">stored_raw</td>
-<td style="text-align:left">Bytes used in pool including copies made</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>Ceph physical device metadata</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">key</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">disk_domain_id</td>
-<td style="text-align:left">Physical device identify id</td>
-</tr>
-<tr>
-<td style="text-align:left">disk_name</td>
-<td style="text-align:left">Device attachment name</td>
-</tr>
-<tr>
-<td style="text-align:left">disk_wwn</td>
-<td style="text-align:left">Device wwn</td>
-</tr>
-<tr>
-<td style="text-align:left">model</td>
-<td style="text-align:left">Device model name</td>
-</tr>
-<tr>
-<td style="text-align:left">serial_number</td>
-<td style="text-align:left">Device serial number</td>
-</tr>
-<tr>
-<td style="text-align:left">size</td>
-<td style="text-align:left">Device size</td>
-</tr>
-<tr>
-<td style="text-align:left">vendor</td>
-<td style="text-align:left">Device vendor name</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>Ceph each objects correlation information</li>
-<li>The module agent information</li>
-<li>The module agent cluster information</li>
-<li>The module agent host information</li>
-</ul>
-<h3 id="SMART-DATA"><a href="#SMART-DATA" class="headerlink" title="SMART DATA"></a>SMART DATA</h3><ul>
-<li>Ceph physical device SMART data (provided by Ceph <em>devicehealth</em> module)</li>
-</ul>
-<h3 id="PREDICTION-DATA"><a href="#PREDICTION-DATA" class="headerlink" title="PREDICTION DATA"></a>PREDICTION DATA</h3><ul>
-<li>Ceph physical device prediction data</li>
-</ul>
-<h1 id="RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）"><a href="#RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）" class="headerlink" title="RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）"></a>RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）</h1><p>您可以使用以下命令从Ceph OSD磁盘驱动器接收预测的健康状态。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device get-predicted-status &lt;device id&gt;</span><br></pre></td></tr></table></figure>
-<p>get-predicted-status命令返回：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;near_failure&quot;: &quot;Good&quot;,</span><br><span class="line">    &quot;disk_wwn&quot;: &quot;5000011111111111&quot;,</span><br><span class="line">    &quot;serial_number&quot;: &quot;111111111&quot;,</span><br><span class="line">    &quot;predicted&quot;: &quot;2018-05-30 18:33:12&quot;,</span><br><span class="line">    &quot;attachment&quot;: &quot;sdb&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">Attribute</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">near_failure</td>
-<td style="text-align:left">The disk failure prediction state: Good/Warning/Bad/Unknown</td>
-</tr>
-<tr>
-<td style="text-align:left">disk_wwn</td>
-<td style="text-align:left">Disk WWN number</td>
-</tr>
-<tr>
-<td style="text-align:left">serial_number</td>
-<td style="text-align:left">Disk serial number</td>
-</tr>
-<tr>
-<td style="text-align:left">predicted</td>
-<td style="text-align:left">Predicted date</td>
-</tr>
-<tr>
-<td style="text-align:left">attachment</td>
-<td style="text-align:left">device name on the local system</td>
-</tr>
-</tbody>
-</table>
-<p>磁盘故障预测状态的near_failure属性在下表中指示磁盘预期寿命。</p>
-<table>
-<thead>
-<tr>
-<th style="text-align:left">near_failure</th>
-<th style="text-align:left">Life expectancy (weeks)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left">Good</td>
-<td style="text-align:left">&gt; 6 weeks</td>
-</tr>
-<tr>
-<td style="text-align:left">Warning</td>
-<td style="text-align:left">2 weeks ~ 6 weeks</td>
-</tr>
-<tr>
-<td style="text-align:left">Bad</td>
-<td style="text-align:left">&lt; 2 weeks</td>
-</tr>
-</tbody>
-</table>
-<h1 id="DEBUGGING"><a href="#DEBUGGING" class="headerlink" title="DEBUGGING"></a>DEBUGGING</h1><p>如果要调试DiskPrediction module映射到Ceph日志记录级别，请使用以下命令。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mgr]</span><br><span class="line"></span><br><span class="line">    debug mgr = 20</span><br></pre></td></tr></table></figure>
-<p>将日志记录设置为管理器调试时，模块将打印出带有前缀mgr [diskprediction]的日志记录消息，以便于过滤。</p>
-
+            <p><a href="https://docs.ceph.com/docs/master/releases/nautilus/" target="_blank" rel="noopener">官方原文</a></p>
+<p><a href="https://pve.proxmox.com/wiki/Ceph_Luminous_to_Nautilus" target="_blank" rel="noopener">参考1</a></p>
+<h3 id="从Luminous之前的版本进行升级（比如jewel版本）"><a href="#从Luminous之前的版本进行升级（比如jewel版本）" class="headerlink" title="从Luminous之前的版本进行升级（比如jewel版本）"></a>从Luminous之前的版本进行升级（比如jewel版本）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。 另外，您的集群必须在运行Luminous的同时至少完成了所有PG的一次scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs flags。</span><br><span class="line"></span><br><span class="line">[root@ceph1 ~]# ceph osd dump | grep ^flags</span><br><span class="line">flags sortbitwise,recovery_deletes,purged_snapdirs</span><br><span class="line"></span><br><span class="line">recovery_deletes flags：Ceph现在在recovery过程中处理delete操作，而不是在peering过程中。以前，将down或out超过15分钟的OSD带回到群集中会导致placement group peering时间延长。peering过程需要很长时间才能完成，因为delete操作是在合并placement group日志作为peering过程的一部分时内联处理的。结果，对处于peering状态的placement group的操作被blocked。通过此更新，Ceph可以在正常recovery过程中而不是peering过程中处理delete操作。结果可以使peering过程更快完成，并且操作不再blocked。（This was fixed with the help of Red Hat Ceph Storage feature request #1452780 and this was released in 2.4 errata version 10.2.7-32.el7cp.）</span><br><span class="line"></span><br><span class="line">purged_snapdirs flags：一旦snapsets全部转换，则设置purged_snapdirs OSDMap flags，这样可以更轻松地测试upgrade + conversion是否已完成。特别是，micim+将能够更简单地测试该flags，而无需等待完整的PG统计信息来知道升级到luminous以外的版本是否安全。</span><br></pre></td></tr></table></figure>
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1、在从Luminous升级到Nautilus的过程中，将monitors升级到Nautilus后，将无法使用Luminous ceph-osd daemon创建新的OSD。避免在升级过程中添加或替换任何OSD。</span><br><span class="line">2、避免在升级过程中创建任何RADOS pools。</span><br><span class="line">3、您可以使用ceph version(s)命令在每个阶段监视升级进度，该命令将告诉您每种ceph daemon正在运行的ceph版本。</span><br></pre></td></tr></table></figure>
+<h1 id="自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能"><a href="#自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能" class="headerlink" title="自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能"></a>自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能</h1><h1 id="Ceph节点升级过程"><a href="#Ceph节点升级过程" class="headerlink" title="Ceph节点升级过程"></a>Ceph节点升级过程</h1><p>1、确认OSD map包含recovery_deletes和purged_snapdirs flags（否则，将导致您的monitor daemons在启动时拒绝加入quorum，从而使其无法运行）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd dump | grep ^flags</span><br><span class="line">命令输出：flags sortbitwise,recovery_deletes,purged_snapdirs</span><br><span class="line"></span><br><span class="line">如果没有recovery_deletes和purged_snapdirs flags需要手动触发pg scrub，并等待大约24-48小时（根据数据量评估）</span><br><span class="line">执行命令：ceph pg dump pgs_brief | cut -d &quot; &quot; -f 1 | xargs -n1 ceph pg scrub</span><br></pre></td></tr></table></figure>
+<p>2、确保集群稳定，集群状态HEALTH_OK，没有down掉的OSD或无法恢复的OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph health detail</span><br><span class="line">命令输出：HEALTH_OK</span><br><span class="line"></span><br><span class="line">执行命令：ceph osd tree | grep down</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">执行命令：ceph osd tree | grep out</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>3、设置noout flags</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd set noout</span><br><span class="line">命令输出：noout is set</span><br><span class="line"></span><br><span class="line">执行命令：ceph health detail</span><br><span class="line">命令输出：</span><br><span class="line">HEALTH_WARN noout flag(s) set</span><br><span class="line">OSDMAP_FLAGS noout flag(s) set</span><br></pre></td></tr></table></figure>
+<p>4、配置centos ceph 14 Luminous mirror</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>5、升级monitors（通过安装新ceph packages并重新启动monitor daemons来升级monitors）</p>
+<p>在<strong>每个monitors主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">5.1、安装monitor packages</span><br><span class="line">执行命令：yum install ceph-mon</span><br><span class="line">命令输出：提示安装ceph-mon以及依赖</span><br><span class="line"></span><br><span class="line">5.2、重启ceph monitor服务</span><br><span class="line">执行命令：systemctl restart ceph-mon.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>monitors启动之后，查找nautilus字符串来验证monitor升级是否完成。确保有min_mon_release 14 (nautilus)字样，如果没有说明尚未升级和重启monitor。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph mon dump | grep min_mon_release</span><br><span class="line">命令输出：</span><br><span class="line">dumped monmap epoch 2</span><br><span class="line">min_mon_release 14 (nautilus)</span><br></pre></td></tr></table></figure>
+<p>6、升级ceph-mgr（通过安装新ceph packages并重新启动ceph-mgr daemons来升级ceph-mgr）</p>
+<p>如果使用Ceph Dashboard需要安装ceph-mgr-dashboard package。</p>
+<p>在<strong>每个ceph-mgr主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">6.1、安装ceph-mgr packages</span><br><span class="line">执行命令：yum install ceph-mgr</span><br><span class="line">命令输出：提示安装ceph-mgr以及依赖</span><br><span class="line"></span><br><span class="line">6.2、安装ceph-mgr-dashboard packages</span><br><span class="line">执行命令：yum install ceph-mgr-dashboard</span><br><span class="line">命令输出：提示安装ceph-mgr-dashboard以及依赖</span><br><span class="line"></span><br><span class="line">6.3、重启ceph mgr服务</span><br><span class="line">执行命令：systemctl restart ceph-mgr.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>通过ceph -s验证ceph-mgr daemons是否正在运行（确保mgr状态active，standbys mgr加入）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph -s</span><br><span class="line">命令输出：</span><br><span class="line">...</span><br><span class="line">  services:</span><br><span class="line">    mon: 3 daemons, quorum community-ceph-2,community-ceph-3,community-ceph-1 (age 25m)</span><br><span class="line">    mgr: community-ceph-2(active, since 3d), standbys: community-ceph-3, community-ceph-1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>7、升级ceph-osd（通过安装新ceph packages并重新启动ceph-osd daemons来升级ceph-osd）</p>
+<p>在<strong>每个ceph-osd主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">7.1、安装ceph-osd packages</span><br><span class="line">执行命令：yum install ceph-osd</span><br><span class="line">命令输出：提示安装ceph-osd以及依赖</span><br><span class="line"></span><br><span class="line">7.2、重启ceph osd服务</span><br><span class="line">执行命令：systemctl restart ceph-osd.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>查看OSD升级的进度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd versions</span><br><span class="line">命令输出：</span><br><span class="line">&#123;</span><br><span class="line">   &quot;ceph version 12.2.x (...) luminous (stable)&quot;: 2,</span><br><span class="line">   &quot;ceph version 14.2.4 (...) nautilus (stable)&quot;: 4,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用ceph-volume接管ceph-disk创建的OSD，在<strong>每个OSD主机上</strong>执行，<strong>执行前确保每个OSD都正在运行，无down或out的OSD</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">1、确保OSD运行正常</span><br><span class="line">执行命令：ceph osd tree | grep down</span><br><span class="line">命令输出：空</span><br><span class="line">执行命令：ceph osd tree | grep out</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">2、所有使用ceph-disk创建的并正在运行的OSDs，从OSD data partition或directory中捕获元数据</span><br><span class="line">执行命令：ceph-volume simple scan</span><br><span class="line">命令输出：</span><br><span class="line"></span><br><span class="line">执行命令后，会生成类似/etc/ceph/osd/0-ab0a204a-42e3-4a47-ab4c-0888edf429cb.json文件，文件内容为：</span><br><span class="line">&#123;</span><br><span class="line">    &quot;active&quot;: &quot;ok&quot;, </span><br><span class="line">    &quot;block&quot;: &#123;</span><br><span class="line">        &quot;path&quot;: &quot;/dev/disk/by-partuuid/0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;, </span><br><span class="line">        &quot;uuid&quot;: &quot;0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;</span><br><span class="line">    &#125;, </span><br><span class="line">    &quot;block_uuid&quot;: &quot;0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;, </span><br><span class="line">    &quot;bluefs&quot;: 1, </span><br><span class="line">    &quot;ceph_fsid&quot;: &quot;c4051efa-1997-43ef-8497-fb02bdf08233&quot;, </span><br><span class="line">    &quot;cluster_name&quot;: &quot;ceph&quot;, </span><br><span class="line">    &quot;data&quot;: &#123;</span><br><span class="line">        &quot;path&quot;: &quot;/dev/vdc1&quot;, </span><br><span class="line">        &quot;uuid&quot;: &quot;ab0a204a-42e3-4a47-ab4c-0888edf429cb&quot;</span><br><span class="line">    &#125;, </span><br><span class="line">    &quot;fsid&quot;: &quot;ab0a204a-42e3-4a47-ab4c-0888edf429cb&quot;, </span><br><span class="line">    &quot;keyring&quot;: &quot;AQB1FLFdXVHVARAARTKkxT1xgrDNU/QECUqdxA==&quot;, </span><br><span class="line">    &quot;kv_backend&quot;: &quot;rocksdb&quot;, </span><br><span class="line">    &quot;magic&quot;: &quot;ceph osd volume v026&quot;, </span><br><span class="line">    &quot;mkfs_done&quot;: &quot;yes&quot;, </span><br><span class="line">    &quot;ready&quot;: &quot;ready&quot;, </span><br><span class="line">    &quot;systemd&quot;: &quot;&quot;, </span><br><span class="line">    &quot;type&quot;: &quot;bluestore&quot;, </span><br><span class="line">    &quot;whoami&quot;: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">3、使systemd units可以mount已配置的devices，并启动Ceph OSD</span><br><span class="line">执行命令：ceph-volume simple activate --all</span><br><span class="line">命令输出：</span><br><span class="line">--&gt; activating OSD specified in /etc/ceph/osd/1-fe327306-54a4-4362-870d-92d28cf65e42.json</span><br><span class="line">Running command: ln -snf /dev/vdc2 /var/lib/ceph/osd/ceph-1/block</span><br><span class="line">Running command: chown -R ceph:ceph /dev/vdc2</span><br><span class="line">Running command: systemctl enable ceph-volume@simple-1-fe327306-54a4-4362-870d-92d28cf65e42</span><br><span class="line">Running command: ln -sf /dev/null /etc/systemd/system/ceph-disk@.service</span><br><span class="line">--&gt; All ceph-disk systemd units have been disabled to prevent OSDs getting triggered by UDEV events</span><br><span class="line">Running command: systemctl enable --runtime ceph-osd@1</span><br><span class="line">Running command: systemctl start ceph-osd@1</span><br><span class="line">--&gt; Successfully activated OSD 1 with FSID fe327306-54a4-4362-870d-92d28cf65e42</span><br><span class="line"></span><br><span class="line">4、重启每个OSD主机，确认OSD是否开机自启</span><br><span class="line">执行命令：reboot</span><br><span class="line">命令输出：无</span><br></pre></td></tr></table></figure>
+<p>8、升级ceph-mds（通过安装新ceph packages并重新启动ceph-mds daemons来升级ceph-mds）</p>
+<p>在<strong>每个ceph-mds主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">记录rank数量，并将ranks数减少到1，通过ceph mds stat命令输出可以查看rank数量。</span><br><span class="line">&#123;0=ceph3=up:active&#125;代表rank数为1，&#123;0=ceph3=up:active,1=ceph2=up:active&#125;代表rank数为2，以此类推。</span><br><span class="line"></span><br><span class="line">8.1、查看当前rank数量</span><br><span class="line">执行命令：ceph mds stat</span><br><span class="line">命令输出：cephfs-1/1/1 up  &#123;0=ceph3=up:active&#125;, 2 up:standby</span><br><span class="line">如果rank为2，命令输出为：cephfs-2/2/2 up  &#123;0=ceph3=up:active,1=ceph2=up:active&#125;, 1 up:standby</span><br><span class="line"></span><br><span class="line">8.2、查看cephfs名称</span><br><span class="line">执行命令：ceph fs ls</span><br><span class="line">命令输出：name: cephfs, metadata pool: cephfs_metadata, data pools: [cephfs_data ]</span><br><span class="line"></span><br><span class="line">8.3、将ranks数减少到1</span><br><span class="line">执行命令：ceph fs set &lt;fs_name&gt; max_mds 1</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.4、通过定期检查状态，等待集群停用所有non-zero ranks，当&#123;0=ceph3=up:active&#125;时为已停用所有non-zero ranks</span><br><span class="line">执行命令：ceph status</span><br><span class="line">命令输出：cephfs-1/1/1 up  &#123;0=ceph3=up:active&#125;, 2 up:standby</span><br><span class="line"></span><br><span class="line">8.5、使用以下命令使所有standby MDS daemons在适当的主机offline</span><br><span class="line">执行命令：systemctl stop ceph-mds@&lt;daemon_name&gt;</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.6、确认只有一个MDS处于online，并且cephfs只有一个rank 0</span><br><span class="line">执行命令：ceph status</span><br><span class="line">命令输出：</span><br><span class="line">...</span><br><span class="line">    mds: cephfs-1/1/1 up  &#123;0=ceph3=up:active&#125;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">8.7、通过安装新packages并重新启动daemon来升级MDS daemon（在每个mds节点上执行）</span><br><span class="line">执行命令：yum install ceph-mds</span><br><span class="line">命令输出：提示安装ceph-mds以及依赖</span><br><span class="line"></span><br><span class="line">执行命令：systemctl restart ceph-mds.target</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.8、重新启动所有已的offline standby MDS daemons</span><br><span class="line">执行命令：systemctl restart ceph-mds.target</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.9、恢复max_mds原始值</span><br><span class="line">执行命令：ceph fs set &lt;fs_name&gt; max_mds &lt;original_max_mds&gt;</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>9、升级ceph-radosgw（通过安装新ceph packages并重新启动ceph-radosgw daemons来升级ceph-radosgw）</p>
+<p>在<strong>每个ceph-radosgw主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">5.1、安装radosgw packages</span><br><span class="line">执行命令：yum install ceph-radosgw</span><br><span class="line">命令输出：提示安装ceph-radosgw以及依赖</span><br><span class="line"></span><br><span class="line">5.2、重启ceph radosgw服务</span><br><span class="line">执行命令：systemctl restart ceph-radosgw.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>10、启用所有Nautilus的新功能来完成升级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd require-osd-release nautilus</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<p>11、清除noout flags</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd unset noout</span><br><span class="line">命令输出：noout is unset</span><br></pre></td></tr></table></figure>
+<p>12、启用新的 v2 network protocol</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph mon enable-msgr2</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+<h1 id="Client节点升级过程"><a href="#Client节点升级过程" class="headerlink" title="Client节点升级过程"></a>Client节点升级过程</h1><p>1、Client节点升级package</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：yum install ceph-common librados2 librbd1 python-rbd python-rados -y</span><br><span class="line">命令输出：提示安装ceph-common librados2 librbd1 python-rbd python-rados以及依赖</span><br></pre></td></tr></table></figure>
+<p>2、Client节点确认升级后的版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph --version</span><br><span class="line">命令输出：ceph version 14.2.4 (75f4de193b3ea58512f204623e6c5a16e6c1e1ba) nautilus (stable)</span><br></pre></td></tr></table></figure>
+<h1 id="Ceph端升级后修复"><a href="#Ceph端升级后修复" class="headerlink" title="Ceph端升级后修复"></a>Ceph端升级后修复</h1><h3 id="1、Legacy-BlueStore-stats-reporting-detected-on-6-OSD-s"><a href="#1、Legacy-BlueStore-stats-reporting-detected-on-6-OSD-s" class="headerlink" title="1、Legacy BlueStore stats reporting detected on 6 OSD(s)"></a>1、Legacy BlueStore stats reporting detected on 6 OSD(s)</h3><p>问题描述：</p>
+<p>​    使用ceph -s命令查看集群状态时，出现Legacy BlueStore stats reporting detected on 6 OSD(s)</p>
+<p>解决办法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop ceph-osd@$OSDID</span><br><span class="line">ceph-bluestore-tool repair –path /var/lib/ceph/osd/ceph-$OSDID</span><br><span class="line">systemctl start ceph-osd@$OSDID</span><br></pre></td></tr></table></figure>
+<p>参考资料：</p>
+<p>【1】<a href="http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html" target="_blank" rel="noopener">http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html</a></p>
+<p>关于执行ceph-bluestore-tool repair报错问题确认：<a href="https://tracker.ceph.com/issues/42297" target="_blank" rel="noopener">https://tracker.ceph.com/issues/42297</a></p>
+<h3 id="2、3-monitors-have-not-enabled-msgr2"><a href="#2、3-monitors-have-not-enabled-msgr2" class="headerlink" title="2、3 monitors have not enabled msgr2"></a>2、3 monitors have not enabled msgr2</h3><p>问题描述：</p>
+<p>​    使用ceph -s命令查看集群状态时，出现 3 monitors have not enabled msgr2</p>
+<p>解决办法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph mon enable-msgr2</span><br><span class="line">systemctl restart ceph-mon@ceph1.service</span><br></pre></td></tr></table></figure>
           
         
       
@@ -820,7 +458,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/12/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><span class="page-number current">13</span><a class="page-number" href="/page/14/">14</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/14/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -866,7 +504,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

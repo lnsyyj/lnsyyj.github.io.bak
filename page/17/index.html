@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/ceph-问题列表/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/16/Ceph版本升级新特性/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/14/ceph-问题列表/" itemprop="url">ceph 问题列表</a></h1>
+                <a class="post-title-link" href="/2019/10/16/Ceph版本升级新特性/" itemprop="url">Ceph版本升级新特性</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-14T15:47:02+08:00">
-                2019-10-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-16T22:13:29+08:00">
+                2019-10-16
               </time>
             
 
@@ -358,322 +358,127 @@
       
         
           
-            <h1 id="问题列表"><a href="#问题列表" class="headerlink" title="问题列表"></a>问题列表</h1><h2 id="Ceph升级（L-to-N）引发的问题"><a href="#Ceph升级（L-to-N）引发的问题" class="headerlink" title="Ceph升级（L to N）引发的问题"></a>Ceph升级（L to N）引发的问题</h2><table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th>1</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td>pre-14.2.3</td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td>…<br>POOLS:<br>    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL <br>    data                             0      63 TiB      44.59M      63 TiB     30.21        48 TiB <br>…<br>but when one OSD was updated it changed to<br>POOLS:<br>    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL <br>    data                             0     558 GiB      43.50M    <br>1.7 TiB      1.22        45 TiB</td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td>1、从nautilus之前的集群进行了升级<br>2、然后，您提供一个或多个新的BlueStore OSD，或在升级的OSD上运行“ceph-bluestore-tool repair”。</td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td>根本原因是，从Nautilus开始，BlueStore维护了每个池的使用情况统计信息，但是它需要对磁盘上的格式进行少量更改。<br>除非您运行ceph-bluestore-tool修复，否则升级后的OSD不会拥有新的统计信息。<br>问题在于，一旦<em> any </em> OSD报告了er-pool统计信息，mon就开始使用新的统计信息（而不是等到<em> all </em> OSD都在这样做）。</td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td>为避免此问题，可以<br>1、升级后不要置备新的BlueStore OSD<br>2、更新所有OSD，以保留新的每个池统计信息。现有的BlueStore OSD可以通过以下方式转换：<br>     systemctl stop ceph-osd@$N<br>     ceph-bluestore-tool repair –path /var/lib/ceph/osd/ceph-$N<br>     systemctl start ceph-osd@$N<br>请注意，FileStore根本不支持新版每个池统计信息，因此，如果集群中有文FileStore OSD，则没有解决方法。无需将文件存储OSD替换为bluestore。<br>修复程序[1]正在通过QA检查，将在14.2.3中出现； 它不会在14.2.2完整发布。</td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td><a href="http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/035889.html" target="_blank" rel="noopener">http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/035889.html</a><br><a href="https://github.com/ceph/ceph/pull/28978" target="_blank" rel="noopener">https://github.com/ceph/ceph/pull/28978</a><br><a href="https://tracker.ceph.com/versions/574" target="_blank" rel="noopener">https://tracker.ceph.com/versions/574</a></td>
-</tr>
-<tr>
-<td>备注</td>
-<td></td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-<td>14.2.3</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th>2</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td>14.2.2</td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td>Legacy BlueStore stats reporting detected on 6 OSD(s)</td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td>1、从nautilus之前的集群进行了升级</td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td></td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td>systemctl stop ceph-osd@$OSDID<br>ceph-bluestore-tool repair –path /var/lib/ceph/osd/ceph-$OSDID<br>systemctl start ceph-osd@$OSDID</td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td><a href="http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036010.html" target="_blank" rel="noopener">http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036010.html</a></td>
-</tr>
-<tr>
-<td>备注</td>
-<td>可以静默告警 bluestore warn on legacy statfs = false</td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td>[root@ceph1 ~]# systemctl stop <a href="mailto:ceph-osd@1.service" target="_blank" rel="noopener">ceph-osd@1.service</a><br>[root@ceph1 ~]# ceph-bluestore-tool repair –path /var/lib/ceph/osd/ceph-1/<br>2019-10-14 15:39:53.940 7f87c8114f80 -1 bluestore(/var/lib/ceph/osd/ceph-1) fsck error: legacy statfs record found, removing<br>2019-10-14 15:39:53.940 7f87c8114f80 -1 bluestore(/var/lib/ceph/osd/ceph-1) fsck error: missing Pool StatFS record for pool 2<br>2019-10-14 15:39:53.940 7f87c8114f80 -1 bluestore(/var/lib/ceph/osd/ceph-1) fsck error: missing Pool StatFS record for pool ffffffffffffffff<br>repair success<br>[root@ceph1 ~]# systemctl start <a href="mailto:ceph-osd@1.service" target="_blank" rel="noopener">ceph-osd@1.service</a></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th>3</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td>14.2.2</td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td>Legacy BlueStore stats reporting detected on 6 OSD(s)</td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td>1、从nautilus之前的集群进行了升级</td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td></td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td>systemctl stop ceph-osd@$OSDID<br>ceph-bluestore-tool repair –path /var/lib/ceph/osd/ceph-$OSDID<br>systemctl start ceph-osd@$OSDID</td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td><a href="http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html" target="_blank" rel="noopener">http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html</a></td>
-</tr>
-<tr>
-<td>备注</td>
-<td>可以静默告警 bluestore warn on legacy statfs = false</td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th>4</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td>14.2.4</td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td>3 monitors have not enabled msgr2告警</td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td>1、从nautilus之前的集群进行了升级</td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td>messenger v2 protocol（msgr2）是Ceph’s on-wire protocol第二次主要修订。</td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td>ceph mon enable-msgr2<br>systemctl restart <a href="mailto:ceph-mon@ceph1.service" target="_blank" rel="noopener">ceph-mon@ceph1.service</a></td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td></td>
-</tr>
-<tr>
-<td>备注</td>
-<td></td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td>ceph mon enable-msgr2<br>systemctl restart <a href="mailto:ceph-mon@ceph1.service" target="_blank" rel="noopener">ceph-mon@ceph1.service</a></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th>5</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td></td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td></td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td></td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td></td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td></td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td></td>
-</tr>
-<tr>
-<td>备注</td>
-<td></td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td></td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td></td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td></td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td></td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td></td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td></td>
-</tr>
-<tr>
-<td>备注</td>
-<td></td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr>
-<th>问题ID</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>问题出现版本</td>
-<td></td>
-</tr>
-<tr>
-<td>问题现象</td>
-<td></td>
-</tr>
-<tr>
-<td>问题触发条件</td>
-<td></td>
-</tr>
-<tr>
-<td>问题原因</td>
-<td></td>
-</tr>
-<tr>
-<td>问题解决办法</td>
-<td></td>
-</tr>
-<tr>
-<td>ceph-users地址</td>
-<td></td>
-</tr>
-<tr>
-<td>备注</td>
-<td></td>
-</tr>
-<tr>
-<td>实践修复</td>
-<td></td>
-</tr>
-<tr>
-<td>问题修复版本（社区计划）</td>
-</tr>
-</tbody>
-</table>
+            <h1 id="V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC"><a href="#V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC" class="headerlink" title="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC"></a>V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC</h1><p>参考：</p>
+<p>【1】<a href="https://docs.ceph.com/docs/master/releases/nautilus/" target="_blank" rel="noopener">https://docs.ceph.com/docs/master/releases/nautilus/</a></p>
+<p>【2】<a href="https://blog.csdn.net/Z_Stand/article/details/89739908" target="_blank" rel="noopener">https://blog.csdn.net/Z_Stand/article/details/89739908</a></p>
+<p>这是Ceph Nautilus的第一个稳定版本。</p>
+<ul>
+<li><p>Dashboard</p>
+<p><a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">Ceph Dashboard</a>增加了许多新功能：</p>
+<ul>
+<li>Support for multiple users / roles</li>
+<li>SSO (SAMLv2) for user authentication</li>
+<li>Auditing support（审计支持）</li>
+<li>New landing page, showing more metrics and health info</li>
+<li>I18N support（国际化）</li>
+<li>REST API documentation with Swagger API</li>
+<li>Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。总体目标是使客户端和文件系统作为服务器以同样的速度来更新。文件的方法，参数和模型紧密集成到服务器端的代码，允许API来始终保持同步。作者：天马行空LQ<br>  链接：<a href="https://www.jianshu.com/p/66a14ea07622" target="_blank" rel="noopener">https://www.jianshu.com/p/66a14ea07622</a><br>来源：简书<br>  著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
+</ul>
+<p>Ceph management新功能：</p>
+<ul>
+<li>OSD management (mark as down/out, change OSD settings, recovery profiles)</li>
+<li>Cluster config settings editor</li>
+<li>Ceph Pool management (create/modify/delete)</li>
+<li><a href="https://www.oschina.net/news/2609" target="_blank" rel="noopener">ECP</a> management</li>
+<li>RBD mirroring configuration</li>
+<li>Embedded Grafana Dashboards (derived from Ceph Metrics)</li>
+<li>CRUSH map viewer</li>
+<li>NFS Ganesha management</li>
+<li>iSCSI target management (via <a href="https://docs.ceph.com/docs/master/rbd/iscsi-overview/#ceph-iscsi" target="_blank" rel="noopener">Ceph iSCSI Gateway</a>)</li>
+<li>RBD QoS configuration</li>
+<li>Ceph Manager (ceph-mgr) module management</li>
+<li>Prometheus alert Management</li>
+</ul>
+</li>
+</ul>
+<p>而且，Ceph Dashboard现在被拆分到ceph-mgr-dashboard的package。 如果您的package management software在安装ceph-mgr时失败，则可能需要单独安装ceph-mgr-dashboard。</p>
+<ul>
+<li>RADOS<ul>
+<li>现在可以随时减少每个pool的placement groups (PGs)数，并且可以根据群集利用率或管理员提示<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler" target="_blank" rel="noopener">自动调整PG数</a>。</li>
+<li>新的<a href="https://docs.ceph.com/docs/master/rados/configuration/msgr2/#msgr2" target="_blank" rel="noopener">v2 wire protocol</a>支持线路加密</li>
+<li>群集可以跟踪OSD和Monitor daemons消耗的物理<a href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices" target="_blank" rel="noopener">存储设备</a>以及运行状况指标（即SMART），并且群集可以通过预先训练的预测模型或者基于云预测服务来<a href="https://docs.ceph.com/docs/master/mgr/diskprediction/#diskprediction" target="_blank" rel="noopener">报告预测的HDD或SSD故障</a>。</li>
+<li>可通过ceph osd numa-status命令轻松监视OSD daemons的NUMA节点，并通过osd_numa_node config选项进行配置。</li>
+<li>现在，当使用BlueStore OSD时，空间利用率将按object data，omap data和internal metadata，pool以及压缩前和压缩后的大小进行细分。</li>
+<li>在执行recovery和backfill时，OSD可以更有效地选择重要的PG和objects优先处理。</li>
+<li>在设备出现问题以后，像recovery这种长期运行在后台的进程，可以使用ceph status命令查看进度。</li>
+<li>增加了一个实验性的（耦合层） <a href="https://www.usenix.org/conference/fast18/presentation/vajha" target="_blank" rel="noopener">Coupled-Layer “Clay” erasure code</a> plugin，该plugin可减少大多数recovery操作所需的网络带宽和IO。</li>
+</ul>
+</li>
+<li>RGW<ul>
+<li>S3 lifecycle可以在storage classes与tiering层之间转换</li>
+<li>Beast取代了civetweb成为默认的web frontend，从而提高了整体性能。</li>
+<li>支持新的publish/subscribe基础架构，允许RGW将events推送至serverless frameworks如knative或data pipelies如Kafka。</li>
+<li>新增一系列身份验证功能，使用OAuth2和OpenID::connect的STS联合以及OPA（开放策略代理）身份验证委派原型。</li>
+<li>新的archive zone federation功能可将所有objects（包括历史记录）完全保留在一个单独的zone中。</li>
+</ul>
+</li>
+<li><p>CephFS</p>
+<ul>
+<li>对于具有large caches和large RAM并长期运行的客户端，MDS的稳定性已大大提高。Cache trimming（调整）和client capability recall现在受到限制，以防止MDS过载。</li>
+<li>现在可以在Rook管理的群集环境中通过NFS-Ganesha导出CephFS。Ceph负责管理集群并确保高可用性和可伸缩性。 <a href="https://ceph.com/community/deploying-a-cephnfs-server-cluster-with-rook/" target="_blank" rel="noopener">入门演示</a>。 预计在未来Nautilus的次要版本中实现此功能的更多自动化。</li>
+<li>MDS mds_standby_for_*，mon_force_standby_active和mds_standby_replay配置选项已过时。 相反，操作者现在可以在CephFS文件系统上<a href="https://docs.ceph.com/docs/master/cephfs/standby/#mds-standby-replay" target="_blank" rel="noopener">设置新的</a>allow_standby_replay标志。 该设置会使文件系统由standbys变为standby-replay，并且任何可用的rank都会生效。（一个 rank 可看作是一个元数据分片）</li>
+<li>MDS支持客户端释放缓存的同时释放自己的存储端缓存，这个过程可由MDS admin socket命令 <code>cache drop</code>来完成</li>
+<li>现在可以检查MDS中正在进行的scrub的进度。 此外，scrub可能会暂停或中止。 有关更多信息，请参见<a href="https://docs.ceph.com/docs/master/cephfs/scrub/#mds-scrub" target="_blank" rel="noopener">scrub文档</a>。</li>
+<li>通过<code>ceph volume</code> command-line-interface提供了一个用于创建volumes的新interface。</li>
+<li>新的<a href="https://docs.ceph.com/docs/master/cephfs/cephfs-shell/" target="_blank" rel="noopener">cephfs-shell工具</a>可用于处理CephFS文件系统而无需mounting。</li>
+<li>为了简洁，清楚和有用，已重新格式化了来自ceph status与CephFS相关的输出。</li>
+<li>Lazy IO已进行了改进。客户端可以使用ceph_open C/C++ API的新CEPH_O_LAZY flag将其打开或通过配置选项client_force_lazyio将其打开。（LazyIO放松了POSIX语义。 即使文件由多个客户端上的多个应用程序打开，也允许缓冲的读/写操作。 应用程序负责自己管理缓存的一致性。自Nautilus发行以来，Libcephfs支持LazyIO。）</li>
+<li>现在可以通过ceph fs fail命令快速关闭CephFS文件系统。有关更多信息，请参见 <a href="https://docs.ceph.com/docs/master/cephfs/administration/#cephfs-administration" target="_blank" rel="noopener">the administration page</a>。</li>
+</ul>
+</li>
+<li><p>RBD</p>
+<ul>
+<li>Images可以在尽量短的停机时间内迁移，以帮助在pool之间移动images或移动到新的layouts。</li>
+<li>新的rbd perf image iotop和rbd perf image iostat命令为所有RBD images提供了类似于iotop和iostat的IO监视器。</li>
+<li>现在，ceph-mgr Prometheus exporter新增一个用于所有RBD images的IO监视器。</li>
+<li>支持pool中的单独image namespaces，以便进行租户隔离。</li>
+</ul>
+</li>
+<li>Misc<ul>
+<li>Ceph 拥有一组新的<a href="https://docs.ceph.com/docs/master/mgr/orchestrator_cli/#orchestrator-cli-module" target="_blank" rel="noopener">orchestrator modules</a>，可直接与外部orchestrators像ceph-ansible, DeepSea, Rook, or simply ssh通过一致的CLI interface(and, eventually, Dashboard) 进行交互。</li>
+</ul>
+</li>
+</ul>
+<h1 id="V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><a href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS" class="headerlink" title="V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS"></a>V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</h1><ul>
+<li>Dashboard<ul>
+<li>Ceph Luminous中引入的（只读）Ceph manager dashboard已由<a href="https://openattic.org/" target="_blank" rel="noopener">openATTIC</a> Ceph management tool新实现取代，提供了具有<a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">许多其他管理功能</a>。</li>
+</ul>
+</li>
+<li>RADOS<ul>
+<li>现在，配置选项可以由monitor集中存储和管理。</li>
+<li>进行recovery或rebalancing操作时，monitor daemon占用的disk space大大减少。</li>
+<li>当OSD从最近的故障中恢复时，异步恢复功能可减少请求的tail latency（少量响应的延迟高于均值，我们把这些响应称为尾延迟）。</li>
+<li>scrub时OSD冲突请求抢占tail latency减少。</li>
+</ul>
+</li>
+<li><p>RGW</p>
+<ul>
+<li>RGW可以将zone （或subset of buckets）复制到外部云存储服务（例如S3）。</li>
+<li>RGW在versioned buckets功能上支持S3 multi-factor authentication API。<ul>
+<li>AWS Multi-Factor Authentication（MFA）它在用户名和密码的基础上增加了一层额外的保护。启用MFA后，当用户登录AWS网站时，系统将提示他们输入用户名和密码以及来自其AWS MFA设备的身份验证代码。这些因素综合在一起，为您的AWS账户设置和资源提供了更高的安全性。</li>
+</ul>
+</li>
+<li>版本控制是在相同的存储桶中保留对象的多个变量的方法。对于 Amazon S3 桶中存储的每个对象，您可以使用版本控制功能来保存、检索和还原它们的各个版本。使用版本控制能够轻松从用户意外操作和应用程序故障中恢复数据。</li>
+<li>Beast frontend不再进行实验，被认为是稳定的并可以使用。</li>
+</ul>
+</li>
+<li><p>CephFS</p>
+<ul>
+<li>Snapshots与多个MDS daemons结合使用时，现在稳定。</li>
+</ul>
+</li>
+<li><p>RBD</p>
+<ul>
+<li>Image clones不再需要明确的protect和unprotect步骤。</li>
+<li>可以将Images deep-copied（包括与parent image和associated snapshots的任何克隆链接）到新pool或修改data layouts。</li>
+</ul>
+</li>
+<li><p>Misc</p>
+<ul>
+<li>由于在Stretch中缺少GCC 8，我们已删除了Mimic的Debian构建。我们希望Debian的构建将在2019年初发布Buster后回归，并希望在Buster可用后构建最终的Luminous发行版（以及以后的Mimic point发行版）。</li>
+</ul>
+</li>
+</ul>
 
           
         
@@ -718,7 +523,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/16/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/16/">16</a><span class="page-number current">17</span><a class="page-number" href="/page/18/">18</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/18/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -764,7 +569,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

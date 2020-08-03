@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/29/udev设备管理/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/13/NIC-bonding-in-CentOS-7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/29/udev设备管理/" itemprop="url">udev设备管理</a></h1>
+                <a class="post-title-link" href="/2019/11/13/NIC-bonding-in-CentOS-7/" itemprop="url">NIC bonding in CentOS 7</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-29T15:19:32+08:00">
-                2019-10-29
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-13T19:15:26+08:00">
+                2019-11-13
               </time>
             
 
@@ -358,16 +358,7 @@
       
         
           
-            <p>Linuxcast学习笔记，视频地址：<a href="https://www.youtube.com/watch?v=eV4InZop--0" target="_blank" rel="noopener">https://www.youtube.com/watch?v=eV4InZop--0</a></p>
-<h1 id="udev是什么"><a href="#udev是什么" class="headerlink" title="udev是什么"></a>udev是什么</h1><p>udev是动态管理设备的机制（/dev/目录下的设备）。udev允许我们自己写一些rule配置文件来控制udev默认的行为动作。默认配置文件在/etc/udev/目录下，在/etc/udev/rules.d/下为默认rule。如70-persistent-net.rules文件，udev在工作时，每次检查/etc/udev/rules.d/目录下的配置文件，并且按照数字的顺序来加载并应用这些配置。</p>
-<p>udev允许我们在一个设备连接到计算机的时候，或者已经连接上，或者卸载的时候执行一些特殊的动作。（设备连接时、设备连接上、设备断开时）</p>
-<h1 id="如何使用udev修改设备默认名称"><a href="#如何使用udev修改设备默认名称" class="headerlink" title="如何使用udev修改设备默认名称"></a>如何使用udev修改设备默认名称</h1><p>如果我们想修改一个设备，那么我们需要唯一的定位一个设备，通过udevadm命令。通常serial（串号）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph2 ~]# udevadm info -a -n /dev/vdc</span><br><span class="line"></span><br><span class="line">Udevadm info starts with the device specified by the devpath and then</span><br><span class="line">walks up the chain of parent devices. It prints for every device</span><br><span class="line">found, all possible attributes in the udev rules key format.</span><br><span class="line">A rule to match, can be composed by the attributes of the device</span><br><span class="line">and the attributes from one single parent device.</span><br><span class="line"></span><br><span class="line">  looking at device &apos;/devices/pci0000:00/0000:00:09.0/virtio4/block/vdc&apos;:</span><br><span class="line">    KERNEL==&quot;vdc&quot;</span><br><span class="line">    SUBSYSTEM==&quot;block&quot;</span><br><span class="line">    DRIVER==&quot;&quot;</span><br><span class="line">    ATTR&#123;ro&#125;==&quot;0&quot;</span><br><span class="line">    ATTR&#123;size&#125;==&quot;104857600&quot;</span><br><span class="line">    ATTR&#123;stat&#125;==&quot;    7223       11   474136    19244   400088    30660  1866945   871549        0   840441   872404&quot;</span><br><span class="line">    ATTR&#123;cache_type&#125;==&quot;write back&quot;</span><br><span class="line">    ATTR&#123;range&#125;==&quot;16&quot;</span><br><span class="line">    ATTR&#123;discard_alignment&#125;==&quot;0&quot;</span><br><span class="line">    ATTR&#123;ext_range&#125;==&quot;256&quot;</span><br><span class="line">    ATTR&#123;serial&#125;==&quot;e850ae75-fcb2-4432-a&quot;</span><br><span class="line">    ATTR&#123;alignment_offset&#125;==&quot;0&quot;</span><br><span class="line">    ATTR&#123;inflight&#125;==&quot;       0        0&quot;</span><br><span class="line">    ATTR&#123;removable&#125;==&quot;0&quot;</span><br><span class="line">    ATTR&#123;capability&#125;==&quot;50&quot;</span><br><span class="line"></span><br><span class="line">  looking at parent device &apos;/devices/pci0000:00/0000:00:09.0/virtio4&apos;:</span><br><span class="line">    KERNELS==&quot;virtio4&quot;</span><br><span class="line">    SUBSYSTEMS==&quot;virtio&quot;</span><br><span class="line">    DRIVERS==&quot;virtio_blk&quot;</span><br><span class="line">    ATTRS&#123;device&#125;==&quot;0x0002&quot;</span><br><span class="line">    ATTRS&#123;features&#125;==&quot;0010101001110000000000000000110010000000000000000000000000000000&quot;</span><br><span class="line">    ATTRS&#123;status&#125;==&quot;0x0000000f&quot;</span><br><span class="line">    ATTRS&#123;vendor&#125;==&quot;0x1af4&quot;</span><br><span class="line"></span><br><span class="line">  looking at parent device &apos;/devices/pci0000:00/0000:00:09.0&apos;:</span><br><span class="line">    KERNELS==&quot;0000:00:09.0&quot;</span><br><span class="line">    SUBSYSTEMS==&quot;pci&quot;</span><br><span class="line">    DRIVERS==&quot;virtio-pci&quot;</span><br><span class="line">    ATTRS&#123;irq&#125;==&quot;10&quot;</span><br><span class="line">    ATTRS&#123;subsystem_vendor&#125;==&quot;0x1af4&quot;</span><br><span class="line">    ATTRS&#123;broken_parity_status&#125;==&quot;0&quot;</span><br><span class="line">    ATTRS&#123;class&#125;==&quot;0x010000&quot;</span><br><span class="line">    ATTRS&#123;driver_override&#125;==&quot;(null)&quot;</span><br><span class="line">    ATTRS&#123;consistent_dma_mask_bits&#125;==&quot;64&quot;</span><br><span class="line">    ATTRS&#123;dma_mask_bits&#125;==&quot;64&quot;</span><br><span class="line">    ATTRS&#123;local_cpus&#125;==&quot;f&quot;</span><br><span class="line">    ATTRS&#123;device&#125;==&quot;0x1001&quot;</span><br><span class="line">    ATTRS&#123;enable&#125;==&quot;1&quot;</span><br><span class="line">    ATTRS&#123;msi_bus&#125;==&quot;&quot;</span><br><span class="line">    ATTRS&#123;local_cpulist&#125;==&quot;0-3&quot;</span><br><span class="line">    ATTRS&#123;vendor&#125;==&quot;0x1af4&quot;</span><br><span class="line">    ATTRS&#123;subsystem_device&#125;==&quot;0x0002&quot;</span><br><span class="line">    ATTRS&#123;numa_node&#125;==&quot;-1&quot;</span><br><span class="line">    ATTRS&#123;d3cold_allowed&#125;==&quot;0&quot;</span><br><span class="line"></span><br><span class="line">  looking at parent device &apos;/devices/pci0000:00&apos;:</span><br><span class="line">    KERNELS==&quot;pci0000:00&quot;</span><br><span class="line">    SUBSYSTEMS==&quot;&quot;</span><br><span class="line">    DRIVERS==&quot;&quot;</span><br></pre></td></tr></table></figure>
-<p> 在/etc/udev/rules.d/下创建rule，99-linuxcast.rules，编辑规则。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KERNEL==&quot;sd*&quot;, ATTR&#123;serial&#125;==&quot;e850ae75-fcb2-4432-a&quot;, NAME=&quot;yujiangvdc%n&quot;</span><br></pre></td></tr></table></figure>
-<p>KERNEL意思是内核识别出来这个设备是什么名字，两个等号==是做比较，一个等号=是赋值。</p>
-<p>通过KERNEL与ATTR{serial}就可以唯一定位到一个设备，要把这个设备修改为其他名字用NAME，udev会自动把%n替换成分区号。</p>
-
+            
           
         
       
@@ -411,7 +402,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/9/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/11/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -457,7 +448,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

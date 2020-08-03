@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/04/08/LVM逻辑卷基本概念/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/27/prometheus-node-exporter-监控项/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/04/08/LVM逻辑卷基本概念/" itemprop="url">LVM逻辑卷基本概念</a></h1>
+                <a class="post-title-link" href="/2019/05/27/prometheus-node-exporter-监控项/" itemprop="url">prometheus node_exporter 监控项</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-08T10:06:35+08:00">
-                2019-04-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-27T14:01:45+08:00">
+                2019-05-27
               </time>
             
 
@@ -358,28 +358,1378 @@
       
         
           
-            <p>LinuxCast视频教程笔记</p>
-<h1 id="传统磁盘管理的问题"><a href="#传统磁盘管理的问题" class="headerlink" title="传统磁盘管理的问题"></a>传统磁盘管理的问题</h1><p>当分区大小不够用时无法扩展其大小，只能通过添加硬盘、创建新的分区来扩展空间，但是新添加进来的硬盘是作为独立文件系统存在的，原有的文件系统并未得到扩充，上层应用很多时候只能访问一个文件系统。只能让现有磁盘下线，换上新的磁盘之后，再将原始数据导入。</p>
-<h1 id="LVM"><a href="#LVM" class="headerlink" title="LVM"></a>LVM</h1><p>LVM（Logical volume Manager）逻辑卷管理通过将底层物理硬盘抽象封装起来，以逻辑卷的形式表现给上层系统，逻辑卷的大小可以动态调整，而且不会丢失现有数据。新加入的硬盘也不会改变现有上层的逻辑卷。</p>
-<p>作为一种动态磁盘管理机制，逻辑卷技术大大提高了磁盘管理的灵活性。</p>
-<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-1.png" alt></p>
-<p>上图黄色为：VG    橙色为：LV</p>
-<p>（1）首先把物理硬盘格式化（存储里面叫条带化）为物理卷（PV），格式化为物理卷的过程实际上是把硬盘空间化成一个一个的PE（PE是逻辑卷空间管理的最基本单位，默认4M）</p>
-<p>（2）第二步我们要创建一个VG，VG的作用是用来装PE的，就像一个空间池。我们可以把一个或者多个PV加到VG当中。加入多少个PV，我们的VG容量就是这些PV大小之和。（当创建VG以后，在/dev目录下会多出一个目录）</p>
-<p>（3）最后创建LV（每个LV的空间可能来自不同的物理硬盘）</p>
-<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-2.png?raw=true" alt></p>
-<h1 id="创建LVM"><a href="#创建LVM" class="headerlink" title="创建LVM"></a>创建LVM</h1><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-3.png" alt></p>
-<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-4.png" alt></p>
-<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-5.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  200G  0 disk </span><br><span class="line">├─vda1 253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  195G  0 part /</span><br><span class="line">vdb    253:16   0  100G  0 disk </span><br><span class="line">vdc    253:32   0  100G  0 disk</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdb /dev/vdc</span><br><span class="line">  Physical volume &quot;/dev/vdb&quot; successfully created.</span><br><span class="line">  Physical volume &quot;/dev/vdc&quot; successfully created.</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG Fmt  Attr PSize   PFree  </span><br><span class="line">  /dev/vdb      lvm2 ---  100.00g 100.00g</span><br><span class="line">  /dev/vdc      lvm2 ---  100.00g 100.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgcreate linuxcast /dev/vdb /dev/vdc </span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully created</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   0   0 wz--n- 199.99g 199.99g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mylv -L 2G linuxcast</span><br><span class="line">  Logical volume &quot;mylv&quot; created.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 2.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mynewlv -L 2G linuxcast</span><br><span class="line">  Logical volume &quot;mynewlv&quot; created.</span><br><span class="line">[root@teuthology ~]# ll /dev/linuxcast/</span><br><span class="line">total 0</span><br><span class="line">lrwxrwxrwx 1 root root 7 Apr  8 14:59 mylv -&gt; ../dm-0</span><br><span class="line">lrwxrwxrwx 1 root root 7 Apr  8 15:03 mynewlv -&gt; ../dm-1</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mkfs.ext4 /dev/linuxcast/mylv</span><br><span class="line">[root@teuthology ~]# mount /dev/linuxcast/mylv /mnt/</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">Filesystem                 Type      Size  Used Avail Use% Mounted on</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G   2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G   0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G   0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G   1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G   0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M  17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M   0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.0G  6.0M  1.8G   1% /mnt</span><br><span class="line"></span><br><span class="line">#删除LVM</span><br><span class="line">[root@teuthology ~]# umount  /mnt/</span><br><span class="line">[root@teuthology ~]# lvremove /dev/linuxcast/mylv </span><br><span class="line">Do you really want to remove active logical volume linuxcast/mylv? [y/n]: y</span><br><span class="line">  Logical volume &quot;mylv&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# lvremove /dev/linuxcast/mynewlv </span><br><span class="line">Do you really want to remove active logical volume linuxcast/mynewlv? [y/n]: y</span><br><span class="line">  Logical volume &quot;mynewlv&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">[root@teuthology ~]# vgremove linuxcast</span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully removed</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdb </span><br><span class="line">  Labels on physical volume &quot;/dev/vdb&quot; successfully wiped.</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdc</span><br><span class="line">  Labels on physical volume &quot;/dev/vdc&quot; successfully wiped.</span><br></pre></td></tr></table></figure>
-<h1 id="LVM逻辑卷的拉伸与缩小"><a href="#LVM逻辑卷的拉伸与缩小" class="headerlink" title="LVM逻辑卷的拉伸与缩小"></a>LVM逻辑卷的拉伸与缩小</h1><p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-6.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda    253:0    0  200G  0 disk </span><br><span class="line">├─vda1 253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2 253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3 253:3    0  195G  0 part /</span><br><span class="line">vdb    253:16   0  100G  0 disk </span><br><span class="line">vdc    253:32   0  100G  0 disk </span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdb /dev/vdc</span><br><span class="line">  Physical volume &quot;/dev/vdb&quot; successfully created.</span><br><span class="line">  Physical volume &quot;/dev/vdc&quot; successfully created.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG Fmt  Attr PSize   PFree  </span><br><span class="line">  /dev/vdb      lvm2 ---  100.00g 100.00g</span><br><span class="line">  /dev/vdc      lvm2 ---  100.00g 100.00g</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgcreate linuxcast /dev/vdb /dev/vdc</span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully created</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvcreate -n mylv -L 2G linuxcast</span><br><span class="line">WARNING: ext4 signature detected on /dev/linuxcast/mylv at offset 1080. Wipe it? [y/n]: y</span><br><span class="line">  Wiping ext4 signature on /dev/linuxcast/mylv.</span><br><span class="line">  Logical volume &quot;mylv&quot; created.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mkfs.ext4 /dev/linuxcast/mylv</span><br><span class="line">mke2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">文件系统标签=</span><br><span class="line">OS type: Linux</span><br><span class="line">块大小=4096 (log=2)</span><br><span class="line">分块大小=4096 (log=2)</span><br><span class="line">Stride=0 blocks, Stripe width=0 blocks</span><br><span class="line">131072 inodes, 524288 blocks</span><br><span class="line">26214 blocks (5.00%) reserved for the super user</span><br><span class="line">第一个数据块=0</span><br><span class="line">Maximum filesystem blocks=536870912</span><br><span class="line">16 block groups</span><br><span class="line">32768 blocks per group, 32768 fragments per group</span><br><span class="line">8192 inodes per group</span><br><span class="line">Superblock backups stored on blocks: </span><br><span class="line">	32768, 98304, 163840, 229376, 294912</span><br><span class="line"></span><br><span class="line">Allocating group tables: 完成                            </span><br><span class="line">正在写入inode表: 完成                            </span><br><span class="line">Creating journal (16384 blocks): 完成</span><br><span class="line">Writing superblocks and filesystem accounting information: 完成 </span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# mount /dev/linuxcast/mylv /mnt/</span><br><span class="line">[root@teuthology ~]# df -TH</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       210G  2.8G  207G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  4.1G     0  4.1G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     4.2G     0  4.2G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     4.2G  9.0M  4.1G    1% /run</span><br><span class="line">tmpfs                      tmpfs     4.2G     0  4.2G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs       1.1G  180M  884M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     821M     0  821M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.1G  6.3M  2.0G    1% /mnt</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 197.99g</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-ao---- 2.00g</span><br><span class="line">[root@teuthology ~]# lvextend -L +1G /dev/linuxcast/mylv </span><br><span class="line">  Size of logical volume linuxcast/mylv changed from 2.00 GiB (512 extents) to 3.00 GiB (768 extents).</span><br><span class="line">  Logical volume linuxcast/mylv successfully resized.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-ao---- 3.00g</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.0G  6.0M  1.8G    1% /mnt</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv </span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Filesystem at /dev/linuxcast/mylv is mounted on /mnt; on-line resizing required</span><br><span class="line">old_desc_blocks = 1, new_desc_blocks = 1</span><br><span class="line">The filesystem on /dev/linuxcast/mylv is now 786432 blocks long.</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统                   类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3                  xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs                   devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs                      tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs                      tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1                  xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs                      tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">/dev/mapper/linuxcast-mylv ext4      2.9G  6.0M  2.8G    1% /mnt</span><br></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-7.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# lsblk</span><br><span class="line">NAME             MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">vda              253:0    0  200G  0 disk </span><br><span class="line">├─vda1           253:1    0    1G  0 part /boot</span><br><span class="line">├─vda2           253:2    0    4G  0 part [SWAP]</span><br><span class="line">└─vda3           253:3    0  195G  0 part /</span><br><span class="line">vdb              253:16   0  100G  0 disk </span><br><span class="line">└─linuxcast-mylv 252:0    0    3G  0 lvm  /mnt</span><br><span class="line">vdc              253:32   0  100G  0 disk </span><br><span class="line">vdd              253:48   0  100G  0 disk </span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vd</span><br><span class="line">vda   vda1  vda2  vda3  vdb   vdc   vdd   </span><br><span class="line">[root@teuthology ~]# pvcreate /dev/vdd </span><br><span class="line">  Physical volume &quot;/dev/vdd&quot; successfully created.</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 196.99g</span><br><span class="line">[root@teuthology ~]# vgextend linuxcast /dev/vdd </span><br><span class="line">  Volume group &quot;linuxcast&quot; successfully extended</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize    VFree   </span><br><span class="line">  linuxcast   3   1   0 wz--n- &lt;299.99g &lt;296.99g</span><br></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-8.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# umount /mnt/</span><br><span class="line">[root@teuthology ~]# df -Th</span><br><span class="line">文件系统       类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">/dev/vda3      xfs       195G  2.6G  193G    2% /</span><br><span class="line">devtmpfs       devtmpfs  3.9G     0  3.9G    0% /dev</span><br><span class="line">tmpfs          tmpfs     3.9G     0  3.9G    0% /dev/shm</span><br><span class="line">tmpfs          tmpfs     3.9G  8.6M  3.9G    1% /run</span><br><span class="line">tmpfs          tmpfs     3.9G     0  3.9G    0% /sys/fs/cgroup</span><br><span class="line">/dev/vda1      xfs      1014M  172M  843M   17% /boot</span><br><span class="line">tmpfs          tmpfs     783M     0  783M    0% /run/user/0</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 3.00g                                                    </span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G</span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">请先运行 &apos;e2fsck -f /dev/linuxcast/mylv&apos;.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# e2fsck -f /dev/linuxcast/mylv</span><br><span class="line">e2fsck 1.42.9 (28-Dec-2013)</span><br><span class="line">第一步: 检查inode,块,和大小</span><br><span class="line">第二步: 检查目录结构</span><br><span class="line">第3步: 检查目录连接性</span><br><span class="line">Pass 4: Checking reference counts</span><br><span class="line">第5步: 检查簇概要信息</span><br><span class="line">/dev/linuxcast/mylv: 11/196608 files (0.0% non-contiguous), 30268/786432 blocks</span><br><span class="line">[root@teuthology ~]# resize2fs /dev/linuxcast/mylv 2G</span><br><span class="line">resize2fs 1.42.9 (28-Dec-2013)</span><br><span class="line">Resizing the filesystem on /dev/linuxcast/mylv to 524288 (4k) blocks.</span><br><span class="line">The filesystem on /dev/linuxcast/mylv is now 524288 blocks long.</span><br><span class="line"></span><br><span class="line">[root@teuthology ~]# lvreduce -L -1G /dev/linuxcast/mylv </span><br><span class="line">  WARNING: Reducing active logical volume to 2.00 GiB.</span><br><span class="line">  THIS MAY DESTROY YOUR DATA (filesystem etc.)</span><br><span class="line">Do you really want to reduce linuxcast/mylv? [y/n]: y</span><br><span class="line">  Size of logical volume linuxcast/mylv changed from 3.00 GiB (768 extents) to 2.00 GiB (512 extents).</span><br><span class="line">  Logical volume linuxcast/mylv successfully resized.</span><br><span class="line">[root@teuthology ~]# lvs</span><br><span class="line">  LV   VG        Attr       LSize Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert</span><br><span class="line">  mylv linuxcast -wi-a----- 2.00g</span><br></pre></td></tr></table></figure>
-<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5/LVM-9.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize    VFree   </span><br><span class="line">  linuxcast   3   1   0 wz--n- &lt;299.99g &lt;296.99g</span><br><span class="line">[root@teuthology ~]# vgreduce linuxcast /dev/vdd </span><br><span class="line">  Removed &quot;/dev/vdd&quot; from volume group &quot;linuxcast&quot;</span><br><span class="line">[root@teuthology ~]# vgs</span><br><span class="line">  VG        #PV #LV #SN Attr   VSize   VFree  </span><br><span class="line">  linuxcast   2   1   0 wz--n- 199.99g 197.99g</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG        Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/vdb   linuxcast lvm2 a--  &lt;100.00g  &lt;98.00g</span><br><span class="line">  /dev/vdc   linuxcast lvm2 a--  &lt;100.00g &lt;100.00g</span><br><span class="line">  /dev/vdd             lvm2 ---   100.00g  100.00g</span><br><span class="line">[root@teuthology ~]# pvremove /dev/vdd </span><br><span class="line">  Labels on physical volume &quot;/dev/vdd&quot; successfully wiped.</span><br><span class="line">[root@teuthology ~]# pvs</span><br><span class="line">  PV         VG        Fmt  Attr PSize    PFree   </span><br><span class="line">  /dev/vdb   linuxcast lvm2 a--  &lt;100.00g  &lt;98.00g</span><br><span class="line">  /dev/vdc   linuxcast lvm2 a--  &lt;100.00g &lt;100.00g</span><br></pre></td></tr></table></figure>
+            <p>截止2019-05-24 node_exporter监控项整理。</p>
+<h2 id="Collectors"><a href="#Collectors" class="headerlink" title="Collectors"></a>Collectors</h2><p>每个操作系统对collector的支持各不相同。 下表列出了所有现有collector和支持的系统。通过<code>--collector.&lt;name&gt;</code>标志来启用collector。默认情况下启用的collector可以通过<code>--no-collector.&lt;name&gt;</code>标志来禁用。</p>
+<h3 id="默认情况下启用"><a href="#默认情况下启用" class="headerlink" title="默认情况下启用"></a>默认情况下启用</h3><table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>OS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>arp</td>
+<td>来自<code>/proc/net/arp</code>的ARP统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>bcache</td>
+<td>来自<code>/sys/fs/bcache/</code>的bcache统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>bonding</td>
+<td>Linux bonding interfaces已配置active slave的数量</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>boottime</td>
+<td>从<code>kern.boottime</code> sysctl派生的系统启动时间</td>
+<td>Darwin, Dragonfly, FreeBSD, NetBSD, OpenBSD, Solaris</td>
+</tr>
+<tr>
+<td>conntrack</td>
+<td>显示conntrack统计信息（如果没有<code>/proc/sys/net/netfilter/</code>，则不执行任何操作）</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>cpu</td>
+<td>CPU统计信息</td>
+<td>Darwin, Dragonfly, FreeBSD, Linux, Solaris</td>
+</tr>
+<tr>
+<td>cpufreq</td>
+<td>CPU频率统计信息</td>
+<td>Linux, Solaris</td>
+</tr>
+<tr>
+<td>diskstats</td>
+<td>磁盘I/O统计信息</td>
+<td>Darwin, Linux, OpenBSD</td>
+</tr>
+<tr>
+<td>edac</td>
+<td>检错和纠错的统计数据</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>entropy</td>
+<td>可用的熵（entropy）</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>exec</td>
+<td>execution统计信息</td>
+<td>Dragonfly, FreeBSD</td>
+</tr>
+<tr>
+<td>filefd</td>
+<td>来自<code>/proc/sys/fs/file-nr</code>的文件描述符统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>filesystem</td>
+<td>文件系统统计信息，例如使用的磁盘空间</td>
+<td>Darwin, Dragonfly, FreeBSD, Linux, OpenBSD</td>
+</tr>
+<tr>
+<td>hwmon</td>
+<td>来自<code>/sys/class/hwmon/</code>的硬件监控和传感器数据</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>infiniband</td>
+<td>特定于InfiniBand和Intel OmniPath配置的网络统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>ipvs</td>
+<td>来自<code>/proc/net/ip_vs</code>的IPVS状态和来自<code>/proc/net/ip_vs_stats</code>的统计数据</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>loadavg</td>
+<td>负载平均值</td>
+<td>Darwin, Dragonfly, FreeBSD, Linux, NetBSD, OpenBSD, Solaris</td>
+</tr>
+<tr>
+<td>mdadm</td>
+<td>有关<code>/proc/mdstat</code>中设备的统计信息（如果没有<code>/proc/mdstat</code>，则不执行任何操作）</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>meminfo</td>
+<td>内存统计信息</td>
+<td>Darwin, Dragonfly, FreeBSD, Linux, OpenBSD</td>
+</tr>
+<tr>
+<td>netclass</td>
+<td>来自<code>/sys/class/net/</code>的网络接口信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>netdev</td>
+<td>网络接口统计信息，如字节传输</td>
+<td>Darwin, Dragonfly, FreeBSD, Linux, OpenBSD</td>
+</tr>
+<tr>
+<td>netstat</td>
+<td>来自<code>/proc/net/netstat</code>的网络统计信息。 这与<code>netstat -s</code>的信息相同</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>nfs</td>
+<td>从<code>/proc/net/rpc/nfs</code>公开NFS客户端统计信息。 这与<code>nfsstat -c</code>的信息相同</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>nfsd</td>
+<td>从<code>/proc/net/rpc/nfsd</code>公开NFS内核服务器统计信息。 这与<code>nfsstat -s</code>的信息相同</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>pressure</td>
+<td>来自<code>/proc/pressure/</code>的压力失速统计</td>
+<td>Linux (kernel 4.20+ and/or <a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/accounting/psi.txt" target="_blank" rel="noopener">CONFIG_PSI</a>)</td>
+</tr>
+<tr>
+<td>sockstat</td>
+<td>公开来自<code>/proc/net/sockstat</code>的各种统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>stat</td>
+<td>来自<code>/proc/stat</code>的各种统计信息。这包括启动时间，forks和interrupts。</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>textfile</td>
+<td>从本地磁盘读取的统计信息。必须设置<code>--collector.textfile.directory</code>标志</td>
+<td><em>any</em></td>
+</tr>
+<tr>
+<td>time</td>
+<td>当前的系统时间</td>
+<td><em>any</em></td>
+</tr>
+<tr>
+<td>timex</td>
+<td>selected adjtimex(2) system call统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>uname</td>
+<td>uname系统调用提供的系统信息</td>
+<td>FreeBSD, Linux</td>
+</tr>
+<tr>
+<td>vmstat</td>
+<td>来自<code>/proc/vmstat</code>的统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>xfs</td>
+<td>XFS运行时统计信息</td>
+<td>Linux (kernel 4.4+)</td>
+</tr>
+<tr>
+<td>zfs</td>
+<td><a href="http://open-zfs.org/" target="_blank" rel="noopener">ZFS</a>性能统计数据</td>
+<td><a href="http://zfsonlinux.org/" target="_blank" rel="noopener">Linux</a>, Solaris</td>
+</tr>
+</tbody>
+</table>
+<h3 id="默认情况下禁用"><a href="#默认情况下禁用" class="headerlink" title="默认情况下禁用"></a>默认情况下禁用</h3><p>由于内核配置和安全设置，默认情况下，所有Linux系统上的perf收集器可能无法正常工作。 要允许访问，请设置以下sysctl参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl -w kernel.perf_event_paranoid=X</span><br></pre></td></tr></table></figure>
+<p>2 仅允许用户空间度量（自Linux 4.6起默认）。</p>
+<p>1 允许内核和用户度量（在Linux 4.6之前默认）。</p>
+<p>0 允许访问特定CPU的数据，但不允许访问raw tracepoint samples。</p>
+<p>-1 没有限制。</p>
+<p>根据配置的值，将提供不同的度量标准，对于大多数情况，<code>0</code>将提供最完整的设置。 有关更多信息，请参阅<code>man 2 perf_event_open</code>。</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>OS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>buddyinfo</td>
+<td>/proc/buddyinfo报告的内存碎片统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>devstat</td>
+<td>设备统计信息</td>
+<td>Dragonfly, FreeBSD</td>
+</tr>
+<tr>
+<td>drbd</td>
+<td>分布式副本（Replicated）块设备统计信息（到版本8.4）</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>interrupts</td>
+<td>详细的中断统计</td>
+<td>Linux, OpenBSD</td>
+</tr>
+<tr>
+<td>ksmd</td>
+<td>来自<code>/sys/kernel/mm/ksm</code>的内核和系统统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>logind</td>
+<td>会话计数来自<a href="http://www.freedesktop.org/wiki/Software/systemd/logind/" target="_blank" rel="noopener">logind</a></td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>meminfo_numa</td>
+<td>来自<code>/proc/meminfo_numa</code>的内存统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>mountstats</td>
+<td>来自<code>/proc/self/mountstats</code>的文件系统统计信息。详细的NFS客户端统计信息。</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>ntp</td>
+<td>本地NTP守护程序运行状况检查<a href="https://github.com/prometheus/node_exporter/blob/master/docs/TIME.md" target="_blank" rel="noopener">时间</a></td>
+<td><em>any</em></td>
+</tr>
+<tr>
+<td>processes</td>
+<td>来自<code>/proc</code>的聚合进程统计信息</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>qdisc</td>
+<td><a href="https://en.wikipedia.org/wiki/Network_scheduler#Linux_kernel" target="_blank" rel="noopener">queuing discipline</a> 统计</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>runit</td>
+<td>来自<a href="http://smarden.org/runit/" target="_blank" rel="noopener">runit</a>的服务状态统计</td>
+<td><em>any</em></td>
+</tr>
+<tr>
+<td>supervisord</td>
+<td>来自<a href="http://supervisord.org/" target="_blank" rel="noopener">supervisord</a>的服务状态统计</td>
+<td><em>any</em></td>
+</tr>
+<tr>
+<td>systemd</td>
+<td>来自<a href="http://www.freedesktop.org/wiki/Software/systemd/" target="_blank" rel="noopener">systemd</a>的服务和系统状态统计</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>tcpstat</td>
+<td>来自<code>/proc/net/tcp</code>和<code>/proc/net/tcp6</code>的TCP连接状态信息。（警告：当前版本在高负载情况下存在潜在的性能问题。）</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>wifi</td>
+<td>WiFi设备和station统计</td>
+<td>Linux</td>
+</tr>
+<tr>
+<td>perf</td>
+<td>基于perf的指标（警告：指标取决于内核配置和设置）</td>
+<td>Linux</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Textfile-Collector"><a href="#Textfile-Collector" class="headerlink" title="Textfile Collector"></a>Textfile Collector</h3><p>textfile collector类似于<a href="https://github.com/prometheus/pushgateway" target="_blank" rel="noopener">Pushgateway</a>因为它允许从批处理job导出统计信息。它还可用于导出静态指标，例如计算机具有的role。Pushgateway应该用于服务级别指标。textfile模式用于绑定计算机的度量标准。</p>
+<p>要使用它，请在Node exporter上设置<code>--collector.textfile.directory</code>标志。collector将使用文本格式解析该目录中与glob <code>*.prom</code>匹配的所有文件。 注意：不支持时间戳。</p>
+<p>以原子方式推送cron job的完成时间：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo my_batch_job_completion_time $(date +%s) &gt; /path/to/directory/my_batch_job.prom.$$</span><br><span class="line">mv /path/to/directory/my_batch_job.prom.$$ /path/to/directory/my_batch_job.prom</span><br></pre></td></tr></table></figure>
+<p>使用标签静态设置计算机的roles：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &apos;role&#123;role=&quot;application_server&quot;&#125; 1&apos; &gt; /path/to/directory/role.prom.$$</span><br><span class="line">mv /path/to/directory/role.prom.$$ /path/to/directory/role.prom</span><br></pre></td></tr></table></figure>
+<h3 id="Filtering-enabled-collectors"><a href="#Filtering-enabled-collectors" class="headerlink" title="Filtering enabled collectors"></a>Filtering enabled collectors</h3><p>默认情况下，<code>node_exporter</code>将从启用的collector中公开所有指标。 这是收集指标以避免在比较不同系列的指标时出错的建议方法。</p>
+<p>高级使用<code>node_exporter</code>可以传递一个可选的收集器列表来过滤指标。 <code>collect[]</code>参数可以多次使用。 在Prometheus配置中，您可以在<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cscrape_config%3E" target="_blank" rel="noopener">scrape config</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">params:</span><br><span class="line">  collect[]:</span><br><span class="line">    - foo</span><br><span class="line">    - bar</span><br></pre></td></tr></table></figure>
+<p>这对于让不同的Prometheus服务器从节点收集特定指标非常有用。</p>
+<h2 id="部分监控项见下表"><a href="#部分监控项见下表" class="headerlink" title="部分监控项见下表"></a>部分监控项见下表</h2><table>
+<thead>
+<tr>
+<th>Metrics</th>
+<th>Chinese   explanation</th>
+<th>English   explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>node_arp_entries</td>
+<td>device的ARP表项</td>
+<td>#   HELP node_arp_entries ARP entries by device</td>
+</tr>
+<tr>
+<td>node_boot_time_seconds</td>
+<td>节点启动时间，unixtime</td>
+<td>#   HELP node_boot_time_seconds Node boot time, in unixtime.</td>
+</tr>
+<tr>
+<td>node_context_switches_total</td>
+<td>context   switches（上下文切换）的总数</td>
+<td>#   HELP node_context_switches_total Total number of context switches.</td>
+</tr>
+<tr>
+<td>node_cpu_guest_seconds_total</td>
+<td>每种模式在guests(VM)上花费CPU的秒数</td>
+<td>#   HELP node_cpu_guest_seconds_total Seconds the cpus spent in guests (VMs) for   each mode.</td>
+</tr>
+<tr>
+<td>node_cpu_seconds_total</td>
+<td>在每种模式下花费CPU的秒数</td>
+<td>#   HELP node_cpu_seconds_total Seconds the cpus spent in each mode.</td>
+</tr>
+<tr>
+<td>node_disk_io_now</td>
+<td>当前正在进行的I/O数量</td>
+<td>#   HELP node_disk_io_now The number of I/Os currently in progress.</td>
+</tr>
+<tr>
+<td>node_disk_io_time_seconds_total</td>
+<td>执行I/O所花费的总时间</td>
+<td>#   HELP node_disk_io_time_seconds_total Total seconds spent doing I/Os.</td>
+</tr>
+<tr>
+<td>node_disk_io_time_weighted_seconds_total</td>
+<td>进行I/O所花费的加权秒数</td>
+<td>#   HELP node_disk_io_time_weighted_seconds_total The weighted # of seconds spent   doing I/Os.</td>
+</tr>
+<tr>
+<td>node_disk_read_bytes_total</td>
+<td>成功读取的总字节数</td>
+<td>#   HELP node_disk_read_bytes_total The total number of bytes read successfully.</td>
+</tr>
+<tr>
+<td>node_disk_read_time_seconds_total</td>
+<td>所有读取花费的总秒数</td>
+<td>#   HELP node_disk_read_time_seconds_total The total number of seconds spent by   all reads.</td>
+</tr>
+<tr>
+<td>node_disk_reads_completed_total</td>
+<td>成功完成的读取总数</td>
+<td>#   HELP node_disk_reads_completed_total The total number of reads completed   successfully.</td>
+</tr>
+<tr>
+<td>node_disk_reads_merged_total</td>
+<td>读合并的次数</td>
+<td>#   HELP node_disk_reads_merged_total The total number of reads merged.</td>
+</tr>
+<tr>
+<td>node_disk_write_time_seconds_total</td>
+<td>这是所有写入花费的总秒数</td>
+<td>#   HELP node_disk_write_time_seconds_total This is the total number of seconds   spent by all writes.</td>
+</tr>
+<tr>
+<td>node_disk_writes_completed_total</td>
+<td>成功完成的写入总数</td>
+<td>#   HELP node_disk_writes_completed_total The total number of writes completed   successfully.</td>
+</tr>
+<tr>
+<td>node_disk_writes_merged_total</td>
+<td>写合并的次数</td>
+<td>#   HELP node_disk_writes_merged_total The number of writes merged.</td>
+</tr>
+<tr>
+<td>node_disk_written_bytes_total</td>
+<td>成功写入的总字节数</td>
+<td>#   HELP node_disk_written_bytes_total The total number of bytes written   successfully.</td>
+</tr>
+<tr>
+<td>node_entropy_available_bits</td>
+<td>可用entropy的Bits（比特）</td>
+<td>#   HELP node_entropy_available_bits Bits of available entropy.</td>
+</tr>
+<tr>
+<td>node_exporter_build_info</td>
+<td>构建node_exporter的版本，修订版，分支和goversion标记，具有常量值“1”的metric</td>
+<td>#   HELP node_exporter_build_info A metric with a constant ‘1’ value labeled by   version, revision, branch, and goversion from which node_exporter was built.</td>
+</tr>
+<tr>
+<td>node_filefd_allocated</td>
+<td>文件描述符统计：已分配</td>
+<td>#   HELP node_filefd_allocated File descriptor statistics: allocated.</td>
+</tr>
+<tr>
+<td>node_filefd_maximum</td>
+<td>文件描述符统计：最大值</td>
+<td>#   HELP node_filefd_maximum File descriptor statistics: maximum.</td>
+</tr>
+<tr>
+<td>node_filesystem_avail_bytes</td>
+<td>非root用户可用的文件系统空间（以字节为单位）</td>
+<td>#   HELP node_filesystem_avail_bytes Filesystem space available to non-root users   in bytes.</td>
+</tr>
+<tr>
+<td>node_filesystem_device_error</td>
+<td>获取指定设备的统计信息时是否发生错误</td>
+<td>#   HELP node_filesystem_device_error Whether an error occurred while getting   statistics for the given device.</td>
+</tr>
+<tr>
+<td>node_filesystem_files</td>
+<td>文件系统总的file   nodes数（inode）</td>
+<td>#   HELP node_filesystem_files Filesystem total file nodes.</td>
+</tr>
+<tr>
+<td>node_filesystem_files_free</td>
+<td>文件系统空闲file   node数（inode）</td>
+<td>#   HELP node_filesystem_files_free Filesystem total free file nodes.</td>
+</tr>
+<tr>
+<td>node_filesystem_free_bytes</td>
+<td>文件系统可用空间，以字节为单位</td>
+<td>#   HELP node_filesystem_free_bytes Filesystem free space in bytes.</td>
+</tr>
+<tr>
+<td>node_filesystem_readonly</td>
+<td>文件系统只读状态</td>
+<td>#   HELP node_filesystem_readonly Filesystem read-only status.</td>
+</tr>
+<tr>
+<td>node_filesystem_size_bytes</td>
+<td>文件系统大小（字节）</td>
+<td>#   HELP node_filesystem_size_bytes Filesystem size in bytes.</td>
+</tr>
+<tr>
+<td>node_forks_total</td>
+<td>forks总数</td>
+<td>#   HELP node_forks_total Total number of forks.</td>
+</tr>
+<tr>
+<td>node_hwmon_chip_names</td>
+<td>人类可读（可读性良好）的芯片名称的注释指标</td>
+<td>#   HELP node_hwmon_chip_names Annotation metric for human-readable chip names</td>
+</tr>
+<tr>
+<td>node_hwmon_sensor_label</td>
+<td>给定芯片和传感器的标签</td>
+<td>#   HELP node_hwmon_sensor_label Label for given chip and sensor</td>
+</tr>
+<tr>
+<td>node_hwmon_temp_celsius</td>
+<td>温度硬件监视器（输入）</td>
+<td>#   HELP node_hwmon_temp_celsius Hardware monitor for temperature (input)</td>
+</tr>
+<tr>
+<td>node_hwmon_temp_crit_alarm_celsius</td>
+<td>温度硬件监控器（crit_alarm）</td>
+<td>#   HELP node_hwmon_temp_crit_alarm_celsius Hardware monitor for temperature   (crit_alarm)</td>
+</tr>
+<tr>
+<td>node_hwmon_temp_crit_celsius</td>
+<td>温度硬件监控器（暴击）</td>
+<td>#   HELP node_hwmon_temp_crit_celsius Hardware monitor for temperature (crit)</td>
+</tr>
+<tr>
+<td>node_hwmon_temp_max_celsius</td>
+<td>温度硬件监控器（最大）</td>
+<td>#   HELP node_hwmon_temp_max_celsius Hardware monitor for temperature (max)</td>
+</tr>
+<tr>
+<td>node_intr_total</td>
+<td>服务的中断总数</td>
+<td>#   HELP node_intr_total Total number of interrupts serviced.</td>
+</tr>
+<tr>
+<td>node_load1</td>
+<td>1m负载平均值</td>
+<td>#   HELP node_load1 1m load average.</td>
+</tr>
+<tr>
+<td>node_load15</td>
+<td>15m负载平均值</td>
+<td>#   HELP node_load15 15m load average.</td>
+</tr>
+<tr>
+<td>node_load5</td>
+<td>5m负载平均值</td>
+<td>#   HELP node_load5 5m load average.</td>
+</tr>
+<tr>
+<td>node_memory_Active_anon_bytes</td>
+<td>内存信息字段Active_anon_bytes</td>
+<td>#   HELP node_memory_Active_anon_bytes Memory information field   Active_anon_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Active_bytes</td>
+<td>内存信息字段Active_bytes</td>
+<td>#   HELP node_memory_Active_bytes Memory information field Active_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Active_file_bytes</td>
+<td>内存信息字段Active_file_bytes</td>
+<td>#   HELP node_memory_Active_file_bytes Memory information field   Active_file_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_AnonHugePages_bytes</td>
+<td>内存信息字段AnonHugePages_bytes</td>
+<td>#   HELP node_memory_AnonHugePages_bytes Memory information field   AnonHugePages_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_AnonPages_bytes</td>
+<td>内存信息字段AnonPages_bytes</td>
+<td>#   HELP node_memory_AnonPages_bytes Memory information field AnonPages_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Bounce_bytes</td>
+<td>内存信息字段Bounce_bytes</td>
+<td>#   HELP node_memory_Bounce_bytes Memory information field Bounce_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Buffers_bytes</td>
+<td>内存信息字段Buffers_bytes</td>
+<td>#   HELP node_memory_Buffers_bytes Memory information field Buffers_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Cached_bytes</td>
+<td>内存信息字段Cached_bytes</td>
+<td>#   HELP node_memory_Cached_bytes Memory information field Cached_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_CmaFree_bytes</td>
+<td>内存信息字段CmaFree_bytes</td>
+<td>#   HELP node_memory_CmaFree_bytes Memory information field CmaFree_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_CmaTotal_bytes</td>
+<td>内存信息字段CmaTotal_bytes</td>
+<td>#   HELP node_memory_CmaTotal_bytes Memory information field CmaTotal_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_CommitLimit_bytes</td>
+<td>内存信息字段CommitLimit_bytes</td>
+<td>#   HELP node_memory_CommitLimit_bytes Memory information field   CommitLimit_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Committed_AS_bytes</td>
+<td>内存信息字段Committed_AS_bytes</td>
+<td>#   HELP node_memory_Committed_AS_bytes Memory information field   Committed_AS_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_DirectMap1G_bytes</td>
+<td>内存信息字段DirectMap1G_bytes</td>
+<td>#   HELP node_memory_DirectMap1G_bytes Memory information field   DirectMap1G_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_DirectMap2M_bytes</td>
+<td>内存信息字段DirectMap2M_bytes</td>
+<td>#   HELP node_memory_DirectMap2M_bytes Memory information field   DirectMap2M_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_DirectMap4k_bytes</td>
+<td>内存信息字段DirectMap4k_bytes</td>
+<td>#   HELP node_memory_DirectMap4k_bytes Memory information field   DirectMap4k_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Dirty_bytes</td>
+<td>内存信息字段Dirty_bytes</td>
+<td>#   HELP node_memory_Dirty_bytes Memory information field Dirty_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_HardwareCorrupted_bytes</td>
+<td>内存信息字段HardwareCorrupted_bytes</td>
+<td>#   HELP node_memory_HardwareCorrupted_bytes Memory information field   HardwareCorrupted_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_HugePages_Free</td>
+<td>内存信息字段HugePages_Free</td>
+<td>#   HELP node_memory_HugePages_Free Memory information field HugePages_Free.</td>
+</tr>
+<tr>
+<td>node_memory_HugePages_Rsvd</td>
+<td>内存信息字段HugePages_Rsvd</td>
+<td>#   HELP node_memory_HugePages_Rsvd Memory information field HugePages_Rsvd.</td>
+</tr>
+<tr>
+<td>node_memory_HugePages_Surp</td>
+<td>内存信息字段HugePages_Surp</td>
+<td>#   HELP node_memory_HugePages_Surp Memory information field HugePages_Surp.</td>
+</tr>
+<tr>
+<td>node_memory_HugePages_Total</td>
+<td>内存信息字段HugePages_Total</td>
+<td>#   HELP node_memory_HugePages_Total Memory information field HugePages_Total.</td>
+</tr>
+<tr>
+<td>node_memory_Hugepagesize_bytes</td>
+<td>内存信息字段Hugepagesize_bytes</td>
+<td>#   HELP node_memory_Hugepagesize_bytes Memory information field   Hugepagesize_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Inactive_anon_bytes</td>
+<td>内存信息字段Inactive_anon_bytes</td>
+<td>#   HELP node_memory_Inactive_anon_bytes Memory information field   Inactive_anon_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Inactive_bytes</td>
+<td>内存信息字段Inactive_bytes</td>
+<td>#   HELP node_memory_Inactive_bytes Memory information field Inactive_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Inactive_file_bytes</td>
+<td>内存信息字段Inactive_file_bytes</td>
+<td>#   HELP node_memory_Inactive_file_bytes Memory information field   Inactive_file_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_KernelStack_bytes</td>
+<td>内存信息字段KernelStack_bytes</td>
+<td>#   HELP node_memory_KernelStack_bytes Memory information field   KernelStack_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Mapped_bytes</td>
+<td>内存信息字段Mapped_bytes</td>
+<td>#   HELP node_memory_Mapped_bytes Memory information field Mapped_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_MemAvailable_bytes</td>
+<td>内存信息字段MemAvailable_bytes</td>
+<td>#   HELP node_memory_MemAvailable_bytes Memory information field   MemAvailable_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_MemFree_bytes</td>
+<td>内存信息字段MemFree_bytes</td>
+<td>#   HELP node_memory_MemFree_bytes Memory information field MemFree_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_MemTotal_bytes</td>
+<td>内存信息字段MemTotal_bytes</td>
+<td>#   HELP node_memory_MemTotal_bytes Memory information field MemTotal_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Mlocked_bytes</td>
+<td>内存信息字段Mlocked_bytes</td>
+<td>#   HELP node_memory_Mlocked_bytes Memory information field Mlocked_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_NFS_Unstable_bytes</td>
+<td>内存信息字段NFS_Unstable_bytes</td>
+<td>#   HELP node_memory_NFS_Unstable_bytes Memory information field   NFS_Unstable_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_PageTables_bytes</td>
+<td>内存信息字段PageTables_bytes</td>
+<td>#   HELP node_memory_PageTables_bytes Memory information field PageTables_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_SReclaimable_bytes</td>
+<td>内存信息字段SReclaimable_bytes</td>
+<td>#   HELP node_memory_SReclaimable_bytes Memory information field   SReclaimable_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_SUnreclaim_bytes</td>
+<td>内存信息字段SUnreclaim_bytes</td>
+<td>#   HELP node_memory_SUnreclaim_bytes Memory information field SUnreclaim_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Shmem_bytes</td>
+<td>内存信息字段Shmem_bytes</td>
+<td>#   HELP node_memory_Shmem_bytes Memory information field Shmem_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Slab_bytes</td>
+<td>内存信息字段Slab_bytes</td>
+<td>#   HELP node_memory_Slab_bytes Memory information field Slab_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_SwapCached_bytes</td>
+<td>内存信息字段SwapCached_bytes</td>
+<td>#   HELP node_memory_SwapCached_bytes Memory information field SwapCached_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_SwapFree_bytes</td>
+<td>内存信息字段SwapFree_bytes</td>
+<td>#   HELP node_memory_SwapFree_bytes Memory information field SwapFree_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_SwapTotal_bytes</td>
+<td>内存信息字段SwapTotal_bytes</td>
+<td>#   HELP node_memory_SwapTotal_bytes Memory information field SwapTotal_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Unevictable_bytes</td>
+<td>内存信息字段Unevictable_bytes</td>
+<td>#   HELP node_memory_Unevictable_bytes Memory information field   Unevictable_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_VmallocChunk_bytes</td>
+<td>内存信息字段VmallocChunk_bytes</td>
+<td>#   HELP node_memory_VmallocChunk_bytes Memory information field   VmallocChunk_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_VmallocTotal_bytes</td>
+<td>内存信息字段VmallocTotal_bytes</td>
+<td>#   HELP node_memory_VmallocTotal_bytes Memory information field   VmallocTotal_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_VmallocUsed_bytes</td>
+<td>内存信息字段VmallocUsed_bytes</td>
+<td>#   HELP node_memory_VmallocUsed_bytes Memory information field   VmallocUsed_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_WritebackTmp_bytes</td>
+<td>内存信息字段WritebackTmp_bytes</td>
+<td>#   HELP node_memory_WritebackTmp_bytes Memory information field   WritebackTmp_bytes.</td>
+</tr>
+<tr>
+<td>node_memory_Writeback_bytes</td>
+<td>内存信息字段Writeback_bytes</td>
+<td>#   HELP node_memory_Writeback_bytes Memory information field Writeback_bytes.</td>
+</tr>
+<tr>
+<td>node_netstat_Icmp6_InErrors</td>
+<td>统计Icmp6InErrors</td>
+<td>#   HELP node_netstat_Icmp6_InErrors Statistic Icmp6InErrors.</td>
+</tr>
+<tr>
+<td>node_netstat_Icmp6_InMsgs</td>
+<td>统计Icmp6InMsgs</td>
+<td>#   HELP node_netstat_Icmp6_InMsgs Statistic Icmp6InMsgs.</td>
+</tr>
+<tr>
+<td>node_netstat_Icmp6_OutMsgs</td>
+<td>统计Icmp6OutMsgs</td>
+<td>#   HELP node_netstat_Icmp6_OutMsgs Statistic Icmp6OutMsgs.</td>
+</tr>
+<tr>
+<td>node_netstat_Icmp_InErrors</td>
+<td>统计IcmpInErrors</td>
+<td>#   HELP node_netstat_Icmp_InErrors Statistic IcmpInErrors.</td>
+</tr>
+<tr>
+<td>node_netstat_Icmp_InMsgs</td>
+<td>统计IcmpInMsgs</td>
+<td>#   HELP node_netstat_Icmp_InMsgs Statistic IcmpInMsgs.</td>
+</tr>
+<tr>
+<td>node_netstat_Icmp_OutMsgs</td>
+<td>统计IcmpOutMsgs</td>
+<td>#   HELP node_netstat_Icmp_OutMsgs Statistic IcmpOutMsgs.</td>
+</tr>
+<tr>
+<td>node_netstat_Ip6_InOctets</td>
+<td>统计Ip6InOctets</td>
+<td>#   HELP node_netstat_Ip6_InOctets Statistic Ip6InOctets.</td>
+</tr>
+<tr>
+<td>node_netstat_Ip6_OutOctets</td>
+<td>统计Ip6OutOctets</td>
+<td>#   HELP node_netstat_Ip6_OutOctets Statistic Ip6OutOctets.</td>
+</tr>
+<tr>
+<td>node_netstat_IpExt_InOctets</td>
+<td>统计IpExtInOctets</td>
+<td>#   HELP node_netstat_IpExt_InOctets Statistic IpExtInOctets.</td>
+</tr>
+<tr>
+<td>node_netstat_IpExt_OutOctets</td>
+<td>统计IpExtOutOctets</td>
+<td>#   HELP node_netstat_IpExt_OutOctets Statistic IpExtOutOctets.</td>
+</tr>
+<tr>
+<td>node_netstat_Ip_Forwarding</td>
+<td>统计IpForwarding</td>
+<td>#   HELP node_netstat_Ip_Forwarding Statistic IpForwarding.</td>
+</tr>
+<tr>
+<td>node_netstat_TcpExt_ListenDrops</td>
+<td>统计TcpExtListenDrops</td>
+<td>#   HELP node_netstat_TcpExt_ListenDrops Statistic TcpExtListenDrops.</td>
+</tr>
+<tr>
+<td>node_netstat_TcpExt_ListenOverflows</td>
+<td>统计TcpExtListenOverflows</td>
+<td>#   HELP node_netstat_TcpExt_ListenOverflows Statistic TcpExtListenOverflows.</td>
+</tr>
+<tr>
+<td>node_netstat_TcpExt_SyncookiesFailed</td>
+<td>统计TcpExtSyncookiesFailed</td>
+<td>#   HELP node_netstat_TcpExt_SyncookiesFailed Statistic TcpExtSyncookiesFailed.</td>
+</tr>
+<tr>
+<td>node_netstat_TcpExt_SyncookiesRecv</td>
+<td>统计TcpExtSyncookiesRecv</td>
+<td>#   HELP node_netstat_TcpExt_SyncookiesRecv Statistic TcpExtSyncookiesRecv.</td>
+</tr>
+<tr>
+<td>node_netstat_TcpExt_SyncookiesSent</td>
+<td>统计TcpExtSyncookiesSent</td>
+<td>#   HELP node_netstat_TcpExt_SyncookiesSent Statistic TcpExtSyncookiesSent.</td>
+</tr>
+<tr>
+<td>node_netstat_TcpExt_TCPSynRetrans</td>
+<td>统计TcpExtTCPSynRetrans</td>
+<td>#   HELP node_netstat_TcpExt_TCPSynRetrans Statistic TcpExtTCPSynRetrans.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_ActiveOpens</td>
+<td>统计TcpActiveOpens</td>
+<td>#   HELP node_netstat_Tcp_ActiveOpens Statistic TcpActiveOpens.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_CurrEstab</td>
+<td>统计TcpCurrEstab</td>
+<td>#   HELP node_netstat_Tcp_CurrEstab Statistic TcpCurrEstab.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_InErrs</td>
+<td>统计TcpInErrs</td>
+<td>#   HELP node_netstat_Tcp_InErrs Statistic TcpInErrs.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_InSegs</td>
+<td>统计TcpInSegs</td>
+<td>#   HELP node_netstat_Tcp_InSegs Statistic TcpInSegs.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_OutSegs</td>
+<td>统计TcpOutSegs</td>
+<td>#   HELP node_netstat_Tcp_OutSegs Statistic TcpOutSegs.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_PassiveOpens</td>
+<td>统计TcpPassiveOpens</td>
+<td>#   HELP node_netstat_Tcp_PassiveOpens Statistic TcpPassiveOpens.</td>
+</tr>
+<tr>
+<td>node_netstat_Tcp_RetransSegs</td>
+<td>统计TcpRetransSegs</td>
+<td>#   HELP node_netstat_Tcp_RetransSegs Statistic TcpRetransSegs.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp6_InDatagrams</td>
+<td>统计Udp6InDatagrams</td>
+<td>#   HELP node_netstat_Udp6_InDatagrams Statistic Udp6InDatagrams.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp6_InErrors</td>
+<td>统计Udp6InErrors</td>
+<td>#   HELP node_netstat_Udp6_InErrors Statistic Udp6InErrors.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp6_NoPorts</td>
+<td>统计Udp6NoPorts</td>
+<td>#   HELP node_netstat_Udp6_NoPorts Statistic Udp6NoPorts.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp6_OutDatagrams</td>
+<td>统计Udp6OutDatagrams</td>
+<td>#   HELP node_netstat_Udp6_OutDatagrams Statistic Udp6OutDatagrams.</td>
+</tr>
+<tr>
+<td>node_netstat_UdpLite6_InErrors</td>
+<td>统计UdpLite6InErrors</td>
+<td>#   HELP node_netstat_UdpLite6_InErrors Statistic UdpLite6InErrors.</td>
+</tr>
+<tr>
+<td>node_netstat_UdpLite_InErrors</td>
+<td>统计UdpLiteInErrors</td>
+<td>#   HELP node_netstat_UdpLite_InErrors Statistic UdpLiteInErrors.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp_InDatagrams</td>
+<td>统计UdpInDatagrams</td>
+<td>#   HELP node_netstat_Udp_InDatagrams Statistic UdpInDatagrams.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp_InErrors</td>
+<td>统计UdpInErrors</td>
+<td>#   HELP node_netstat_Udp_InErrors Statistic UdpInErrors.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp_NoPorts</td>
+<td>统计UdpNoPorts</td>
+<td>#   HELP node_netstat_Udp_NoPorts Statistic UdpNoPorts.</td>
+</tr>
+<tr>
+<td>node_netstat_Udp_OutDatagrams</td>
+<td>统计UdpOutDatagrams</td>
+<td>#   HELP node_netstat_Udp_OutDatagrams Statistic UdpOutDatagrams.</td>
+</tr>
+<tr>
+<td>node_network_address_assign_type</td>
+<td>/sys/class/net/<iface>   address_assign_type值</iface></td>
+<td>#   HELP node_network_address_assign_type address_assign_type value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_carrier</td>
+<td>/sys/class/net/<iface>   carrier值</iface></td>
+<td>#   HELP node_network_carrier carrier value of /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_carrier_changes_total</td>
+<td>/sys/class/net/<iface>   carrier_changes_total值</iface></td>
+<td>#   HELP node_network_carrier_changes_total carrier_changes_total value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_device_id</td>
+<td>/sys/class/net/<iface>   device_id值</iface></td>
+<td>#   HELP node_network_device_id device_id value of /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_dormant</td>
+<td>/sys/class/net/<iface>   dormant（休眠）值</iface></td>
+<td>#   HELP node_network_dormant dormant value of /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_flags</td>
+<td>/sys/class/net/<iface>   flags值</iface></td>
+<td>#   HELP node_network_flags flags value of /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_iface_id</td>
+<td>/sys/class/net/<iface>   iface_id值</iface></td>
+<td>#   HELP node_network_iface_id iface_id value of /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_iface_link</td>
+<td>/sys/class/net/<iface>   iface_link值</iface></td>
+<td>#   HELP node_network_iface_link iface_link value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_iface_link_mode</td>
+<td>/sys/class/net/<iface>   iface_link_mode值</iface></td>
+<td>#   HELP node_network_iface_link_mode iface_link_mode value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_info</td>
+<td>来自/sys/class/net/<iface>的非数字数据，值始终为1</iface></td>
+<td>#   HELP node_network_info Non-numeric data from /sys/class/net/<iface>,   value is always 1.</iface></td>
+</tr>
+<tr>
+<td>node_network_mtu_bytes</td>
+<td>/sys/class/net/<iface>   mtu_bytes值</iface></td>
+<td>#   HELP node_network_mtu_bytes mtu_bytes value of /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_net_dev_group</td>
+<td>/sys/class/net/<iface>   net_dev_group值</iface></td>
+<td>#   HELP node_network_net_dev_group net_dev_group value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_protocol_type</td>
+<td>/sys/class/net/<iface>   protocol_type值</iface></td>
+<td>#   HELP node_network_protocol_type protocol_type value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_receive_bytes_total</td>
+<td>网络设备统计信息receive_bytes</td>
+<td>#   HELP node_network_receive_bytes_total Network device statistic receive_bytes.</td>
+</tr>
+<tr>
+<td>node_network_receive_compressed_total</td>
+<td>网络设备统计信息receive_compressed</td>
+<td>#   HELP node_network_receive_compressed_total Network device statistic   receive_compressed.</td>
+</tr>
+<tr>
+<td>node_network_receive_drop_total</td>
+<td>网络设备统计信息receive_drop</td>
+<td>#   HELP node_network_receive_drop_total Network device statistic receive_drop.</td>
+</tr>
+<tr>
+<td>node_network_receive_errs_total</td>
+<td>网络设备统计信息receive_errs</td>
+<td>#   HELP node_network_receive_errs_total Network device statistic receive_errs.</td>
+</tr>
+<tr>
+<td>node_network_receive_fifo_total</td>
+<td>网络设备统计信息receive_fifo</td>
+<td>#   HELP node_network_receive_fifo_total Network device statistic receive_fifo.</td>
+</tr>
+<tr>
+<td>node_network_receive_frame_total</td>
+<td>网络设备统计信息receive_frame</td>
+<td>#   HELP node_network_receive_frame_total Network device statistic receive_frame.</td>
+</tr>
+<tr>
+<td>node_network_receive_multicast_total</td>
+<td>网络设备统计信息receive_multicast</td>
+<td>#   HELP node_network_receive_multicast_total Network device statistic   receive_multicast.</td>
+</tr>
+<tr>
+<td>node_network_receive_packets_total</td>
+<td>网络设备统计信息receive_packets</td>
+<td>#   HELP node_network_receive_packets_total Network device statistic   receive_packets.</td>
+</tr>
+<tr>
+<td>node_network_speed_bytes</td>
+<td>/sys/class/net/<iface>   speed_bytes值</iface></td>
+<td>#   HELP node_network_speed_bytes speed_bytes value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_transmit_bytes_total</td>
+<td>网络设备统计信息transmit_bytes</td>
+<td>#   HELP node_network_transmit_bytes_total Network device statistic   transmit_bytes.</td>
+</tr>
+<tr>
+<td>node_network_transmit_carrier_total</td>
+<td>网络设备统计信息transmit_carrier</td>
+<td>#   HELP node_network_transmit_carrier_total Network device statistic   transmit_carrier.</td>
+</tr>
+<tr>
+<td>node_network_transmit_colls_total</td>
+<td>网络设备统计信息transmit_colls</td>
+<td>#   HELP node_network_transmit_colls_total Network device statistic   transmit_colls.</td>
+</tr>
+<tr>
+<td>node_network_transmit_compressed_total</td>
+<td>网络设备统计信息transmit_compressed</td>
+<td>#   HELP node_network_transmit_compressed_total Network device statistic   transmit_compressed.</td>
+</tr>
+<tr>
+<td>node_network_transmit_drop_total</td>
+<td>网络设备统计信息transmit_drop</td>
+<td>#   HELP node_network_transmit_drop_total Network device statistic transmit_drop.</td>
+</tr>
+<tr>
+<td>node_network_transmit_errs_total</td>
+<td>网络设备统计信息transmit_errs</td>
+<td>#   HELP node_network_transmit_errs_total Network device statistic transmit_errs.</td>
+</tr>
+<tr>
+<td>node_network_transmit_fifo_total</td>
+<td>网络设备统计信息transmit_fifo</td>
+<td>#   HELP node_network_transmit_fifo_total Network device statistic transmit_fifo.</td>
+</tr>
+<tr>
+<td>node_network_transmit_packets_total</td>
+<td>网络设备统计信息transmit_packets</td>
+<td>#   HELP node_network_transmit_packets_total Network device statistic   transmit_packets.</td>
+</tr>
+<tr>
+<td>node_network_transmit_queue_length</td>
+<td>/sys/class/net/<iface>   transmit_queue_length值</iface></td>
+<td>#   HELP node_network_transmit_queue_length transmit_queue_length value of   /sys/class/net/<iface>.</iface></td>
+</tr>
+<tr>
+<td>node_network_up</td>
+<td>如果operstate为’up’，则值为1，否则为0</td>
+<td>#   HELP node_network_up Value is 1 if operstate is ‘up’, 0 otherwise.</td>
+</tr>
+<tr>
+<td>node_procs_blocked</td>
+<td>阻塞等待I/O完成的进程数</td>
+<td>#   HELP node_procs_blocked Number of processes blocked waiting for I/O to   complete.</td>
+</tr>
+<tr>
+<td>node_procs_running</td>
+<td>处于可运行状态的进程数</td>
+<td>#   HELP node_procs_running Number of processes in runnable state.</td>
+</tr>
+<tr>
+<td>node_scrape_collector_duration_seconds</td>
+<td>node_exporter：collector scrape持续时间</td>
+<td>#   HELP node_scrape_collector_duration_seconds node_exporter: Duration of a   collector scrape.</td>
+</tr>
+<tr>
+<td>node_scrape_collector_success</td>
+<td>node_exporter：collector 是否成功</td>
+<td>#   HELP node_scrape_collector_success node_exporter: Whether a collector   succeeded.</td>
+</tr>
+<tr>
+<td>node_sockstat_FRAG_inuse</td>
+<td>state   inuse中的FRAG sockets数量</td>
+<td>#   HELP node_sockstat_FRAG_inuse Number of FRAG sockets in state inuse.</td>
+</tr>
+<tr>
+<td>node_sockstat_FRAG_memory</td>
+<td>state   memory（状态存储器）中的FRAG sockets数量</td>
+<td>#   HELP node_sockstat_FRAG_memory Number of FRAG sockets in state memory.</td>
+</tr>
+<tr>
+<td>node_sockstat_RAW_inuse</td>
+<td>state   inuse中的RAW sockets数</td>
+<td>#   HELP node_sockstat_RAW_inuse Number of RAW sockets in state inuse.</td>
+</tr>
+<tr>
+<td>node_sockstat_TCP_alloc</td>
+<td>state   alloc中的TCP sockets数</td>
+<td>#   HELP node_sockstat_TCP_alloc Number of TCP sockets in state alloc.</td>
+</tr>
+<tr>
+<td>node_sockstat_TCP_inuse</td>
+<td>state   inuse中的TCP sockets数</td>
+<td>#   HELP node_sockstat_TCP_inuse Number of TCP sockets in state inuse.</td>
+</tr>
+<tr>
+<td>node_sockstat_TCP_mem</td>
+<td>state   mem中的TCP sockets数</td>
+<td>#   HELP node_sockstat_TCP_mem Number of TCP sockets in state mem.</td>
+</tr>
+<tr>
+<td>node_sockstat_TCP_mem_bytes</td>
+<td>state   mem_bytes中的TCP sockets数</td>
+<td>#   HELP node_sockstat_TCP_mem_bytes Number of TCP sockets in state mem_bytes.</td>
+</tr>
+<tr>
+<td>node_sockstat_TCP_orphan</td>
+<td>state   orphan中的TCP sockets数</td>
+<td>#   HELP node_sockstat_TCP_orphan Number of TCP sockets in state orphan.</td>
+</tr>
+<tr>
+<td>node_sockstat_TCP_tw</td>
+<td>state   tw中的TCP sockets数</td>
+<td>#   HELP node_sockstat_TCP_tw Number of TCP sockets in state tw.</td>
+</tr>
+<tr>
+<td>node_sockstat_UDPLITE_inuse</td>
+<td>state   inuse中的UDPLITE UDP sockets数</td>
+<td>#   HELP node_sockstat_UDPLITE_inuse Number of UDPLITE sockets in state inuse.</td>
+</tr>
+<tr>
+<td>node_sockstat_UDP_inuse</td>
+<td>state   inuse中的UDP sockets数</td>
+<td>#   HELP node_sockstat_UDP_inuse Number of UDP sockets in state inuse.</td>
+</tr>
+<tr>
+<td>node_sockstat_UDP_mem</td>
+<td>state   mem中的UDP sockets数</td>
+<td>#   HELP node_sockstat_UDP_mem Number of UDP sockets in state mem.</td>
+</tr>
+<tr>
+<td>node_sockstat_UDP_mem_bytes</td>
+<td>state   mem_bytes中的UDP sockets数</td>
+<td>#   HELP node_sockstat_UDP_mem_bytes Number of UDP sockets in state mem_bytes.</td>
+</tr>
+<tr>
+<td>node_sockstat_sockets_used</td>
+<td>state   used中的sockets sockets数</td>
+<td>#   HELP node_sockstat_sockets_used Number of sockets sockets in state used.</td>
+</tr>
+<tr>
+<td>node_textfile_scrape_error</td>
+<td>如果打开或读取文件时出错时为1，否则为0</td>
+<td>#   HELP node_textfile_scrape_error 1 if there was an error opening or reading a   file, 0 otherwise</td>
+</tr>
+<tr>
+<td>node_time_seconds</td>
+<td>以纪元（1970年）开始的系统时间</td>
+<td>#   HELP node_time_seconds System time in seconds since epoch (1970).</td>
+</tr>
+<tr>
+<td>node_timex_estimated_error_seconds</td>
+<td>估计误差（秒）</td>
+<td>#   HELP node_timex_estimated_error_seconds Estimated error in seconds.</td>
+</tr>
+<tr>
+<td>node_timex_frequency_adjustment_ratio</td>
+<td>本地时钟频率调整</td>
+<td>#   HELP node_timex_frequency_adjustment_ratio Local clock frequency adjustment.</td>
+</tr>
+<tr>
+<td>node_timex_loop_time_constant</td>
+<td>锁相回路时间常数</td>
+<td>#   HELP node_timex_loop_time_constant Phase-locked loop time constant.</td>
+</tr>
+<tr>
+<td>node_timex_maxerror_seconds</td>
+<td>最大误差（秒）</td>
+<td>#   HELP node_timex_maxerror_seconds Maximum error in seconds.</td>
+</tr>
+<tr>
+<td>node_timex_offset_seconds</td>
+<td>本地系统和参考时钟之间的时间偏移</td>
+<td>#   HELP node_timex_offset_seconds Time offset in between local system and   reference clock.</td>
+</tr>
+<tr>
+<td>node_timex_pps_calibration_total</td>
+<td>每秒脉冲校准间隔计数</td>
+<td>#   HELP node_timex_pps_calibration_total Pulse per second count of calibration   intervals.</td>
+</tr>
+<tr>
+<td>node_timex_pps_error_total</td>
+<td>每秒脉冲校准错误计数</td>
+<td>#   HELP node_timex_pps_error_total Pulse per second count of calibration errors.</td>
+</tr>
+<tr>
+<td>node_timex_pps_frequency_hertz</td>
+<td>脉冲每秒频率</td>
+<td>#   HELP node_timex_pps_frequency_hertz Pulse per second frequency.</td>
+</tr>
+<tr>
+<td>node_timex_pps_jitter_seconds</td>
+<td>脉冲每秒抖动</td>
+<td>#   HELP node_timex_pps_jitter_seconds Pulse per second jitter.</td>
+</tr>
+<tr>
+<td>node_timex_pps_jitter_total</td>
+<td>每秒脉冲数超出抖动限制的事件数</td>
+<td>#   HELP node_timex_pps_jitter_total Pulse per second count of jitter limit   exceeded events.</td>
+</tr>
+<tr>
+<td>node_timex_pps_shift_seconds</td>
+<td>每秒脉冲数超出稳定极限的事件数</td>
+<td>#   HELP node_timex_pps_shift_seconds Pulse per second interval duration.</td>
+</tr>
+<tr>
+<td>node_timex_pps_stability_exceeded_total</td>
+<td>每秒脉冲数超出稳定极限事件</td>
+<td>#   HELP node_timex_pps_stability_exceeded_total Pulse per second count of   stability limit exceeded events.</td>
+</tr>
+<tr>
+<td>node_timex_pps_stability_hertz</td>
+<td>脉冲每秒稳定性，最近频率变化的平均值</td>
+<td>#   HELP node_timex_pps_stability_hertz Pulse per second stability, average of   recent frequency changes.</td>
+</tr>
+<tr>
+<td>node_timex_status</td>
+<td>status   array bits的值</td>
+<td>#   HELP node_timex_status Value of the status array bits.</td>
+</tr>
+<tr>
+<td>node_timex_sync_status</td>
+<td>时钟与可靠服务器同步(1   = yes, 0 = no)</td>
+<td>#   HELP node_timex_sync_status Is clock synchronized to a reliable server (1 =   yes, 0 = no).</td>
+</tr>
+<tr>
+<td>node_timex_tai_offset_seconds</td>
+<td>国际原子时间（TAI）偏移量</td>
+<td>#   HELP node_timex_tai_offset_seconds International Atomic Time (TAI) offset.</td>
+</tr>
+<tr>
+<td>node_timex_tick_seconds</td>
+<td>时钟周期之间的秒数</td>
+<td>#   HELP node_timex_tick_seconds Seconds between clock ticks.</td>
+</tr>
+<tr>
+<td>node_uname_info</td>
+<td>由uname系统调用提供的标记系统信息</td>
+<td>#   HELP node_uname_info Labeled system information as provided by the uname   system call.</td>
+</tr>
+<tr>
+<td>node_vmstat_pgfault</td>
+<td>/proc/vmstat信息字段pgfault</td>
+<td>#   HELP node_vmstat_pgfault /proc/vmstat information field pgfault.</td>
+</tr>
+<tr>
+<td>node_vmstat_pgmajfault</td>
+<td>/proc/vmstat信息字段pgmajfault</td>
+<td>#   HELP node_vmstat_pgmajfault /proc/vmstat information field pgmajfault.</td>
+</tr>
+<tr>
+<td>node_vmstat_pgpgin</td>
+<td>/proc/vmstat信息字段pgpgin</td>
+<td>#   HELP node_vmstat_pgpgin /proc/vmstat information field pgpgin.</td>
+</tr>
+<tr>
+<td>node_vmstat_pgpgout</td>
+<td>/proc/vmstat信息字段pgpgout</td>
+<td>#   HELP node_vmstat_pgpgout /proc/vmstat information field pgpgout.</td>
+</tr>
+<tr>
+<td>node_vmstat_pswpin</td>
+<td>/proc/vmstat信息字段pswpin</td>
+<td>#   HELP node_vmstat_pswpin /proc/vmstat information field pswpin.</td>
+</tr>
+<tr>
+<td>node_vmstat_pswpout</td>
+<td>/proc/vmstat信息字段pswpout</td>
+<td>#   HELP node_vmstat_pswpout /proc/vmstat information field pswpout.</td>
+</tr>
+<tr>
+<td>node_xfs_allocation_btree_compares_total</td>
+<td>文件系统的分配B-tree比较数</td>
+<td>#   HELP node_xfs_allocation_btree_compares_total Number of allocation B-tree   compares for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_allocation_btree_lookups_total</td>
+<td>文件系统的分配B-tree查找数</td>
+<td>#   HELP node_xfs_allocation_btree_lookups_total Number of allocation B-tree   lookups for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_allocation_btree_records_deleted_total</td>
+<td>为文件系统删除的分配B-tree记录数</td>
+<td>#   HELP node_xfs_allocation_btree_records_deleted_total Number of allocation   B-tree records deleted for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_allocation_btree_records_inserted_total</td>
+<td>为文件系统插入的分配B-tree记录数</td>
+<td>#   HELP node_xfs_allocation_btree_records_inserted_total Number of allocation   B-tree records inserted for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_map_btree_compares_total</td>
+<td>对于文件系统block映射B-tree比较的数量</td>
+<td>#   HELP node_xfs_block_map_btree_compares_total Number of block map B-tree   compares for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_map_btree_lookups_total</td>
+<td>对于文件系统block映射B-tree查找的数量</td>
+<td>#   HELP node_xfs_block_map_btree_lookups_total Number of block map B-tree   lookups for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_map_btree_records_deleted_total</td>
+<td>文件系统删除block映射B-tree记录的数量</td>
+<td>#   HELP node_xfs_block_map_btree_records_deleted_total Number of block map   B-tree records deleted for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_map_btree_records_inserted_total</td>
+<td>文件系统插入block映射B-tree记录的数量</td>
+<td>#   HELP node_xfs_block_map_btree_records_inserted_total Number of block map   B-tree records inserted for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_extent_list_compares_total</td>
+<td>文件系统的extent列表比较数</td>
+<td>#   HELP node_xfs_block_mapping_extent_list_compares_total Number of extent list   compares for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_extent_list_deletions_total</td>
+<td>文件系统的extent列表删除数</td>
+<td>#   HELP node_xfs_block_mapping_extent_list_deletions_total Number of extent list   deletions for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_extent_list_insertions_total</td>
+<td>文件系统的extent列表插入数</td>
+<td>#   HELP node_xfs_block_mapping_extent_list_insertions_total Number of extent   list insertions for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_extent_list_lookups_total</td>
+<td>文件系统的extent列表查找次数</td>
+<td>#   HELP node_xfs_block_mapping_extent_list_lookups_total Number of extent list   lookups for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_reads_total</td>
+<td>文件系统读取操作的block映射数</td>
+<td>#   HELP node_xfs_block_mapping_reads_total Number of block map for read   operations for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_unmaps_total</td>
+<td>文件系统的block取消映射（删除）的数量</td>
+<td>#   HELP node_xfs_block_mapping_unmaps_total Number of block unmaps (deletes) for   a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_block_mapping_writes_total</td>
+<td>文件系统写操作的block映射数</td>
+<td>#   HELP node_xfs_block_mapping_writes_total Number of block map for write   operations for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_extent_allocation_blocks_allocated_total</td>
+<td>文件系统分配的block数</td>
+<td>#   HELP node_xfs_extent_allocation_blocks_allocated_total Number of blocks   allocated for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_extent_allocation_blocks_freed_total</td>
+<td>文件系统释放的block数</td>
+<td>#   HELP node_xfs_extent_allocation_blocks_freed_total Number of blocks freed for   a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_extent_allocation_extents_allocated_total</td>
+<td>为文件系统分配的extent数      在电脑文件系统中，一个 Extent (在中国大陆某些文献中翻译为“区块”[1])，是指一段连续的存储空间。一般来说，一个文件的物理大小一定是一个   extent 容量的整数倍。当一个进程创建一个文件的时候，文件系统管理程序会将整个 extent 分配给这个文件。当再次向该文件写入数据时   (有可能是在其他写入操作之后)，数据会从上次写入的数据末尾处追加数据。这样可以减少甚至消除文件碎片。      参考：<a href="http://www.wikiwand.com/zh-sg/Extent_(%E6%AA%94%E6%A1%88%E7%B3%BB%E7%B5%B1)" target="_blank" rel="noopener">http://www.wikiwand.com/zh-sg/Extent_(%E6%AA%94%E6%A1%88%E7%B3%BB%E7%B5%B1)</a></td>
+<td>#   HELP node_xfs_extent_allocation_extents_allocated_total Number of extents   allocated for a filesystem.</td>
+</tr>
+<tr>
+<td>node_xfs_extent_allocation_extents_freed_total</td>
+<td>文件系统释放的extent数</td>
+<td>#   HELP node_xfs_extent_allocation_extents_freed_total Number of extents freed   for a filesystem.</td>
+</tr>
+</tbody>
+</table>
 
           
         
@@ -424,7 +1774,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/36/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><span class="page-number current">37</span><a class="page-number" href="/page/38/">38</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/38/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/36/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/36/">36</a><span class="page-number current">37</span><a class="page-number" href="/page/38/">38</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/38/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -470,7 +1820,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

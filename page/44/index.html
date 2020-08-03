@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/06/如何在CentOS-7上将BIND配置为专用网络DNS服务器/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/07/ceph中的单元测试/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/01/06/如何在CentOS-7上将BIND配置为专用网络DNS服务器/" itemprop="url">如何在CentOS 7上将BIND配置为专用网络DNS服务器</a></h1>
+                <a class="post-title-link" href="/2019/01/07/ceph中的单元测试/" itemprop="url">ceph中的单元测试</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-06T00:00:30+08:00">
-                2019-01-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-07T16:31:08+08:00">
+                2019-01-07
               </time>
             
 
@@ -358,258 +358,15 @@
       
         
           
-            <p>Ceph的对象存储服务中有网站托管服务，需要结合DNS来做配合。所以想借此机会了解一下DNS服务，DNS开源软件中最有名的当属BIND。那么如果搭建该服务？如何与Ceph的对象存储服务radosgateway对接？这两个课题是需要来实验的。这篇文章不包括DNS理论，因为在网络上有很多，可以自己google一下。本篇文章主要是：如果搭建BIND服务，以实践为主，我在网络上找到一篇英文文章，是关于BIND在centos7上搭建的，如果英文可以请看<a href="https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-a-private-network-dns-server-on-centos-7" target="_blank" rel="noopener">原文</a>。</p>
-<p>下面我们就来验证一下BIND的搭建：</p>
-<h1 id="Introduction-介绍"><a href="#Introduction-介绍" class="headerlink" title="Introduction 介绍"></a>Introduction 介绍</h1><p>通过设置适当的域名系统（DNS, Domain Name System），可以按名称查找network interfaces和IP地址，这使得管理server configuration和infrastructure变得更容易。在本教程中，我们将使用CentOS 7上的BIND name servers软件（BIND9）来讨论如何设置内部DNS服务器，Virtual Private Servers (VPS) 可以使用它来解析private host names和private IP地址。这是管理内部多主机hostnames和私有IP地址时必不可少的。</p>
-<p>可以在此处找到本教程的<a href="https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-a-private-network-dns-server-on-ubuntu-14-04" target="_blank" rel="noopener">Ubuntu版本</a>。</p>
-<h1 id="Prerequisites-先决条件"><a href="#Prerequisites-先决条件" class="headerlink" title="Prerequisites 先决条件"></a>Prerequisites 先决条件</h1><p>要完成本教程，您需要以下内容：</p>
-<ul>
-<li>同一datacenter，并运行在同一private networking下的多台server（可以是虚拟机）</li>
-<li>Primary DNS server，ns1</li>
-<li>Secondary DNS server，ns2</li>
-<li>Root访问以上所有内容（<a href="https://www.digitalocean.com/community/tutorials/initial-server-setup-with-centos-7" target="_blank" rel="noopener">steps 1-4 here</a>）</li>
-</ul>
-<p>如果您不熟悉DNS概念，建议您阅读<a href="https://www.digitalocean.com/community/tutorial_series/an-introduction-to-managing-dns" target="_blank" rel="noopener">Introduction to Managing DNS</a>。</p>
-<h1 id="Example-Hosts-示例主机"><a href="#Example-Hosts-示例主机" class="headerlink" title="Example Hosts 示例主机"></a>Example Hosts 示例主机</h1><p>出于示例目的，我们将假设以下内容：</p>
-<ul>
-<li>我们有两个现有的VPS叫做”host1”和”host2”</li>
-<li>两个VPS都存在于nyc3 datacenter</li>
-<li>两个VPS都启用了private networking（并且位于10.128.0.0/16子网上）</li>
-<li>两个VPS都与我们在”example.com”上运行的Web应用程序有某种关联</li>
-</ul>
-<p>有了这些假设，我们使用”nyc3.example.com”来参考我们的private subnet或zone的命名方案。因此，host1的private Fully-Qualified Domain Name (FQDN) 将为”host1.nyc3.example.com”。</p>
-<p>请参阅下表中的相关详细信息：</p>
-<table>
-<thead>
-<tr>
-<th>Host</th>
-<th>Role</th>
-<th>Private FQDN</th>
-<th>Private IP Address</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>host1</td>
-<td>Generic Host 1</td>
-<td>host1.nyc3.example.com</td>
-<td>10.128.100.101</td>
-</tr>
-<tr>
-<td>host2</td>
-<td>Generic Host 2</td>
-<td>host2.nyc3.example.com</td>
-<td>10.128.200.102</td>
-</tr>
-</tbody>
-</table>
-<p>注意：自己的实验环境将有所不同，示例中的名称和IP地址只是用于演示如何配置DNS server以提供内部DNS服务。您应该设置适合自己环境的host names和private IP addresses。没有必要在命名方案中使用datacenter的region名称，但我们在此处使用它来表示这些主机属于特定datacenter的private network。如果您使用多个datacenters，则可以在每个相应的datacenter内设置内部DNS。</p>
-<h1 id="Our-Goal-我们的目标"><a href="#Our-Goal-我们的目标" class="headerlink" title="Our Goal 我们的目标"></a>Our Goal 我们的目标</h1><p>在本教程结束时，我们将有一个primary DNS server（ns1），以及可选的secondary DNS server（ns2，它将用作备份）。</p>
-<p>这是一个包含示例名称和IP地址的表：</p>
-<table>
-<thead>
-<tr>
-<th>Host</th>
-<th>Role</th>
-<th>Private FQDN</th>
-<th>Private IP Address</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ns1</td>
-<td>Primary DNS Server</td>
-<td>ns1.nyc3.example.com</td>
-<td>10.128.10.11</td>
-</tr>
-<tr>
-<td>ns2</td>
-<td>Secondary DNS Server</td>
-<td>ns2.nyc3.example.com</td>
-<td>10.128.20.12</td>
-</tr>
-</tbody>
-</table>
-<p>让我们开始安装我们的Primary DNS server，ns1。</p>
-<h1 id="Install-BIND-on-DNS-Servers-在DNS服务器上安装BIND"><a href="#Install-BIND-on-DNS-Servers-在DNS服务器上安装BIND" class="headerlink" title="Install BIND on DNS Servers 在DNS服务器上安装BIND"></a>Install BIND on DNS Servers 在DNS服务器上安装BIND</h1><p>注意：以红色突出显示的文本很重要！ 它通常用于表示需要用您自己的设置替换的内容，或者应该修改或添加到配置文件中的内容。（红色字体我会标注red，全文搜索red就可以）例如，如果您看到类似host1.nyc3.example.com（red）的内容，请将其替换为您自己服务器的FQDN。同样，如果您看到host1_private_IP（red），请将其替换为您自己服务器的private IP地址。</p>
-<p>在两个DNS服务器ns1和ns2上，使用yum安装BIND：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y bind bind-utils</span><br></pre></td></tr></table></figure>
-<p>现在已经安装了BIND，让我们配置primary DNS server。</p>
-<h1 id="Configure-Primary-DNS-Server-配置主DNS服务器"><a href="#Configure-Primary-DNS-Server-配置主DNS服务器" class="headerlink" title="Configure Primary DNS Server 配置主DNS服务器"></a>Configure Primary DNS Server 配置主DNS服务器</h1><p>BIND的配置由多个文件组成，这些文件包含在主配置文件named. conf中。 这些文件名以“named”开头，因为这是BIND运行时进程的名称。 我们将从配置options文件开始。</p>
-<h2 id="Configure-Bind-配置Bind"><a href="#Configure-Bind-配置Bind" class="headerlink" title="Configure Bind 配置Bind"></a>Configure Bind 配置Bind</h2><p>BIND的进程名为named，因此，许多文件以”named”命名，而不是”BIND”。</p>
-<p>在ns1上，打开named.conf文件进行编辑：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/named.conf</span><br></pre></td></tr></table></figure>
-<p>在现有options block上方，创建一个名为”trusted”的新ACL block。在这里我们将定义允许递归查询DNS的客户端列表（即与ns1位于同一datacenter的服务器）。使用我们的示例private IP地址，我们将ns1，ns2，host1和host2的IP添加到可信客户端列表中：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 1 of 4</span><br><span class="line"></span><br><span class="line">acl &quot;trusted&quot; &#123;</span><br><span class="line">        10.128.10.11;    # ns1 - can be set to localhost</span><br><span class="line">        10.128.20.12;    # ns2</span><br><span class="line">        10.128.100.101;  # host1</span><br><span class="line">        10.128.200.102;  # host2</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>我们有了可信DNS客户端列表，我们将要编辑options block。将ns1的private IP添加到<code>listen-on port 53</code>指令中，并注释掉<code>listen-on-v6</code>行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 2 of 4</span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; 127.0.0.1; 10.128.10.11; &#125;;</span><br><span class="line">#        listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>在这些条目下面，将allow-transfer指令从”none”更改为ns2的private IP地址。另外，将allow-query指令从”localhost”更改为”trusted”：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 3 of 4</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">options &#123;</span><br><span class="line">...</span><br><span class="line">        allow-transfer &#123; 10.128.20.12; &#125;;      # disable zone transfers by default</span><br><span class="line">...</span><br><span class="line">        allow-query &#123; trusted; &#125;;  # allows queries from &quot;trusted&quot; clients</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>在文件末尾，添加以下行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 4 of 4</span><br><span class="line"></span><br><span class="line">include &quot;/etc/named/named.conf.local&quot;;</span><br></pre></td></tr></table></figure>
-<p>现在保存并退出named.conf。上述配置指定只有您自己的服务器（”trusted”服务器）才能查询DNS服务器。</p>
-<p>接下来，我们将配置local文件，以指定我们的DNS zones。</p>
-<h2 id="Configure-Local-File-配置Local文件"><a href="#Configure-Local-File-配置Local文件" class="headerlink" title="Configure Local File 配置Local文件"></a>Configure Local File 配置Local文件</h2><p>在ns1上，打开named.conf.local文件以进行编辑：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/named/named.conf.local</span><br></pre></td></tr></table></figure>
-<p>该文件应为空。 在这里，我们将指定forward和reverse zones。</p>
-<p>使用以下行添加forward zone（替换您自己的zone名称）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/named.conf.local — 1 of 2</span><br><span class="line"></span><br><span class="line">zone &quot;nyc3.example.com&quot; &#123;</span><br><span class="line">    type master;</span><br><span class="line">    file &quot;/etc/named/zones/db.nyc3.example.com&quot;; # zone file path</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>假设我们的private subnet是10.128.0.0/16，请使用以下行添加reverse zone（请注意，我们的reverse zone名称以”128.10”开头，这是”10.128”的八位字节反转，octet reversal of “10.128”）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/named.conf.local — 2 of 2</span><br><span class="line"></span><br><span class="line">zone &quot;128.10.in-addr.arpa&quot; &#123;</span><br><span class="line">    type master;</span><br><span class="line">    file &quot;/etc/named/zones/db.10.128&quot;;  # 10.128.0.0/16 subnet</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure>
-<p>如果您的服务器跨多个private subnets但位于同一datacenter，请确保为每个不同的subnet指定一个额外的zone和zone文件。添加完所有所需zone后，保存并退出named.conf.local文件。</p>
-<p>既然我们的zone是在BIND中指定的，我们需要创建相应的forward和reverse zone文件。</p>
-<h2 id="Create-Forward-Zone-File-创建Forward-Zone文件"><a href="#Create-Forward-Zone-File-创建Forward-Zone文件" class="headerlink" title="Create Forward Zone File 创建Forward Zone文件"></a>Create Forward Zone File 创建Forward Zone文件</h2><p>forward zone文件中，我们为正向DNS查找定义了DNS records（记录）。也就是说，当DNS收到名称查询（例如”host1.nyc3.example.com”）时，它将查找forward zone文件以解析host1的相应private IP地址。</p>
-<p>创建我们的zone文件。根据我们的named.conf.local配置，该位置应为/etc/named/zones：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod 755 /etc/named</span><br><span class="line">sudo mkdir /etc/named/zones</span><br></pre></td></tr></table></figure>
-<p>现在让我们编辑我们的forward zone文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/named/zones/db.nyc3.example.com</span><br></pre></td></tr></table></figure>
-<p>首先，您需要添加SOA record（记录）。将突出显示的ns1 FQDN替换为您自己的FQDN，然后将第二个”nyc3.example.com”替换为您自己的domain。 每次编辑zone文件时，都应该在重新启动named进程之前增加serial值 —— 我们将它增加到”3”。它应该看起来像这样：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.nyc3.example.com — 1 of 3</span><br><span class="line"></span><br><span class="line">@       IN      SOA     ns1.nyc3.example.com. admin.nyc3.example.com. (</span><br><span class="line">                              3         ; Serial</span><br><span class="line">             604800     ; Refresh</span><br><span class="line">              86400     ; Retry</span><br><span class="line">            2419200     ; Expire</span><br><span class="line">             604800 )   ; Negative Cache TTL</span><br></pre></td></tr></table></figure>
-<p>之后，使用以下行添加您的nameserver records（替换自己的名称<code>nyc3.example.com.</code>）。请注意，第二列指定这些是”NS” records（记录）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.nyc3.example.com — 2 of 3</span><br><span class="line"></span><br><span class="line">; name servers - NS records</span><br><span class="line">    IN      NS      ns1.nyc3.example.com.</span><br><span class="line">    IN      NS      ns2.nyc3.example.com.</span><br></pre></td></tr></table></figure>
-<p>然后为属于此zone的主机添加A记录。 这包括我们希望以”.nyc3.example.com” 结尾的名称的任何服务器（替换名称和private IP地址）。使用我们的示例名称和private IP地址，我们将为ns1，ns2，host1和host2添加A记录，如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.nyc3.example.com — 3 of 3</span><br><span class="line"></span><br><span class="line">; name servers - A records</span><br><span class="line">ns1.nyc3.example.com.          IN      A       10.128.10.11</span><br><span class="line">ns2.nyc3.example.com.          IN      A       10.128.20.12</span><br><span class="line"></span><br><span class="line">; 10.128.0.0/16 - A records</span><br><span class="line">host1.nyc3.example.com.        IN      A      10.128.100.101</span><br><span class="line">host2.nyc3.example.com.        IN      A      10.128.200.102</span><br></pre></td></tr></table></figure>
-<p>保存并退出db.nyc3.example.com文件。</p>
-<p>我们的最终示例forward zone文件如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.nyc3.example.com — complete</span><br><span class="line"></span><br><span class="line">$TTL    604800</span><br><span class="line">@       IN      SOA     ns1.nyc3.example.com. admin.nyc3.example.com. (</span><br><span class="line">                  3       ; Serial</span><br><span class="line">             604800     ; Refresh</span><br><span class="line">              86400     ; Retry</span><br><span class="line">            2419200     ; Expire</span><br><span class="line">             604800 )   ; Negative Cache TTL</span><br><span class="line">;</span><br><span class="line">; name servers - NS records</span><br><span class="line">     IN      NS      ns1.nyc3.example.com.</span><br><span class="line">     IN      NS      ns2.nyc3.example.com.</span><br><span class="line"></span><br><span class="line">; name servers - A records</span><br><span class="line">ns1.nyc3.example.com.          IN      A       10.128.10.11</span><br><span class="line">ns2.nyc3.example.com.          IN      A       10.128.20.12</span><br><span class="line"></span><br><span class="line">; 10.128.0.0/16 - A records</span><br><span class="line">host1.nyc3.example.com.        IN      A      10.128.100.101</span><br><span class="line">host2.nyc3.example.com.        IN      A      10.128.200.102</span><br></pre></td></tr></table></figure>
-<p>现在让我们转到reverse zone文件。</p>
-<h2 id="Create-Reverse-Zone-File-s-创建Reverse-Zone文件"><a href="#Create-Reverse-Zone-File-s-创建Reverse-Zone文件" class="headerlink" title="Create Reverse Zone File(s) 创建Reverse Zone文件"></a>Create Reverse Zone File(s) 创建Reverse Zone文件</h2><p>Reverse zone文件是我们为反向DNS查找定义DNS PTR记录的地方。也就是说，当DNS通过IP地址（例如”10.128.100.101”）接收查询时，它将查看reverse zone文件以解析相应的FQDN，在这种情况下查询结果为”host1.nyc3.example.com”。</p>
-<p>在ns1上，对于named.conf.local文件中指定的每个reverse zone，都创建一个reverse zone文件。</p>
-<p>编辑与named.conf.local中定义的reverse zone对应的reverse zone文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/named/zones/db.10.128</span><br></pre></td></tr></table></figure>
-<p>与forward zone文件相同的方式，将突出显示的ns1 FQDN替换为您自己的FQDN，然后将第二个”nyc3.example.com”替换为您自己的domain。每次编辑zone文件时，都应该在重新启动named进程之前递增serial值 —— 我们将其增加到”3”。 它应该看起来像这样：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.10.128 — 1 of 3</span><br><span class="line"></span><br><span class="line">@       IN      SOA     ns1.nyc3.example.com. admin.nyc3.example.com. (</span><br><span class="line">                              3         ; Serial</span><br><span class="line">                         604800         ; Refresh</span><br><span class="line">                          86400         ; Retry</span><br><span class="line">                        2419200         ; Expire</span><br><span class="line">                         604800 )       ; Negative Cache TTL</span><br></pre></td></tr></table></figure>
-<p>之后，使用以下行添加您的nameserver records（用您自己的名称替换）。 请注意，第二列指定这些是”NS”记录：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.10.128 — 2 of 3</span><br><span class="line"></span><br><span class="line">; name servers - NS records</span><br><span class="line">      IN      NS      ns1.nyc3.example.com.</span><br><span class="line">      IN      NS      ns2.nyc3.example.com.</span><br></pre></td></tr></table></figure>
-<p>然后为所有服务器添加PTR记录，这些服务器的IP地址位于您正在编辑的zone文件的subnet上。在我们的示例中，这包括我们所有的主机，因为它们都在10.128.0.0/16 subnet上。请注意，第一列包含服务器private IP地址的最后两个八位字节，顺序相反。请务必替换名称和private IP地址以匹配您的服务器：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.10.128 — 3 of 3</span><br><span class="line"></span><br><span class="line">; PTR Records</span><br><span class="line">11.10   IN      PTR     ns1.nyc3.example.com.    ; 10.128.10.11</span><br><span class="line">12.20   IN      PTR     ns2.nyc3.example.com.    ; 10.128.20.12</span><br><span class="line">101.100 IN      PTR     host1.nyc3.example.com.  ; 10.128.100.101</span><br><span class="line">102.200 IN      PTR     host2.nyc3.example.com.  ; 10.128.200.102</span><br></pre></td></tr></table></figure>
-<p>保存并退出reverse zone文件（如果需要添加更多reverse zone文件，请重复此部分）。</p>
-<p>我们的最终示例反向区域文件如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/zones/db.10.128 — complete</span><br><span class="line"></span><br><span class="line">$TTL    604800</span><br><span class="line">@       IN      SOA     nyc3.example.com. admin.nyc3.example.com. (</span><br><span class="line">                              3         ; Serial</span><br><span class="line">                         604800         ; Refresh</span><br><span class="line">                          86400         ; Retry</span><br><span class="line">                        2419200         ; Expire</span><br><span class="line">                         604800 )       ; Negative Cache TTL</span><br><span class="line">; name servers</span><br><span class="line">      IN      NS      ns1.nyc3.example.com.</span><br><span class="line">      IN      NS      ns2.nyc3.example.com.</span><br><span class="line"></span><br><span class="line">; PTR Records</span><br><span class="line">11.10   IN      PTR     ns1.nyc3.example.com.    ; 10.128.10.11</span><br><span class="line">12.20   IN      PTR     ns2.nyc3.example.com.    ; 10.128.20.12</span><br><span class="line">101.100 IN      PTR     host1.nyc3.example.com.  ; 10.128.100.101</span><br><span class="line">102.200 IN      PTR     host2.nyc3.example.com.  ; 10.128.200.102</span><br></pre></td></tr></table></figure>
-<h2 id="Check-BIND-Configuration-Syntax-检查BIND配置语法"><a href="#Check-BIND-Configuration-Syntax-检查BIND配置语法" class="headerlink" title="Check BIND Configuration Syntax 检查BIND配置语法"></a>Check BIND Configuration Syntax 检查BIND配置语法</h2><p>运行以下命令以检查named.conf *文件的语法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo named-checkconf</span><br></pre></td></tr></table></figure>
-<p>如果您的named配置文件没有语法错误，您将返回shell提示符并且看不到任何错误消息。 如果配置文件有问题，请检查error message和Configure Primary DNS Server section，然后再次尝试named-checkconf。</p>
-<p>named-checkzone命令可用于检查zone文件的正确性。 其第一个参数指定zone名称，第二个参数指定相应的zone文件，这两个文件都在named.conf.local中定义。</p>
-<p>例如，要检查”nyc3.example.com”的forward zone配置，请运行以下命令（更改名称以匹配你自己的forward zone和文件）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo named-checkzone nyc3.example.com /etc/named/zones/db.nyc3.example.com</span><br></pre></td></tr></table></figure>
-<p>要检查”128.10.in-addr.arpa”的reverse zone配置，请运行以下命令（更改数字以匹配你自己的reverse zone和文件）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo named-checkzone 128.10.in-addr.arpa /etc/named/zones/db.10.128</span><br></pre></td></tr></table></figure>
-<p>当所有配置和zone文件都没有错误时，您应该重新启动BIND服务。</p>
-<h2 id="Start-BIND-启动BIND"><a href="#Start-BIND-启动BIND" class="headerlink" title="Start BIND 启动BIND"></a>Start BIND 启动BIND</h2><p>启动BIND：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start named</span><br></pre></td></tr></table></figure>
-<p>如果你想在OS启动时自动启动BIND服务，请执行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl enable named</span><br></pre></td></tr></table></figure>
-<p>您的primary DNS服务器现已设置好并可以响应DNS查询了。 让我们继续创建secondary DNS服务器。</p>
-<h1 id="Configure-Secondary-DNS-Server-配置备用DNS服务器"><a href="#Configure-Secondary-DNS-Server-配置备用DNS服务器" class="headerlink" title="Configure Secondary DNS Server 配置备用DNS服务器"></a>Configure Secondary DNS Server 配置备用DNS服务器</h1><p>在大多数环境中，最好设置secondary DNS服务器，以便在primary服务器不可用时响应请求。幸运的是，secondary DNS服务器更容易配置。</p>
-<p>在ns2上，编辑named.conf文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/named.conf</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意：如果您希望跳过这些说明，可以复制ns1的named.conf文件并对其进行修改以侦听ns2的private IP地址，and not allow transfers。</span><br></pre></td></tr></table></figure>
-<p>在现有options block上方，创建一个名为”trusted”的新ACL block。在这里我们将定义允许递归DNS查询的客户端列表（即与ns1位于同一datacenter的服务器）。使用我们的示例private IP地址，我们将ns1，ns2，host1和host2添加到trusted（可信）客户端列表中：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 1 of 4</span><br><span class="line"></span><br><span class="line">acl &quot;trusted&quot; &#123;</span><br><span class="line">        10.128.10.11;    # ns1 - can be set to localhost</span><br><span class="line">        10.128.20.12;    # ns2</span><br><span class="line">        10.128.100.101;  # host1</span><br><span class="line">        10.128.200.102;  # host2</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>现在我们有了trusted（可信）DNS客户端列表，我们将要编辑options block。将ns1的private IP地址添加到listen-on port 53指令，并注释掉listen-on-v6行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 2 of 4</span><br><span class="line"></span><br><span class="line">options &#123;</span><br><span class="line">        listen-on port 53 &#123; 127.0.0.1; 10.128.20.12; &#125;;</span><br><span class="line">#        listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>将allow-query指令从”localhost”更改为”trusted”：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 3 of 4</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">options &#123;</span><br><span class="line">...</span><br><span class="line">        allow-query &#123; trusted; &#125;; # allows queries from &quot;trusted&quot; clients</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
-<p>在文件末尾，添加以下行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/etc/named.conf — 4 of 4</span><br><span class="line"></span><br><span class="line">include &quot;/etc/named/named.conf.local&quot;;</span><br></pre></td></tr></table></figure>
-<p>现在保存并退出named.conf。 上述配置指定只有您自己的服务器（”trusted”服务器）才能查询您的DNS服务。</p>
-<p>接下来，我们将配置local文件，以指定我们的DNS zones。</p>
-<p>保存并退出named.conf。</p>
-<p>现在编辑named.conf.local文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod 755 /etc/named</span><br><span class="line">sudo vi /etc/named/named.conf.local</span><br></pre></td></tr></table></figure>
-<p>定义与primary DNS服务器上的master zones对应的slave zones。请注意，类型是”slave”，文件不包含路径，并且有一个masters指令应该设置为primary DNS服务器的private IP。如果您在primary DNS服务器中定义了多个reverse zones，请确保在此处全部添加它们：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/etc/named/named.conf.local</span><br><span class="line"></span><br><span class="line">zone &quot;nyc3.example.com&quot; &#123;</span><br><span class="line">    type slave;</span><br><span class="line">    file &quot;slaves/db.nyc3.example.com&quot;;</span><br><span class="line">    masters &#123; 10.128.10.11; &#125;;  # ns1 private IP</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">zone &quot;128.10.in-addr.arpa&quot; &#123;</span><br><span class="line">    type slave;</span><br><span class="line">    file &quot;slaves/db.10.128&quot;;</span><br><span class="line">    masters &#123; 10.128.10.11; &#125;;  # ns1 private IP</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>现在保存并退出named.conf.local。</p>
-<p>运行以下命令以检查配置文件的有效性：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo named-checkconf</span><br></pre></td></tr></table></figure>
-<p>检查后，启动BIND：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl start named</span><br></pre></td></tr></table></figure>
-<p>如果你想在OS启动时自动启动BIND服务，请执行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl enable named</span><br></pre></td></tr></table></figure>
-<p>现在，您拥有用于private network名称和IP地址解析的primary DNS服务器和secondary DNS服务器。 现在，您必须配置客户端服务器以使用您的private DNS服务器。</p>
-<h1 id="Configure-DNS-Clients-配置DNS客户端"><a href="#Configure-DNS-Clients-配置DNS客户端" class="headerlink" title="Configure DNS Clients 配置DNS客户端"></a>Configure DNS Clients 配置DNS客户端</h1><p>在”trusted” ACL中的所有服务器都可以查询DNS服务器之前，必须将客户端服务器配置为使用ns1和ns2作为nameservers。 此过程因操作系统而异，但对于大多数Linux发行版，它涉及将name servers添加到/etc/resolv.conf文件中。</p>
-<h2 id="CentOS-Clients"><a href="#CentOS-Clients" class="headerlink" title="CentOS Clients"></a>CentOS Clients</h2><p>在CentOS，RedHat和Fedora Linux VPS上，只需编辑resolv.conf文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/resolv.conf</span><br></pre></td></tr></table></figure>
-<p>然后将以下行添加到文件的顶部（替换您的private domain，以及ns1和ns2 private IP地址）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/etc/resolv.conf</span><br><span class="line"></span><br><span class="line">search nyc3.example.com  # your private domain</span><br><span class="line">nameserver 10.128.10.11  # ns1 private IP address</span><br><span class="line">nameserver 10.128.20.12  # ns2 private IP address</span><br></pre></td></tr></table></figure>
-<p>现在保存并退出。 客户端现在已经配置为使用您自己的DNS服务器。</p>
-<h2 id="Ubuntu-Clients"><a href="#Ubuntu-Clients" class="headerlink" title="Ubuntu Clients"></a>Ubuntu Clients</h2><p>在Ubuntu和Debian Linux VPS上，您可以编辑head文件，该文件在启动时附加到resolv.conf：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/resolvconf/resolv.conf.d/head</span><br></pre></td></tr></table></figure>
-<p>将以下行添加到文件中（替换您的private domain，以及ns1和ns2 private IP地址）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">/etc/resolvconf/resolv.conf.d/head</span><br><span class="line"></span><br><span class="line">search nyc3.example.com  # your private domain</span><br><span class="line">nameserver 10.128.10.11  # ns1 private IP address</span><br><span class="line">nameserver 10.128.20.12  # ns2 private IP address</span><br></pre></td></tr></table></figure>
-<p>现在运行resolvconf以生成新的resolv.conf文件：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo resolvconf -u</span><br></pre></td></tr></table></figure>
-<p>客户端现在已经配置为使用您自己的DNS服务器。</p>
-<h2 id="Test-Clients"><a href="#Test-Clients" class="headerlink" title="Test Clients"></a>Test Clients</h2><p>使用nslookup —— 包含在”bind-utils”包中 —— 测试您的客户端是否可以查询您的name servers。您应该能够在已配置在”trusted” ACL中的所有客户端上执行此操作。</p>
-<h2 id="Forward-Lookup"><a href="#Forward-Lookup" class="headerlink" title="Forward Lookup"></a>Forward Lookup</h2><p>例如，我们可以通过运行以下命令来执行forward（正向）查找以检索host1.nyc3.example.com的IP地址：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nslookup host1</span><br></pre></td></tr></table></figure>
-<p>查询”host1”会扩展为”host1.nyc3.example.com”，因为搜索选项设置为您的private subdomain，在查找其他DNS server之前，DNS查询将尝试查看该subdomain。上面命令的输出如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Output:</span><br><span class="line">Server:     10.128.10.11</span><br><span class="line">Address:    10.128.10.11#53</span><br><span class="line"></span><br><span class="line">Name:   host1.nyc3.example.com</span><br><span class="line">Address: 10.128.100.101</span><br></pre></td></tr></table></figure>
-<h2 id="Reverse-Lookup"><a href="#Reverse-Lookup" class="headerlink" title="Reverse Lookup"></a>Reverse Lookup</h2><p>要测试reverse（反向）查找，请使用host1的private IP地址查询DNS服务器：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nslookup 10.128.100.101</span><br></pre></td></tr></table></figure>
-<p>您应该看到如下所示的输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Output:</span><br><span class="line">Server:     10.128.10.11</span><br><span class="line">Address:    10.128.10.11#53</span><br><span class="line"></span><br><span class="line">11.10.128.10.in-addr.arpa   name = host1.nyc3.example.com.</span><br></pre></td></tr></table></figure>
-<p>如果所有名称和IP地址都解析为正确的值，则表示您的zone文件已正确配置。如果收到异常值，请务必查看primary DNS服务器上的zone文件（例如db.nyc3.example.com和db.10.128）。</p>
-<p>恭喜！ 您的内部DNS服务器现已正确设置！ 现在我们将介绍如何维护您的zone records。</p>
-<h1 id="Maintaining-DNS-Records-维护DNS记录"><a href="#Maintaining-DNS-Records-维护DNS记录" class="headerlink" title="Maintaining DNS Records 维护DNS记录"></a>Maintaining DNS Records 维护DNS记录</h1><p>现在您有了一个正常工作的内部DNS，您需要维护DNS records，以便它们准确地响应您的server environment。</p>
-<h2 id="Adding-Host-to-DNS-将主机添加到DNS"><a href="#Adding-Host-to-DNS-将主机添加到DNS" class="headerlink" title="Adding Host to DNS 将主机添加到DNS"></a>Adding Host to DNS 将主机添加到DNS</h2><p>每当您向environment添加主机（在同一datacenter中）时，都需要将其添加到DNS中。以下是您需要执行的步骤：</p>
-<p>Primary Nameserver（主Nameserver）</p>
-<ul>
-<li>Forward zone文件：为新主机添加”A”记录，增加”Serial”的值</li>
-<li>Reverse zone文件：为新主机添加”PTR”记录，增加”Serial”的值</li>
-<li>将新主机的private IP地址添加到”trusted” ACL（named.conf.options）</li>
-</ul>
-<p>然后重新加载BIND：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl reload named</span><br></pre></td></tr></table></figure>
-<p>Secondary Nameserver（辅助Nameserver）</p>
-<ul>
-<li>将新主机的private IP地址添加到”trusted” ACL（named.conf.options）</li>
-</ul>
-<p>然后重新加载BIND：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl reload named</span><br></pre></td></tr></table></figure>
-<p>配置新主机以使用您自己的DNS</p>
-<ul>
-<li>配置resolv.conf以使用您自己的DNS服务器</li>
-<li>使用nslookup进行测试</li>
-</ul>
-<h2 id="Removing-Host-from-DNS-从DNS中删除主机"><a href="#Removing-Host-from-DNS-从DNS中删除主机" class="headerlink" title="Removing Host from DNS 从DNS中删除主机"></a>Removing Host from DNS 从DNS中删除主机</h2><p>如果您从environment中删除主机或想要将其从DNS中删除，只需删除将服务器添加到DNS时添加的所有内容（即上述步骤的相反步骤）。</p>
-<h1 id="Conclusion-结论"><a href="#Conclusion-结论" class="headerlink" title="Conclusion 结论"></a>Conclusion 结论</h1><p>现在，您可以按名称而不是IP地址来访问服务器的private network interfaces。这使得服务和应用程序的配置更加容易，因为您不再需要记住private IP地址，并且文件将更易于阅读和理解。此外，现在您可以更改配置，以便在单个位置指向新服务器，即primary DNS服务器，而不必编辑各种分布式配置文件，从而简化了维护。</p>
-<p>设置内部DNS并且配置文件使用private FQDN指定网络连接后，维护DNS服务器至关重要。如果它们都不可用，那么依赖它们的服务和应用程序将无法正常运行。这就是为什么建议使用至少一个secondary服务器设置DNS，并维护所有这些服务器的工作备份原因。</p>
-<h1 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h1><table>
-<thead>
-<tr>
-<th>Host</th>
-<th>Role</th>
-<th>Private FQDN</th>
-<th>Private IP Address</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>ns1</td>
-<td>Primary DNS Server</td>
-<td>ns1.nyc3.example.com</td>
-<td>192.168.0.22</td>
-</tr>
-<tr>
-<td>ns2</td>
-<td>Secondary DNS Server</td>
-<td>ns2.nyc3.example.com</td>
-<td>192.168.0.23</td>
-</tr>
-<tr>
-<td>dns-client</td>
-<td>DNS client</td>
-<td></td>
-<td>192.168.0.24</td>
-</tr>
-</tbody>
-</table>
-<p>1、安装BIND在Primary DNS Server</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y bind bind-utils</span><br></pre></td></tr></table></figure>
-<p>2、修改/etc/named.conf</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">sudo vi /etc/named.conf</span><br><span class="line"></span><br><span class="line">acl &quot;trusted&quot; &#123;</span><br><span class="line">        192.168.0.22;    # ns1 - can be set to localhost</span><br><span class="line">        192.168.0.23;    # ns2</span><br><span class="line">        192.168.0.24;    # dns-client</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">options &#123; # options start</span><br><span class="line">		# ... ...</span><br><span class="line">     	listen-on port 53 &#123; 127.0.0.1; 192.168.0.22; &#125;;</span><br><span class="line">        # listen-on-v6 port 53 &#123; ::1; &#125;;</span><br><span class="line">        # ... ...</span><br><span class="line">        allow-transfer &#123; 192.168.0.23; &#125;;      # disable zone transfers by default</span><br><span class="line">        allow-query     &#123; trusted; &#125;;</span><br><span class="line">&#125; # options end</span><br><span class="line"></span><br><span class="line">include &quot;/etc/named/named.conf.local&quot;;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sudo vi /etc/named/named.conf.local</span><br><span class="line">sudo chmod 755 /etc/named</span><br><span class="line">sudo mkdir /etc/named/zones</span><br><span class="line">sudo vi /etc/named/zones/db.nyc3.example.com</span><br><span class="line">sudo vi /etc/named/zones/db.192.168</span><br><span class="line">sudo named-checkconf</span><br><span class="line">sudo named-checkzone nyc3.example.com /etc/named/zones/db.nyc3.example.com</span><br><span class="line">sudo named-checkzone 192.168.in-addr.arpa /etc/named/zones/db.192.168</span><br><span class="line">sudo systemctl start named</span><br><span class="line">sudo systemctl enable named</span><br></pre></td></tr></table></figure>
+            <p>Ceph中的单元测试使用的是Google Test，嵌入到Ceph源码中。Google Test的使用这里有一篇<a href="http://www.yeolar.com/note/2014/12/21/gtest/#id15" target="_blank" rel="noopener">入门文章</a>，大体思路讲的很清晰。我们主要重心是如何在Ceph源码中添加单元测试。</p>
+<p>在添加之前我们先读一下已经存在的单元测试，在代码中不同的单元测试实现方式不同，可能按照以下Demo无法完全复制，但是慢慢看代码总会理解的。我们挑一个最简单的，不讲解详细测试内容（因为涉及知识较多，目前我还无法完全理解）。</p>
+<p>下面我们以<code>ceph_test_filejournal</code>为例，它存在于ceph-test*.rpm包中，在打社区版Ceph rpm包时（根据ceph.spec）会生成出来《<a href="https://lnsyyj.github.io/2018/09/13/ceph-build-rpm/" target="_blank" rel="noopener">ceph build rpm</a>》，在我们的被测Ceph节点上安装该rpm，会在<code>/usr/bin/</code>目录中找到<code>ceph_test_filejournal</code>（其实会有很多类似<code>ceph_test_</code>的二进制文件，这些都是Ceph的单元测试）。</p>
+<h1 id="CMakeLists"><a href="#CMakeLists" class="headerlink" title="CMakeLists"></a>CMakeLists</h1><p>单元测试总CMakeLists文件位置在<code>src/test/CMakeLists.txt</code>，如果想自己编写测试代码添加到测试集中，需要修改这个CMakeLists。在社区Ceph我们编译出来可执行测试二进制<code>ceph_test_*</code>，都是在这里通过CMakeLists <code>add_executable</code>定义的。</p>
+<h1 id="单元测试代码位置"><a href="#单元测试代码位置" class="headerlink" title="单元测试代码位置"></a>单元测试代码位置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add_executable(ceph_test_filejournal</span><br><span class="line">  test_filejournal.cc</span><br><span class="line">  )</span><br></pre></td></tr></table></figure>
+<p>在<code>add_executable</code>中同时定义了测试代码源文件<code>test_filejournal.cc</code>。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">::testing::InitGoogleTest(&amp;argc, argv);</span><br></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>【1】<a href="http://www.yeolar.com/note/2014/12/21/gtest/#id15" target="_blank" rel="noopener">http://www.yeolar.com/note/2014/12/21/gtest/#id15</a></p>
+<p>【2】<a href="https://www.ibm.com/developerworks/cn/aix/library/au-googletestingframework.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/aix/library/au-googletestingframework.html</a></p>
 
           
         
@@ -654,7 +411,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/43/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/43/">43</a><span class="page-number current">44</span><a class="page-number" href="/page/45/">45</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/45/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/43/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/43/">43</a><span class="page-number current">44</span><a class="page-number" href="/page/45/">45</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/45/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -700,7 +457,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

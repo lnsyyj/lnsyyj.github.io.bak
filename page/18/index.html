@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/Ceph-MESSENGER-V2/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/14/Ceph-MESSENGER-V2/" itemprop="url">Ceph MESSENGER V2</a></h1>
+                <a class="post-title-link" href="/2019/10/15/AUTOSCALING-PLACEMENT-GROUPS/" itemprop="url">AUTOSCALING PLACEMENT GROUPS</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-14T11:00:56+08:00">
-                2019-10-14
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-15T14:26:54+08:00">
+                2019-10-15
               </time>
             
 
@@ -358,86 +358,151 @@
       
         
           
-            <h1 id="WHAT-IS-IT"><a href="#WHAT-IS-IT" class="headerlink" title="WHAT IS IT"></a>WHAT IS IT</h1><p>messenger v2 protocol（msgr2）是Ceph’s on-wire protocol第二次主要修订。它具有几个关键功能：</p>
+            <h1 id="AUTOSCALING-PLACEMENT-GROUPS"><a href="#AUTOSCALING-PLACEMENT-GROUPS" class="headerlink" title="AUTOSCALING PLACEMENT GROUPS"></a>AUTOSCALING PLACEMENT GROUPS</h1><p>Placement groups (PGs)是ceph分布数据的内部实现。您可以通过启用pg-autoscaling允许根据集群的使用方式提出建议或自动调整PG。</p>
+<p>系统中的每个pool都有一个pg_autoscale_mode属性，可以将其设置为off，on或warn。</p>
 <ul>
-<li>安全模式，对通过网络传递的所有数据进行加密</li>
-<li>改进了authentication payloads的封装，未来可以集成新的authentication模式（例如Kerberos）</li>
-<li>改进了早期的advertisement和negotiation（协商）功能，支持未来的protocol（协议）修订</li>
-</ul>
-<p>Ceph daemons现在可以绑定到多个端口，从而允许旧版Ceph客户端和支持v2的新客户端连接到同一集群。</p>
-<p>默认情况下，monitors现在绑定到新的v2协议的新IANA分配端口3300（ce4h或0xce4），同时还绑定到旧的默认端口6789（旧的v1协议）。</p>
-<h1 id="ADDRESS-FORMATS"><a href="#ADDRESS-FORMATS" class="headerlink" title="ADDRESS FORMATS"></a>ADDRESS FORMATS</h1><p>在nautilus之前，所有网络地址都呈现为1.2.3.4:567/89012，其中有一个IP地址，一个端口和一个随机数，以唯一地标识网络上的客户端或daemon 。 从nautilus开始，我们现在具有三种不同的地址类型：</p>
-<ul>
-<li><p>v2：<code>v2:1.2.3.4:578/89012</code>标识daemon绑定到新v2协议的端口</p>
+<li><p>off: Disable该pool的autoscaling，<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#choosing-number-of-placement-groups" target="_blank" rel="noopener">Choosing the number of Placement Groups</a></p>
 </li>
-<li><p>v1：<code>v1:1.2.3.4:578/89012</code>标识绑定到旧版v1协议的端口的daemon。 以前使用任何前缀显示的任何地址现在都显示为v1: address。</p>
+<li><p>on: 为指定的pool启用PG count自动调整。</p>
 </li>
-<li><p>TYPE_ANY地址标识表示客户端可以支持两种协议版本。 在nautilus之前，客户端将显示为<code>1.2.3.4:0/123456</code>，其中端口0表示它们是客户端，并且不接受连接。 从Nautilus开始，这些客户端现在在内部由TYPE_ANY address表示，并且仍显示为不带前缀，因为它们可能会使用v2或v1协议连接到daemons，具体取决于daemons使用的协议。</p>
+<li><p>warn: 当调整PG count时提出health alerts</p>
 </li>
 </ul>
-<p>因为daemons现在绑定到多个端口，所以现在用地址向量而不是单个地址来描述它们。 例如，在Nautilus cluster上dump monitor map会有如下输出：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 ~]# ceph mon dump</span><br><span class="line">epoch 1</span><br><span class="line">fsid 50fcf227-be32-4bcb-8b41-34ca8370bd16</span><br><span class="line">last_changed 2019-02-25 11:10:46.700821</span><br><span class="line">created 2019-02-25 11:10:46.700821</span><br><span class="line">min_mon_release 14 (nautilus)</span><br><span class="line">0: [v2:10.0.0.10:3300/0,v1:10.0.0.10:6789/0] mon.foo</span><br><span class="line">1: [v2:10.0.0.11:3300/0,v1:10.0.0.11:6789/0] mon.bar</span><br><span class="line">2: [v2:10.0.0.12:3300/0,v1:10.0.0.12:6789/0] mon.baz</span><br></pre></td></tr></table></figure>
-<p>方括号或地址向量表示可以在多个端口（和协议）上访问同一daemon。如果可能，任何连接到该daemon的客户端或其他daemon都将使用v2协议（listed first）； 否则，它将返回到旧版v1协议。 旧版客户端将仅看到v1地址，并且将继续使用v1协议进行连接。</p>
-<p>从Nautilus开始，mon_host配置选项和<code>-m &lt;mon-host&gt;</code>命令行选项支持相同的带括号的地址向量语法。</p>
-<h2 id="BIND-CONFIGURATION-OPTIONS"><a href="#BIND-CONFIGURATION-OPTIONS" class="headerlink" title="BIND CONFIGURATION OPTIONS"></a>BIND CONFIGURATION OPTIONS</h2><p>两个新的配置选项控制是否使用v1 and/or v2协议：</p>
+<p>要为已有的pool设置autoscaling mode，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &lt;pool-name&gt; pg_autoscale_mode &lt;mode&gt;</span><br></pre></td></tr></table></figure>
+<p>例如，要对池foo启用autoscaling，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set foo pg_autoscale_mode on</span><br></pre></td></tr></table></figure>
+<p>您还可以使用以下命令配置默认pg_autoscale_mode，该默认pg_autoscale_mode应用于以后创建的任何pool：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global osd_pool_default_pg_autoscale_mode &lt;mode&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="VIEWING-PG-SCALING-RECOMMENDATIONS"><a href="#VIEWING-PG-SCALING-RECOMMENDATIONS" class="headerlink" title="VIEWING PG SCALING RECOMMENDATIONS"></a>VIEWING PG SCALING RECOMMENDATIONS</h3><p>您可以使用以下命令查看每个pool，pool的相对利用率以及对PG count的任何建议更改：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool autoscale-status</span><br></pre></td></tr></table></figure>
+<p>输出将类似于：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">POOL                         SIZE  TARGET SIZE  RATE  RAW CAPACITY   RATIO  TARGET RATIO  BIAS  PG_NUM  NEW PG_NUM  AUTOSCALE </span><br><span class="line">cephfs_metadata             1540k                3.0        594.0G  0.0000                 4.0       8              warn      </span><br><span class="line">default.rgw.meta            1536k                3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">cephfs_data                    0                 3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">default.rgw.buckets.index      0                 3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">default.rgw.control            0                 3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">yujiang                        0        553.2G   1.0        594.0G  0.9313                 1.0     512              on        </span><br><span class="line">.rgw.root                   1344k                3.0        594.0G  0.0000                 1.0       8              warn      </span><br><span class="line">rbd                        576.0k                3.0        594.0G  0.0000                 1.0       4              on        </span><br><span class="line">default.rgw.log                0                 3.0        594.0G  0.0000                 1.0       8              warn</span><br></pre></td></tr></table></figure>
+<p>SIZE是存储在pool中的数据量。TARGET SIZE（如果存在）是管理员希望最终存储在该pool中的数据量。系统使用两个值中的较大者进行计算。</p>
+<p>RATE是pool的multiplier（乘数或倍数），它确定要消耗多少raw（原始） storage capacity。例如，3个副本池的比率为3.0，而k=4，m=2擦除编码池的比率为1.5。</p>
+<p>RAW CAPACITY是OSD上负责存储该pool（可能还有其他pool）数据的raw storage capacity的总量。RATIO是该pool消耗的总容量的比率（即ratio = size * rate / raw capacity）。</p>
+<p>TARGET RATIO（如果存在）是管理员指定他们希望该pool使用的存储空间的比率。系统使用actual ratio和target ratio中的较大者进行计算。 如果同时指定了target size bytes和ratio ，则ratio优先。</p>
+<p>PG_NUM是该pool的当前PG数。系统认为应将pool的pg_num更改为NEW PG_NUM（如果存在）。它始终是2的幂，并且仅在“理想”值与当前值的差异大于3倍时才存在。</p>
+<p>最后一列，AUTOSCALE，是pool pg_autoscale_mode，on, off或warn。</p>
+<h3 id="AUTOMATED-SCALING"><a href="#AUTOMATED-SCALING" class="headerlink" title="AUTOMATED SCALING"></a>AUTOMATED SCALING</h3><p>最简单的方法是允许集群根据使用情况自动扩展PG。Ceph将查看可用的总存储量和整个系统的target PG数量，查看每个pool中存储了多少数据并尝试分配相应的PG。该系统的方法相对保守，只有当当前 PG （pg_num） 的数量比它认为的要小 3 倍以上时，才会对pool进行更改。</p>
+<p>每个 OSD 的target PG 数基于可配置的 mon_target_pg_per_osd（默认值：100），可通过以下功能进行调整：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global mon_target_pg_per_osd 100</span><br></pre></td></tr></table></figure>
+<p>autoscaler根据每个per-subtree分析pool并进行调整。由于每个pool可能映射到不同的 CRUSH rule，并且每个rule可以跨不同的设备分发数据，所以Ceph将考虑独立使用层次结构的每个subtree。例如，映射到ssd类的OSD的pool和映射到hdd类的OSD的pool将分别具有最佳PG counts，具体取决于这些相应设备类型的数量。</p>
+<h3 id="SPECIFYING-EXPECTED-POOL-SIZE（指定预期的pool大小）"><a href="#SPECIFYING-EXPECTED-POOL-SIZE（指定预期的pool大小）" class="headerlink" title="SPECIFYING EXPECTED POOL SIZE（指定预期的pool大小）"></a>SPECIFYING EXPECTED POOL SIZE（指定预期的pool大小）</h3><p>首次创建集群或pool时，它将占用集群总容量的一小部分，并在系统中显示只需要少量的placement groups。但是，在大多数情况下，集群管理员最好知道哪些pool会随着时间的推移消耗大部分系统容量。通过向ceph提供这些信息，可以从一开始就使用更适当数量的pg，从而防止pg-num中的后续更改以及在进行调整时与移动数据相关的开销。</p>
+<p>pool的target size*可通过两种方式指定：按pool的绝对大小（即字节）或群集总容量的ratio（比率）指定。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set mypool target_size_bytes 100T</span><br></pre></td></tr></table></figure>
+<p>会告诉系统mypool预计会占用100 TiB的空间。 或者：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set mypool target_size_ratio .9</span><br></pre></td></tr></table></figure>
+<p>告诉系统mypool预计会消耗群集总容量的90％。</p>
+<p>您还可以使用ceph osd pool create命令的可选<code>--target-size-bytes &lt;bytes&gt;</code>或<code>--target-size-ratio &lt;ratio&gt;</code>参数在创建时设置pool的target size。</p>
+<p>请注意，如果指定了不可能的target size值（例如，容量大于整个群集的容量或ratio(s)之和大于1.0），则会引发health警告（POOL_TARET_SIZE_RATIO_OVERCOMMITTED或POOL_TARGET_SIZE_BYTES_OVERCOMMITTED）。<a href="https://www.mail-archive.com/ceph-users@lists.ceph.com/msg56416.html" target="_blank" rel="noopener">https://www.mail-archive.com/ceph-users@lists.ceph.com/msg56416.html</a></p>
+<h3 id="SPECIFYING-BOUNDS-ON-A-POOL’S-PGS（在pool的PGS上指定界限）"><a href="#SPECIFYING-BOUNDS-ON-A-POOL’S-PGS（在pool的PGS上指定界限）" class="headerlink" title="SPECIFYING BOUNDS ON A POOL’S PGS（在pool的PGS上指定界限）"></a>SPECIFYING BOUNDS ON A POOL’S PGS（在pool的PGS上指定界限）</h3><p>也可以为一个pool指定最小数量的PG。设置下限可防止Ceph将PG编号减少（或建议减少）到配置的编号以下。</p>
+<p>您可以使用以下方法设置pool的最小PG数量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &lt;pool-name&gt; pg_num_min &lt;num&gt;</span><br></pre></td></tr></table></figure>
+<p>您还可以使用ceph osd pool create命令的可选<code>--pg-num-min &lt;num&gt;</code>参数指定创建pool时的最小PG count。</p>
+<h1 id="A-PRESELECTION-OF-PG-NUM"><a href="#A-PRESELECTION-OF-PG-NUM" class="headerlink" title="A PRESELECTION OF PG_NUM"></a>A PRESELECTION OF PG_NUM</h1><p>使用以下方法创建新pool时：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool create &#123;pool-name&#125; [pg_num]</span><br></pre></td></tr></table></figure>
+<p>选择pg_num的值是可选的。 如果您未指定pg_num，则集群可以（默认情况下）根据pool中存储的数据为您自动对其进行调整（请参见上文， <a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler" target="_blank" rel="noopener">Autoscaling placement groups</a>）。</p>
+<p>或者，可以显式提供pg_num。 但是，是否指定pg_num值并不影响群集是否自动调整该值。 要启用或禁用自动调整，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; pg_autoscaler_mode (on|off|warn)</span><br></pre></td></tr></table></figure>
+<p>传统上，每个OSD PG的”rule of thumb”为100。使用balancer的附加功能（默认情况下也启用的），每个OSD大约50 PG可能是合理的。autoscaler通常为您提供：</p>
 <ul>
-<li>ms_bind_msgr1 [default: true]控制daemon是否绑定到使用v1协议的端口</li>
-<li>ms_bind_msgr2 [default: true]控制daemon是否绑定到使用v2协议的端口</li>
+<li>使每个pool中的PG与pool中的数据成比例</li>
+<li>考虑到每个PG在OSD上的replication或erasuring-coding，最终每个OSD会有50-100个PG</li>
 </ul>
-<p>同样，两个选项控制是否使用IPv4和IPv6地址：</p>
+<h1 id="HOW-ARE-PLACEMENT-GROUPS-USED（如何使用PLACEMENT-GROUPS）"><a href="#HOW-ARE-PLACEMENT-GROUPS-USED（如何使用PLACEMENT-GROUPS）" class="headerlink" title="HOW ARE PLACEMENT GROUPS USED（如何使用PLACEMENT GROUPS）"></a>HOW ARE PLACEMENT GROUPS USED（如何使用PLACEMENT GROUPS）</h1><p>placement group (PG)聚集pool中的objects，因为以每个object为基础跟踪object placement和object metadata在计算上是昂贵的，即，具有数百万个object的系统无法实际以每个object为基础跟踪placement。</p>
+<p><img src="https://docs.ceph.com/docs/master/_images/ditaa-1fde157d24b63e3b465d96eb6afea22078c85a90.png" alt></p>
+<p>Ceph客户端将计算object应位于哪个placement group中。它通过hashing object ID并根据定义的pool中PG的数量和pool ID进行操作来实现此目的。有关详细信息，请参见 <a href="https://docs.ceph.com/docs/master/architecture#mapping-pgs-to-osds" target="_blank" rel="noopener">Mapping PGs to OSDs</a>。</p>
+<p>placement group中object的内容存储在一组OSD中。 例如，在大小为2的replicated pool中，每个placement group将在两个OSD上存储objects，如下所示。</p>
+<p><img src="https://docs.ceph.com/docs/master/_images/ditaa-3c86866fb6edc99dad6ccf51e25e536806f0b079.png" alt></p>
+<p>如果OSD #2失败，则将另一个分配给Placement Group #1，并用OSD #1中所有objects的副本填充。 如果pool大小从2更改为3，则会将一个额外的OSD分配给该placement group，并将接收该placement group中所有objects的副本。</p>
+<p>Placement groups不拥有OSD； 他们与同一资源pool甚至其他资源pool中的其他placement groups共享它。 如果OSD #2失败，则Placement Group #2还必须使用OSD #3恢复objects的副本。</p>
+<p>当placement groups的数量增加时，将为新的placement groups分配OSD。CRUSH函数的结果也将更改，并且先前placement groups中的某些objects将被复制到新的placement groups中，并从旧的placement groups中删除。</p>
+<h1 id="PLACEMENT-GROUPS-TRADEOFFS（权衡）"><a href="#PLACEMENT-GROUPS-TRADEOFFS（权衡）" class="headerlink" title="PLACEMENT GROUPS TRADEOFFS（权衡）"></a>PLACEMENT GROUPS TRADEOFFS（权衡）</h1><p>数据持久性以及所有OSD之间的均匀分配都需要更多的placement groups，但应将其数量减少到最少，以节省CPU和内存。</p>
+<h3 id="DATA-DURABILITY（数据持久性）"><a href="#DATA-DURABILITY（数据持久性）" class="headerlink" title="DATA DURABILITY（数据持久性）"></a>DATA DURABILITY（数据持久性）</h3><p>OSD发生故障后，数据丢失的风险会增加，直到完全恢复其中包含的数据为止。 假设有一种情况会导致单个placement group中的数据永久丢失：</p>
 <ul>
-<li>ms_bind_ipv4 [默认值：true]控制daemon是否绑定到IPv4地址</li>
-<li>ms_bind_ipv6 [默认值：false]控制daemon是否绑定到IPv6地址</li>
+<li>OSD失败，并且它包含的object的所有副本均丢失。对于placement group中的所有objects，副本的数量突然从3个减少到2个。</li>
+<li>Ceph通过选择一个新的OSD重新创建所有objects的第三个副本，开始对该placement group的恢复。</li>
+<li>在同一placement group内的另一个OSD在新OSD完全填充第三份副本之前发生故障。 这样，某些objects将只有一个幸存副本。</li>
+<li>Ceph选择了另一个OSD并保持复制objects以恢复所需的副本数。</li>
+<li>在同一placement group中的第三个OSD在恢复完成之前发生故障。 如果此OSD包含object的唯一剩余副本，则它将永久丢失。</li>
 </ul>
-<h1 id="CONNECTION-MODES"><a href="#CONNECTION-MODES" class="headerlink" title="CONNECTION MODES"></a>CONNECTION MODES</h1><p>v2协议支持两种连接模式：</p>
-<ul>
-<li><p>crc模式提供：</p>
-<ul>
-<li>建立连接时进行强大的初始身份验证（通过cephx，双方相互认证，防止中间人或窃听者进入）</li>
-<li>CRC32C完整性检查，以防止由于flaky hardware或cosmic rays引起的位翻转</li>
-</ul>
-<p>crc模式不提供：</p>
-<ul>
-<li>加密（网络上的窃听者可以看到所有经过身份验证后的流量）</li>
-<li>免受恶意中间人的攻击（只要他们调整crc32c的值以使其匹配，就可以故意修改流量）</li>
-</ul>
-</li>
-<li><p>secure模式提供：</p>
-<ul>
-<li>建立连接时进行强大的初始身份验证（通过cephx，双方相互认证，防止中间人或窃听者进入）</li>
-<li>对所有认证后流量完全加密，包括加密完整性检查。</li>
-</ul>
-<p>在Nautilus中，secure模式使用<a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode" target="_blank" rel="noopener">AES-GCM</a> stream cipher，这在现代处理器上通常非常快（例如，比SHA-256 cryptographic hash更快）。</p>
-</li>
-</ul>
-<h2 id="CONNECTION-MODE-CONFIGURATION-OPTIONS"><a href="#CONNECTION-MODE-CONFIGURATION-OPTIONS" class="headerlink" title="CONNECTION MODE CONFIGURATION OPTIONS"></a>CONNECTION MODE CONFIGURATION OPTIONS</h2><p>对于大多数连接，有一些选项可以控制使用哪种模式：</p>
-<ul>
-<li>ms_cluster_mode用于Ceph daemons之间的集群内通信的连接模式（或允许的模式）。 如果列出了多个模式，则首选第一个列出的模式。</li>
-<li>ms_service_mode是客户端连接到群集时允许使用的模式的列表。</li>
-<li>ms_client_mode是按优先顺序排列的连接模式列表，供客户端在与Ceph群集通信时使用（或允许）。</li>
-</ul>
-<p>有一组并行的选项专门适用于monitors，允许管理员设置与monitors通信的不同（通常更安全）要求。</p>
-<ul>
-<li>ms_mon_cluster_mode是monitors之间使用的连接模式（或允许的模式）。</li>
-<li>ms_mon_service_mode是客户端或其他Ceph daemons连接到monitors时允许使用的模式的列表。</li>
-<li>ms_mon_client_mode是按优先顺序排列的连接模式列表，供客户端或non-monitor daemons在连接monitors时使用。</li>
-</ul>
-<h1 id="TRANSITIONING-FROM-V1-ONLY-TO-V2-PLUS-V1"><a href="#TRANSITIONING-FROM-V1-ONLY-TO-V2-PLUS-V1" class="headerlink" title="TRANSITIONING FROM V1-ONLY TO V2-PLUS-V1"></a>TRANSITIONING FROM V1-ONLY TO V2-PLUS-V1</h1><p>默认情况下，从Nautilus 14.2.z开始，ms_bind_msgr2为true。 但是，在monitors开始使用v2之前，只有有限的服务可以使用v2地址。</p>
-<p>对于大多数用户，monitors已绑定到v1协议的默认旧版端口6789。 在这种情况下，启用v2非常简单：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph mon enable-msgr2</span><br></pre></td></tr></table></figure>
-<p>如果monitors绑定到non-standard端口，则需要为v2明确指定其端口。例如，如果monitors mon.a绑定到1.2.3.4:1111，并且您想要在端口1112上添加v2，则：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph mon set-addrs a [v2:1.2.3.4:1112,v1:1.2.3.4:1111]</span><br></pre></td></tr></table></figure>
-<p>monitors绑定到v2后，每个daemon将在下一次重新启动时开始使用v2地址。</p>
-<h1 id="UPDATING-CEPH-CONF-AND-MON-HOST"><a href="#UPDATING-CEPH-CONF-AND-MON-HOST" class="headerlink" title="UPDATING CEPH.CONF AND MON_HOST"></a>UPDATING CEPH.CONF AND MON_HOST</h1><p>在Nautilus之前，CLI用户或daemon通常将通过/etc/ceph/ceph.conf中的mon_host选项发现monitors。 此选项的语法从Nautilus开始扩展，以允许支持新的方括号列表格式。 例如，像这样的旧行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon_host = 10.0.0.1:6789,10.0.0.2:6789,10.0.0.3:6789</span><br></pre></td></tr></table></figure>
-<p>可以更改为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon_host = [v2:10.0.0.1:3300/0,v1:10.0.0.1:6789/0],[v2:10.0.0.2:3300/0,v1:10.0.0.2:6789/0],[v2:10.0.0.3:3300/0,v1:10.0.0.3:6789/0]</span><br></pre></td></tr></table></figure>
-<p>但是，使用默认端口（3300和6789）时，可以将其省略：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon_host = 10.0.0.1,10.0.0.2,10.0.0.3</span><br></pre></td></tr></table></figure>
-<p>一旦在monitors上启用了v2，可能需要更新ceph.conf以不指定任何端口（这通常是最简单的），或者显式指定v2和v1地址。 但是请注意，Nautilus和更高版本才能理解新的带括号语法，因此请不要在尚未升级其ceph packages的主机上进行此更改。</p>
-<p>当更新ceph.conf时，请注意新的<code>ceph config generate-minimal-conf</code>命令（它生成一个简单的配置文件，其中包含足够的信息来访问monitors）而<code>ceph config assimilate-conf</code>（将配置文件选项移动到monitors’配置数据库中）可能会有所帮助。 例如，：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># ceph config assimilate-conf &lt; /etc/ceph/ceph.conf</span><br><span class="line"># ceph config generate-minimal-config &gt; /etc/ceph/ceph.conf.new</span><br><span class="line"># cat /etc/ceph/ceph.conf.new</span><br><span class="line"># minimal ceph.conf for 0e5a806b-0ce5-4bc6-b949-aa6f68f5c2a3</span><br><span class="line">[global]</span><br><span class="line">        fsid = 0e5a806b-0ce5-4bc6-b949-aa6f68f5c2a3</span><br><span class="line">        mon_host = [v2:10.0.0.1:3300/0,v1:10.0.0.1:6789/0]</span><br><span class="line"># mv /etc/ceph/ceph.conf.new /etc/ceph/ceph.conf</span><br></pre></td></tr></table></figure>
-<h1 id="PROTOCOL"><a href="#PROTOCOL" class="headerlink" title="PROTOCOL"></a>PROTOCOL</h1><p>有关v2 wire protocol的详细说明，请参见<a href="https://docs.ceph.com/docs/nautilus/dev/msgr2/#msgr2-protocol" target="_blank" rel="noopener">msgr2 protocol</a>。</p>
+<p>在三个副本pool中包含10个OSD和512个placement groups的集群中，CRUSH将为每个placement groups提供三个OSD。 最后，每个OSD将托管(512 * 3) / 10 = ~150 Placement Groups。 当第一个OSD发生故障时，以上情况将同时启动所有150个placement groups的恢复。</p>
+<p>恢复的150个placement groups可能均匀分布在剩余的9个OSD上。 因此，每个剩余的OSD可能会将objects的副本发送给所有其他objects，并且还可能会接收一些要存储的新objects，因为它们已成为新placement group的一部分。</p>
+<p>完成恢复所需的时间完全取决于Ceph集群的架构。 假设每个OSD由一台机器上的1TB SSD托管，并且所有OSD都连接到10Gb/s交换机，并且单个OSD的恢复在M分钟内完成。 如果每台计算机使用不带SSD journal的spinners和1Gb/s交换机的两个OSD，则速度至少要慢一个数量级。</p>
+<p>在这种大小的集群中，placement groups的数量几乎对数据持久性没有影响。 可能是128或8192，恢复速度不会变慢或变快。</p>
+<p>但是，将相同的Ceph集群增加到20个OSD而不是10个OSD可能会加快恢复速度，从而显着提高数据的持久性。 现在，每个OSD只能参与约75个placement groups，而不是只有10个OSD时的约150个placement groups，并且仍然需要全部19个剩余OSD执行相同数量的object副本才能恢复。 但是，如果10个OSD必须每个复制大约100GB，则现在它们必须每个复制50GB。 如果网络是瓶颈，恢复将以两倍的速度进行。 换句话说，当OSD数量增加时，恢复速度会更快。</p>
+<p>如果该群集增长到40个OSD，则每个OSD将仅托管约35个placement groups。 如果OSD死亡，则恢复将保持更快的速度，除非它被另一个瓶颈阻塞。 但是，如果该集群增长到200个OSD，则每个OSD将仅托管约7个placement groups。 如果OSD死亡，则将在这些placement groups中的最多约21 (7 * 3)个OSD之间进行恢复：恢复将比有40个OSD时花费的时间更长，这意味着应增加placement groups的数量。</p>
+<p>无论恢复时间有多短，第二个OSD在进行过程中都有可能发生故障。 在上述10个OSD群集中，如果它们中的任何一个失败，则〜17个placement groups（即，正在恢复〜150/9个placement groups）将只有一个幸存副本。 并且如果剩余的8个OSD中的任何一个失败，则两个placement groups的最后一个objects很可能会丢失（即〜17/8个placement groups，仅恢复了一个剩余副本）。</p>
+<p>当群集的大小增加到20个OSD时，丢失三个OSD损坏的Placement Groups的数量将减少。 第二个OSD丢失将降级〜4个（即恢复到约75个/ 19个Placement Groups），而不是〜17个，而第三个OSD丢失则仅在它是包含尚存副本的四个OSD之一时才丢失数据。 换句话说，如果在恢复时间范围内丢失一个OSD的概率为0.0001％，则它从具有10个OSD的群集中的17 <em> 10 </em> 0.0001％变为具有20个OSD的群集中的4 <em> 20 </em> 0.0001％。</p>
+<p>简而言之，更多的OSD意味着恢复更快，较低的级联故障风险，从而导致Placement Group的永久丢失。 就数据持久性而言，在少于50个OSD的群集中，具有512或4096个Placement Group大致等效。</p>
+<p>注意：向集群添加的新OSD可能需要很长时间才能分配有分配给它的placement groups。 但是，不会降低任何object的质量，也不会影响集群中包含的数据的持久性。</p>
+<h3 id="OBJECT-DISTRIBUTION-WITHIN-A-POOL（pool内的object分布）"><a href="#OBJECT-DISTRIBUTION-WITHIN-A-POOL（pool内的object分布）" class="headerlink" title="OBJECT DISTRIBUTION WITHIN A POOL（pool内的object分布）"></a>OBJECT DISTRIBUTION WITHIN A POOL（pool内的object分布）</h3><p>理想情况下，object均匀地分布在每个placement group中。 由于CRUSH计算每个object的placement group，但实际上不知道该placement group内每个OSD中存储了多少数据，因此placement group数与OSD数之比可能会显着影响数据的分布。</p>
+<p>例如，如果在三个副本pool中有一个用于十个OSD的placement group，则仅使用三个OSD，因为CRUSH别无选择。 当有更多的placement group可用时，object更有可能在其中均匀分布。 CRUSH还尽一切努力在所有现有的placement group中平均分配OSD。</p>
+<p>只要Placement Groups比OSD多一个或两个数量级，则分布应该均匀。 例如，用于3个OSD的256个Placement Groups，用于10个OSD的512或1024个Placement Groups等。</p>
+<p>数据分布不均可能是由OSD与placement groups之间的比率以外的因素引起的。 由于CRUSH未考虑object的大小，因此一些非常大的object可能会造成不平衡。 假设有100万个4K object（总计4GB）均匀分布在10个OSD的1024个placement groups中。 他们将在每个OSD上使用4GB / 10 = 400MB。 如果将一个400MB object添加到pool中，则支持放置object的placement groups的三个OSD将填充400MB + 400MB = 800MB，而其余七个将仅占据400MB。</p>
+<h3 id="MEMORY-CPU-AND-NETWORK-USAGE（内存，CPU和网络使用情况）"><a href="#MEMORY-CPU-AND-NETWORK-USAGE（内存，CPU和网络使用情况）" class="headerlink" title="MEMORY, CPU AND NETWORK USAGE（内存，CPU和网络使用情况）"></a>MEMORY, CPU AND NETWORK USAGE（内存，CPU和网络使用情况）</h3><p>对于每个placement group，OSD和MON始终需要内存，网络和CPU，并且在恢复期间甚至更多。 通过对placement group内的object进行聚类objects来共享此开销是它们存在的主要原因之一。</p>
+<p>最小化placement groups的数量可以节省大量资源。</p>
+<h1 id="CHOOSING-THE-NUMBER-OF-PLACEMENT-GROUPS（选择PLACEMENT-GROUPS的数量）"><a href="#CHOOSING-THE-NUMBER-OF-PLACEMENT-GROUPS（选择PLACEMENT-GROUPS的数量）" class="headerlink" title="CHOOSING THE NUMBER OF PLACEMENT GROUPS（选择PLACEMENT GROUPS的数量）"></a>CHOOSING THE NUMBER OF PLACEMENT GROUPS（选择PLACEMENT GROUPS的数量）</h1><p>如果您有超过50个OSD，我们建议每个OSD大约有50-100个placement groups，以平衡资源使用，数据持久性和分发。 如果OSD少于50个，则最好在上述<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#preselection" target="_blank" rel="noopener">preselection</a>中进行选择。 对于单个objects pool，可以使用以下公式获取baseline：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">             (OSDs * 100)</span><br><span class="line">Total PGs =  ------------</span><br><span class="line">              pool size</span><br></pre></td></tr></table></figure>
+<p>pool size是replicated pools的副本数或erasure coded pools的K + M总和（由ceph osd erasure-code-profile get返回）。</p>
+<p>然后，您应该检查设计Ceph集群的方式，以最大程度地提高<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#data-durability" target="_blank" rel="noopener">数据持久性</a>，<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#object-distribution" target="_blank" rel="noopener">对象分配</a>并最小化<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#resource-usage" target="_blank" rel="noopener">资源使用</a>。</p>
+<p>结果应始终四舍五入到最接近的2的幂。</p>
+<p>只有2的幂可以平衡placement groups之间的objects数量。 其他值将导致OSD上的数据分布不均。</p>
+<p>例如，对于具有200个OSD和3个副本的pool大小的集群，您可以按以下方式估计PG的数量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(200 * 100)</span><br><span class="line">----------- = 6667. Nearest power of 2: 8192</span><br><span class="line">     3</span><br></pre></td></tr></table></figure>
+<p>当使用多个data pools存储objects时，需要确保在每个pool的placement groups数量与每个OSD的placement groups数量之间取得平衡，以便获得合理的placement groups总数，从而为每个OSD提供合理的低偏差而不会增加系统资源的负担或使对等进程太慢。</p>
+<p>例如，一个10个pool的集群，每个pool在十个OSD上具有512个placement groups，则总共有5120个placement groups分布在十个OSD上，即每个OSD 512个placement groups。 那不会使用太多资源。 但是，如果创建了1000个pool，每个pool有512个placement groups，则OSD将分别处理约50,000个placement groups，这将需要更多的资源和时间来进行对等。</p>
+<p>您可能会发现<a href="http://ceph.com/pgcalc/" target="_blank" rel="noopener">PGCalc</a>工具很有帮助。</p>
+<h1 id="SET-THE-NUMBER-OF-PLACEMENT-GROUPS（设置PLACEMENT-GROUPS数）"><a href="#SET-THE-NUMBER-OF-PLACEMENT-GROUPS（设置PLACEMENT-GROUPS数）" class="headerlink" title="SET THE NUMBER OF PLACEMENT GROUPS（设置PLACEMENT GROUPS数）"></a>SET THE NUMBER OF PLACEMENT GROUPS（设置PLACEMENT GROUPS数）</h1><p>要设置pool中的placement groups数量，必须在创建pool时指定placement groups的数量。有关详细信息，请参见<a href="https://docs.ceph.com/docs/master/rados/operations/pools#createpool" target="_blank" rel="noopener">Create a Pool</a>。 即使在创建pool之后，您也可以使用以下方法更改placement groups的数量：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; pg_num &#123;pg_num&#125;</span><br></pre></td></tr></table></figure>
+<p>增加placement groups的数量之后，还必须增加placement（pgp_num）的数量，然后集群才能重新平衡。 pgp_num将是CRUSH算法考虑placement的placement groups的数量。 pg_num的增加会拆分placement groups，但是数据将不会迁移到较新的placement groups，直到placement的placement groups为止。 pgp_num增加了。 pgp_num应该等于pg_num。 要增加用于placement的placement groups的数量，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; pgp_num &#123;pgp_num&#125;</span><br></pre></td></tr></table></figure>
+<p>当减少PG的数量时，将自动为您调整pgp_num。</p>
+<h1 id="GET-THE-NUMBER-OF-PLACEMENT-GROUPS（获取PLACEMENT-GROUPS数）"><a href="#GET-THE-NUMBER-OF-PLACEMENT-GROUPS（获取PLACEMENT-GROUPS数）" class="headerlink" title="GET THE NUMBER OF PLACEMENT GROUPS（获取PLACEMENT GROUPS数）"></a>GET THE NUMBER OF PLACEMENT GROUPS（获取PLACEMENT GROUPS数）</h1><p>要获取pool中的placement groups数，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool get &#123;pool-name&#125; pg_num</span><br></pre></td></tr></table></figure>
+<h1 id="GET-A-CLUSTER’S-PG-STATISTICS（获取集群的PG统计信息）"><a href="#GET-A-CLUSTER’S-PG-STATISTICS（获取集群的PG统计信息）" class="headerlink" title="GET A CLUSTER’S PG STATISTICS（获取集群的PG统计信息）"></a>GET A CLUSTER’S PG STATISTICS（获取集群的PG统计信息）</h1><p>要获取集群中placement groups的统计信息，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg dump [--format &#123;format&#125;]</span><br></pre></td></tr></table></figure>
+<p>有效格式为plain（默认）和json。</p>
+<h1 id="GET-STATISTICS-FOR-STUCK-PGS（获取STUCK-PGS的统计信息）"><a href="#GET-STATISTICS-FOR-STUCK-PGS（获取STUCK-PGS的统计信息）" class="headerlink" title="GET STATISTICS FOR STUCK PGS（获取STUCK PGS的统计信息）"></a>GET STATISTICS FOR STUCK PGS（获取STUCK PGS的统计信息）</h1><p>要获取所有处于指定状态的placement groups的统计信息，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg dump_stuck inactive|unclean|stale|undersized|degraded [--format &lt;format&gt;] [-t|--threshold &lt;seconds&gt;]</span><br></pre></td></tr></table></figure>
+<p>Inactive Placement groups无法处理读写，因为它们正在等待OSD包含最新数据。</p>
+<p>Unclean Placement groups包含的object未复制所需的次数。。 他们应该正在恢复。</p>
+<p>Stale Placement groups处于未知状态—承载这些PG的OSD在一段时间内未向monitor报告（由mon_osd_report_timeout配置）。</p>
+<p>有效格式为plain（默认）和json。 阈值定义placement group在将其包括在返回的统计信息之前卡住的最小秒数（默认为300秒）。</p>
+<h1 id="GET-A-PG-MAP"><a href="#GET-A-PG-MAP" class="headerlink" title="GET A PG MAP"></a>GET A PG MAP</h1><p>要获取特placement group map，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg map &#123;pg-id&#125;</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg map 1.6c</span><br></pre></td></tr></table></figure>
+<p>Ceph将返回placement group map，placement group和OSD状态：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">osdmap e13 pg 1.6c (1.6c) -&gt; up [1,0] acting [1,0]</span><br></pre></td></tr></table></figure>
+<h1 id="GET-A-PGS-STATISTICS（获取PGS统计信息）"><a href="#GET-A-PGS-STATISTICS（获取PGS统计信息）" class="headerlink" title="GET A PGS STATISTICS（获取PGS统计信息）"></a>GET A PGS STATISTICS（获取PGS统计信息）</h1><p>要检索特定placement group的统计信息，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg &#123;pg-id&#125; query</span><br></pre></td></tr></table></figure>
+<h1 id="SCRUB-A-PLACEMENT-GROUP"><a href="#SCRUB-A-PLACEMENT-GROUP" class="headerlink" title="SCRUB A PLACEMENT GROUP"></a>SCRUB A PLACEMENT GROUP</h1><p>要scrub a placement group，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg scrub &#123;pg-id&#125;</span><br></pre></td></tr></table></figure>
+<p>Ceph检查primary和任何replica nodes生成的placement group中所有objects的目录进行比较，以确保没有丢失或不匹配的objects，并且它们的内容一致。 假设所有副本都匹配，则扫描可确保所有与snapshot-related的object metadata都是一致的。 通过日志报告错误。</p>
+<p>要清理特定pool中的所有placement groups，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool scrub &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="PRIORITIZE-BACKFILL-RECOVERY-OF-A-PLACEMENT-GROUP-S-（优先考虑PLACEMENT-GROUP的BACKFILL-RECOVERY）"><a href="#PRIORITIZE-BACKFILL-RECOVERY-OF-A-PLACEMENT-GROUP-S-（优先考虑PLACEMENT-GROUP的BACKFILL-RECOVERY）" class="headerlink" title="PRIORITIZE BACKFILL/RECOVERY OF A PLACEMENT GROUP(S)（优先考虑PLACEMENT GROUP的BACKFILL/RECOVERY）"></a>PRIORITIZE BACKFILL/RECOVERY OF A PLACEMENT GROUP(S)（优先考虑PLACEMENT GROUP的BACKFILL/RECOVERY）</h1><p>您可能会遇到这样的情况，即一堆placement groups需要recovery和/或backfill，并且某些特定的groups保存的数据比其他的更为重要（例如，那些PG可能保存正在运行的机器使用的images的数据，而其他PG可能由不活动的机器使用/较少的相关数据）。 在这种情况下，您可能希望优先考虑恢复这些groups，以便更早恢复存储在这些groups上的数据的性能和/或可用性。 为此（在backfill或recovery期间将特定的placement group(s)标记为优先），请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph pg force-recovery &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br><span class="line">ceph pg force-backfill &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br></pre></td></tr></table></figure>
+<p>这将导致Ceph首先在其他placement groups之前对指定的placement groups执行recovery或backfill。 这不会中断当前正在进行的backfill或recovery，但会导致尽快处理指定的PG。 如果您改变主意或优先考虑wrong groups，请使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph pg cancel-force-recovery &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br><span class="line">ceph pg cancel-force-backfill &#123;pg-id&#125; [&#123;pg-id #2&#125;] [&#123;pg-id #3&#125; ...]</span><br></pre></td></tr></table></figure>
+<p>这将从这些PG中删除“force” flag，并将以默认顺序对其进行处理。 同样，这不会影响当前正在处理的placement groups，只会影响仍在排队的placement groups。</p>
+<p>recovery或backfill group后，将自动清除“force” flag。</p>
+<p>同样，您可以使用以下命令强制Ceph首先对指定pool中的所有placement groups执行recovery或backfill：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool force-recovery &#123;pool-name&#125;</span><br><span class="line">ceph osd pool force-backfill &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+<p>或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool cancel-force-recovery &#123;pool-name&#125;</span><br><span class="line">ceph osd pool cancel-force-backfill &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+<p>如果您改变主意，则可以恢复到默认的recovery或backfill优先级。</p>
+<p>请注意，这些命令可能会破坏Ceph内部优先级计算的顺序，因此请谨慎使用！ 特别是，如果您有多个当前共享相同底层OSD的pool，并且某些特定pool中的数据比其他pool更重要，我们建议您使用以下命令以更好的顺序重新排列所有pool的recovery/backfill优先级：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set &#123;pool-name&#125; recovery_priority &#123;value&#125;</span><br></pre></td></tr></table></figure>
+<p>例如，如果您有10个pool，则可以将最重要的一个优先级设置为10，下一个9，等等。或者您可以不理会大多数pool，而说3个重要的pool分别设置为优先级1或优先级3、2、1。</p>
+<h1 id="REVERT-LOST（永不消失）"><a href="#REVERT-LOST（永不消失）" class="headerlink" title="REVERT LOST（永不消失）"></a>REVERT LOST（永不消失）</h1><p>如果集群丢失了一个或多个object，并且您决定放弃对丢失数据的搜索，则必须将unfound的object标记为lost。</p>
+<p>如果已查询所有可能的位置并且仍然丢失了objects，则可能必须放弃丢失的objects。</p>
+<p>当前唯一受支持的选项是“revert”，它可以回滚到该object的先前版本，或者（如果是新object）则完全忘记它。 要将“unfound”的object标记为“lost”，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph pg &#123;pg-id&#125; mark_unfound_lost revert|delete</span><br></pre></td></tr></table></figure>
+<p>重要说明：请谨慎使用此功能，因为它可能会使期望object存在的应用程序感到困惑。</p>
 
           
         
@@ -482,7 +547,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/17/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/19/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/17/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><span class="page-number current">18</span><a class="page-number" href="/page/19/">19</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/19/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -528,7 +593,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

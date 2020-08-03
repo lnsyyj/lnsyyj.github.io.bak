@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/12/RocksDB介绍/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/使用Vundle管理Vim插件/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/12/RocksDB介绍/" itemprop="url">RocksDB介绍</a></h1>
+                <a class="post-title-link" href="/2018/04/17/使用Vundle管理Vim插件/" itemprop="url">使用Vundle管理Vim插件</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-12T14:53:12+08:00">
-                2018-04-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-17T19:17:49+08:00">
+                2018-04-17
               </time>
             
 
@@ -358,19 +358,21 @@
       
         
           
-            <h2 id="Welcome-to-RocksDB"><a href="#Welcome-to-RocksDB" class="headerlink" title="Welcome to RocksDB"></a>Welcome to RocksDB</h2><p>RocksDB：A Persistent Key-Value Store for Flash and RAM Storage</p>
-<p>RocksDB是一个嵌入式key-value store C ++库，其中keys和values是任意byte streams。RocksDB由Facebook Database Engineering Team开发和维护，基于LevelDB二次开发，并对LevelDB API提供向后兼容。它支持原子读取和写入。RocksDB借鉴了开源leveldb项目中的重要代码以及Apache HBase的重要思想。最初的代码是从开源的leveldb 1.5中分离出来的。它还建立在Facebook之前在RocksDB开发的代码和想法之上。</p>
-<p>RocksDB针对Flash进行了优化，延迟极低。RocksDB使用Log Structured Database Engine进行存储，完全用C ++编写。一个名为RocksJava的Java版本目前正在开发中。</p>
-<p>RocksDB具有高度灵活的配置选项，可以调整以运行在各种生产环境上的不同设备之上，包括pure memory，Flash，hard disks或HDFS。它支持各种压缩算法并且为production support和debugging提供良好的工具。</p>
-<h2 id="Features"><a href="#Features" class="headerlink" title="Features"></a>Features</h2><ul>
-<li>专门希望存储在本地Flash drives或RAM中，高达几TB数据的应用程序服务器而设计</li>
-<li>针对fast storage设备，存储small到medium size key-values进行了优化( flash devices 或 in-memory )</li>
-<li><p>与CPU数量线性扩展，以便在具有多核的处理器上运行良好</p>
-<h2 id="Features-Not-in-LevelDB"><a href="#Features-Not-in-LevelDB" class="headerlink" title="Features Not in LevelDB"></a>Features Not in LevelDB</h2></li>
-</ul>
-<p>RocksDB引入了几十个新的主要features。不在LevelDB中的feature<a href="https://github.com/facebook/rocksdb/wiki/Features-Not-in-LevelDB" target="_blank" rel="noopener">列表</a></p>
-<h2 id="Assumptions-and-Goals"><a href="#Assumptions-and-Goals" class="headerlink" title="Assumptions and Goals"></a>Assumptions and Goals</h2><h3 id="Performance"><a href="#Performance" class="headerlink" title="Performance"></a>Performance</h3><p>RocksDB设计主要专注于fast storage和server workloads。它应该利用Flash或RAM子系统提供的高速率读/写全部潜力。它应该支持高效的point lookups以及range scans。它应该可配置为支持high random-read workloads，high update workloads或两者的组合（最优解）。其架构应易于调整Read Amplification, Write Amplification 和 Space Amplification。</p>
-<h3 id="Production-Support"><a href="#Production-Support" class="headerlink" title="Production Support"></a>Production Support</h3><h3 id="Compatibility"><a href="#Compatibility" class="headerlink" title="Compatibility"></a>Compatibility</h3>
+            <p>工欲善其事，必先利其器。这篇文章记录怎样在Linux上使用Vundle管理Vim插件，提高效率。</p>
+<p>步骤很简单，大体如下：</p>
+<h3 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# yum install -y redhat-lsb</span><br><span class="line">[root@centos7 ~]# lsb_release -a</span><br><span class="line">LSB Version:	:core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:desktop-4.1-amd64:desktop-4.1-noarch:languages-4.1-amd64:languages-4.1-noarch:printing-4.1-amd64:printing-4.1-noarch</span><br><span class="line">Distributor ID:	CentOS</span><br><span class="line">Description:	CentOS Linux release 7.4.1708 (Core) </span><br><span class="line">Release:	7.4.1708</span><br><span class="line">Codename:	Core</span><br></pre></td></tr></table></figure>
+<h3 id="Install-vim-and-git"><a href="#Install-vim-and-git" class="headerlink" title="Install vim and git"></a>Install vim and git</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# yum install -y git vim</span><br></pre></td></tr></table></figure>
+<h3 id="Set-up-Vundle"><a href="#Set-up-Vundle" class="headerlink" title="Set up Vundle"></a>Set up Vundle</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim</span><br></pre></td></tr></table></figure>
+<h3 id="Configure-Plugins"><a href="#Configure-Plugins" class="headerlink" title="Configure Plugins"></a>Configure Plugins</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">set nocompatible              &quot; be iMproved, required</span><br><span class="line">filetype off                  &quot; required</span><br><span class="line"></span><br><span class="line">&quot; set the runtime path to include Vundle and initialize</span><br><span class="line">set rtp+=~/.vim/bundle/Vundle.vim</span><br><span class="line">call vundle#begin()</span><br><span class="line">&quot; alternatively, pass a path where Vundle should install plugins</span><br><span class="line">&quot;call vundle#begin(&apos;~/some/path/here&apos;)</span><br><span class="line"></span><br><span class="line">&quot; let Vundle manage Vundle, required</span><br><span class="line">Plugin &apos;VundleVim/Vundle.vim&apos;</span><br><span class="line"></span><br><span class="line">&quot; All of your Plugins must be added before the following line</span><br><span class="line">call vundle#end()            &quot; required</span><br><span class="line">filetype plugin indent on    &quot; required</span><br><span class="line">&quot; To ignore plugin indent changes, instead use:</span><br><span class="line">&quot;filetype plugin on</span><br><span class="line">&quot;</span><br><span class="line">&quot; Brief help</span><br><span class="line">&quot; :PluginList       - lists configured plugins</span><br><span class="line">&quot; :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate</span><br><span class="line">&quot; :PluginSearch foo - searches for foo; append `!` to refresh local cache</span><br><span class="line">&quot; :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal</span><br><span class="line">&quot;</span><br><span class="line">&quot; see :h vundle for more details or wiki for FAQ</span><br><span class="line">&quot; Put your non-Plugin stuff after this line</span><br></pre></td></tr></table></figure>
+<p>打开~/.vimrc，并添加你要安装的Plugins</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">call vundle#begin()</span><br><span class="line">&quot; 在其之间添加你要安装的Plugins，例如我这里安装一个NERDTree</span><br><span class="line">Plugin &apos;scrooloose/nerdtree&apos;</span><br><span class="line">call vundle#end()</span><br></pre></td></tr></table></figure>
+<h3 id="Install-Plugins"><a href="#Install-Plugins" class="headerlink" title="Install Plugins"></a>Install Plugins</h3><p>启动vim并运行:PluginInstall</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">:PluginInstall</span><br></pre></td></tr></table></figure>
+<p>配置已安装NERDTree插件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">添加以下，注意&lt;F2&gt;后面有空格，配置好以后，使用vim打开任意文件就可以使用F2来调出NERDTree了</span><br><span class="line">map &lt;F2&gt; :NERDTreeToggle&lt;CR&gt;</span><br></pre></td></tr></table></figure>
+<p>当然vim不止这一个插件，这里只是介绍一下怎样配置，其他好玩的插件请自己发掘。</p>
+<h3 id="vim常用选项"><a href="#vim常用选项" class="headerlink" title="vim常用选项"></a>vim常用选项</h3><p><a href="http://gohom.win/2015/06/08/Vim-Setup/" target="_blank" rel="noopener">http://gohom.win/2015/06/08/Vim-Setup/</a></p>
+
           
         
       
@@ -414,7 +416,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/94/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/94/">94</a><span class="page-number current">95</span><a class="page-number" href="/page/96/">96</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/96/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/94/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/94/">94</a><span class="page-number current">95</span><a class="page-number" href="/page/96/">96</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/96/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -460,7 +462,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/16/ceph社区为什么要使用ceph-volume代替ceph-disk/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/20/git-常用操作/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/08/16/ceph社区为什么要使用ceph-volume代替ceph-disk/" itemprop="url">ceph社区为什么要使用ceph-volume代替ceph-disk</a></h1>
+                <a class="post-title-link" href="/2019/08/20/git-常用操作/" itemprop="url">git 常用操作</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-16T16:35:15+08:00">
-                2019-08-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-20T21:12:49+08:00">
+                2019-08-20
               </time>
             
 
@@ -358,27 +358,20 @@
       
         
           
-            <p><a href="https://docs.ceph.com/docs/master/ceph-volume/intro/#ceph-disk-replaced" target="_blank" rel="noopener">原文地址</a></p>
-<h1 id="OVERVIEW"><a href="#OVERVIEW" class="headerlink" title="OVERVIEW"></a>OVERVIEW</h1><p>ceph-volume旨在成为一个单一用途的命令行工具，将logical volumes部署为OSDs，在preparing, activating, 和creating OSDs时，试图维护与ceph-disk类似的API。</p>
-<p>因为它不依赖于为CEPH安装的UDEV规则且没有交互，因此它背离了ceph-disk。这些rules允许自动检测先前设置的devices，这些devices又被送入ceph-disk以activate它们。</p>
-<h1 id="REPLACING-CEPH-DISK"><a href="#REPLACING-CEPH-DISK" class="headerlink" title="REPLACING CEPH-DISK"></a>REPLACING <code>CEPH-DISK</code></h1><p>ceph-disk工具是在项目需要支持许多不同类型的init系统（upstart, sysvinit, etc…）时创建的，同时能够发现devices。这导致工具最初（以及后来）专注于GPT分区上。特别是在GPT GUID上，它以独特的方式标记device，以回答以下问题：</p>
-<ul>
-<li>device是否是Journal？</li>
-<li>是否是encrypted data partition（加密数据分区）？</li>
-<li>device是否已部分准备就绪？</li>
+            <p>视频地址：<a href="https://www.youtube.com/channel/UCPhn2rCqhu0HdktsFjixahA" target="_blank" rel="noopener">https://www.youtube.com/channel/UCPhn2rCqhu0HdktsFjixahA</a></p>
+<p>原文地址：<a href="https://github.com/twtrubiks/Git-Tutorials" target="_blank" rel="noopener">https://github.com/twtrubiks/Git-Tutorials</a></p>
+<p>本文档只作为学习笔记，方便自己速查，如果想系统学习请看沈老师的视频和github。</p>
+<h1 id="如何加速大型repo-clone速度"><a href="#如何加速大型repo-clone速度" class="headerlink" title="如何加速大型repo clone速度"></a>如何加速大型repo clone速度</h1><ul>
+<li>–depth参数：只下载最新1次commits log，默认会加–single-branch（只clone单分支，无法checkout）。如果想clone所有分支需要加–no-single-branch（git clone <a href="https://github.com/ceph/ceph.git" target="_blank" rel="noopener">https://github.com/ceph/ceph.git</a> –depth 1 –no-single-branch），可以checkout。</li>
 </ul>
-<p><code>为了解决这些问题，它使用UDEV规则来匹配GUID，这些GUID将调用ceph-disk，最后在ceph-disk systemd unit和ceph-disk可执行文件之间来回切换。该过程非常不可靠且耗时（必须为每个OSD设置接近3小时的超时），并且会导致OSD 在节点的boot过程中根本不出现。</code></p>
-<p>考虑到UDEV的异步行为，很难调试甚至复现这些问题。</p>
-<p>由于ceph-disk的world-view必须是专门的GPT分区，这意味着它无法与其他技术（如LVM或类似的device mapper devices）一起使用。它最终决定创建一些模块化的东西，从LVM支持开始，并根据需要扩展其他技术。</p>
-<h1 id="GPT-PARTITIONS-ARE-SIMPLE"><a href="#GPT-PARTITIONS-ARE-SIMPLE" class="headerlink" title="GPT PARTITIONS ARE SIMPLE?"></a>GPT PARTITIONS ARE SIMPLE?</h1><p>尽管分区通常很容易理解，但ceph-disk分区并不简单。它需要大量特殊标志才能使它们与device discovery工作流程一起正常工作。以下是创建数据分区的示例调用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sgdisk --largest-new=1 --change-name=1:ceph data --partition-guid=1:f0fc39fd-eeb2-49f1-b922-a11939cf8a0f --typecode=1:89c57f98-2fe5-4dc0-89c1-f3ad0ceff2be --mbrtogpt -- /dev/sdb</span><br></pre></td></tr></table></figure>
-<p>创建这些不仅很难，而且这些分区要求device由 Ceph 独占。例如，在某些情况下，在device加密时将创建一个特殊分区，其中包含未加密的密钥。这是ceph-disk领域的知识，它不会转变对”GPT partitions are simple”的理解。下面是正在创建的特殊分区的示例：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sgdisk --new=5:0:+10M --change-name=5:ceph lockbox --partition-guid=5:None --typecode=5:fb3aabf9-d25f-47cc-bf5e-721d181642be --mbrtogpt -- /dev/sdad</span><br></pre></td></tr></table></figure>
-<h1 id="MODULARITY"><a href="#MODULARITY" class="headerlink" title="MODULARITY"></a>MODULARITY</h1><p>ceph-volume被设计成一个模块化工具，因为我们预计人们会使用多种方式来配置硬件设备。目前已有两个情况：传统的ceph-disk devices仍然在使用并且有GPT分区（handled by <a href="https://docs.ceph.com/docs/master/ceph-volume/simple/#ceph-volume-simple" target="_blank" rel="noopener">simple</a>）和lvm。</p>
-<p>我们直接从用户空间管理NVMe devices的SPDK devices即将出现，LVM将无法在那里工作，因为根本不涉及内核。</p>
-<h1 id="CEPH-VOLUME-LVM"><a href="#CEPH-VOLUME-LVM" class="headerlink" title="CEPH-VOLUME LVM"></a>CEPH-VOLUME LVM</h1><p>通过使用<a href="https://docs.ceph.com/docs/master/glossary/#term-lvm-tags" target="_blank" rel="noopener">LVM tags</a>，<a href="https://docs.ceph.com/docs/master/ceph-volume/lvm/#ceph-volume-lvm" target="_blank" rel="noopener">lvm</a>子命令能够保存并随后重新发现和查询与OSD相关联的devices，以便可以激活（activate）它们。 这包括对基于LVM的技术（如dm-cache）的支持。</p>
-<p>对于ceph-volume，dm-cache的使用是透明的，对于工具没有区别，它将dm-cache视为普通logical volume。</p>
-<h1 id="LVM-PERFORMANCE-PENALTY"><a href="#LVM-PERFORMANCE-PENALTY" class="headerlink" title="LVM PERFORMANCE PENALTY"></a>LVM PERFORMANCE PENALTY</h1><p>简而言之：我们未能注意到与LVM更改相关的任何重大性能损失。 通过与LVM合作，可以使用其他device mapper技术（例如dmcache）：处理任何位于Logical Volume以下的事情没有技术困难。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMacBook-Pro-13:test yujiang$ git clone https://github.com/ceph/ceph.git --depth 1</span><br><span class="line">Cloning into &apos;ceph&apos;...</span><br><span class="line">remote: Enumerating objects: 8395, done.</span><br><span class="line">remote: Counting objects: 100% (8395/8395), done.</span><br><span class="line">remote: Compressing objects: 100% (7508/7508), done.</span><br><span class="line">remote: Total 8395 (delta 1133), reused 2722 (delta 467), pack-reused 0</span><br><span class="line">Receiving objects: 100% (8395/8395), 21.01 MiB | 1.52 MiB/s, done.</span><br><span class="line">Resolving deltas: 100% (1133/1133), done.</span><br><span class="line">Checking out files: 100% (8847/8847), done.</span><br><span class="line">yujiangdeMacBook-Pro-13:test yujiang$ cd ceph/</span><br><span class="line">yujiangdeMacBook-Pro-13:ceph yujiang$ git log</span><br><span class="line">commit 6b0ef5dc3c550cd8d17c830156541dd491e9a57a (grafted, HEAD -&gt; master, origin/master, origin/HEAD)</span><br><span class="line">Author: Alfredo Deza &lt;adeza@redhat.com&gt;</span><br><span class="line">Date:   Tue Aug 20 09:32:05 2019 -0400</span><br><span class="line"></span><br><span class="line">    Merge pull request #29762 from alfredodeza/bz-1738379</span><br><span class="line">    </span><br><span class="line">    ceph-volume: use the OSD identifier when reporting success</span><br><span class="line">    </span><br><span class="line">    Reviewed-by: Jan Fajerski &lt;jfajerski@suse.com&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="git-subtree"><a href="#git-subtree" class="headerlink" title="git subtree"></a>git subtree</h1><p>git submodule是link的概念</p>
+<p>git subtree是copy的概念</p>
+<p><a href="https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt" target="_blank" rel="noopener">https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt</a></p>
+<h3 id="create-git-subtree"><a href="#create-git-subtree" class="headerlink" title="create git subtree"></a>create git subtree</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1、首先clone主repo</span><br><span class="line">git clone --recurse-submodules -j8 git@github.com:lnsyyj/lnsyyj-ansible.git</span><br><span class="line">2、进入主repo</span><br><span class="line">cd lnsyyj-ansible</span><br><span class="line">3、添加子repo</span><br><span class="line">git subtree add --prefix=roles/elasticsearch --squash git@github.com:lnsyyj/ansible-role-elasticsearch.git master</span><br><span class="line">git subtree add --prefix=roles/kibana --squash git@github.com:lnsyyj/ansible-role-kibana.git master</span><br><span class="line"></span><br><span class="line">git subtree add --prefix=roles/cloudalchemy.node-exporter --squash git@github.com:cloudalchemy/ansible-node-exporter.git master</span><br><span class="line">git subtree add --prefix=roles/cloudalchemy.prometheus --squash git@github.com:cloudalchemy/ansible-prometheus.git master</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--squash  合并子repo的git log</span><br><span class="line">--prefix= 指定copy到主repo的位置</span><br></pre></td></tr></table></figure>
+<h3 id="push-git-subtree"><a href="#push-git-subtree" class="headerlink" title="push git subtree"></a>push git subtree</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="pull-git-subtree"><a href="#pull-git-subtree" class="headerlink" title="pull git subtree"></a>pull git subtree</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h1 id="常见问题1"><a href="#常见问题1" class="headerlink" title="常见问题1"></a>常见问题1</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fatal: early EOF</span><br><span class="line">fatal: the remote end hung up unexpectedly</span><br><span class="line">fatal: index-pack failed</span><br><span class="line">error: RPC failed; curl 18 transfer closed with outstanding read data remaining</span><br><span class="line"></span><br><span class="line">解决办法：</span><br><span class="line">git config --global http.postBuffer 5242880000</span><br><span class="line">git clone https://github.com/ansible/ansible.git</span><br></pre></td></tr></table></figure>
 
           
         
@@ -423,7 +416,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/27/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><span class="page-number current">28</span><a class="page-number" href="/page/29/">29</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/29/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/27/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/27/">27</a><span class="page-number current">28</span><a class="page-number" href="/page/29/">29</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/29/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -469,7 +462,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

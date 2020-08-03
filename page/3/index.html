@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/27/Ceph-iSCIS-gateway-监控/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/03/11/ceph运维笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/11/27/Ceph-iSCIS-gateway-监控/" itemprop="url">Ceph iSCIS gateway 监控</a></h1>
+                <a class="post-title-link" href="/2020/03/11/ceph运维笔记/" itemprop="url">ceph运维笔记</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-27T23:27:23+08:00">
-                2019-11-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-03-11T10:23:44+08:00">
+                2020-03-11
               </time>
             
 
@@ -358,26 +358,21 @@
       
         
           
-            <h1 id="监控ISCSI-GATEWAYS"><a href="#监控ISCSI-GATEWAYS" class="headerlink" title="监控ISCSI GATEWAYS"></a>监控ISCSI GATEWAYS</h1><p>Ceph为iSCSI gateway环境提供了一个附加工具，以监视导出的RADOS Block Device (RBD) images的性能。</p>
-<p>gwtop工具是一个类似top的工具，用于显示通过iSCSI导出到客户端的RBD images的聚合性能指标。 这些指标来自Performance Metrics Domain Agent（PMDA）。 来自Linux-IO target (LIO) PMDA的信息用于列出每个已导出的RBD image以及所连接的客户端及其相关的I/O指标。</p>
-<p><strong>Requirements:</strong></p>
-<p>正在运行的Ceph iSCSI gateway</p>
-<p><strong>Installing:</strong></p>
-<p>1、以root用户身份在每个iSCSI gateway节点上安装ceph-iscsi-tools package：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install ceph-iscsi-tools</span><br></pre></td></tr></table></figure>
-<p>2、以root用户身份在每个iSCSI gateway节点上安装performance co-pilot package：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp</span><br></pre></td></tr></table></figure>
-<p>3、以root用户身份在每个iSCSI gateway节点上安装LIO PMDA package：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># yum install pcp-pmda-lio</span><br></pre></td></tr></table></figure>
-<p>4、以root用户身份，在每个iSCSI gateway节点上启用并启动performance co-pilot service：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl enable pmcd</span><br><span class="line"># systemctl start pmcd</span><br></pre></td></tr></table></figure>
-<p>5、以root用户身份注册pcp-pmda-lio agent：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /var/lib/pcp/pmdas/lio</span><br><span class="line">./Install</span><br></pre></td></tr></table></figure>
-<p>默认情况下，gwtop假定iSCSI gateway configuration object存储在rbd pool中的一个名为gateway.conf的RADOS object中。 此configuration定义了收集性能统计信息的iSCSI gateways。 可以使用-g或-c标志将其覆盖。 有关更多详细信息，请参见gwtop –help。</p>
-<p>LIO configuration决定要从performance co-pilot提取的性能统计信息的类型。 gwtop启动时，它会查看LIO configuration，如果找到user-space disks，则gwtop会自动选择LIO collector。</p>
-<p>示例<code>gwtop</code>输出</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gwtop  2/2 Gateways   CPU% MIN:  4 MAX:  5    Network Total In:    2M  Out:    3M   10:20:00</span><br><span class="line">Capacity:   8G    Disks:   8   IOPS:  503   Clients:  1   Ceph: HEALTH_OK          OSDs:   3</span><br><span class="line">Pool.Image       Src    Size     iops     rMB/s     wMB/s   Client</span><br><span class="line">iscsi.t1703             500M        0      0.00      0.00</span><br><span class="line">iscsi.testme1           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme2           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme3           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme5           500M        0      0.00      0.00</span><br><span class="line">rbd.myhost_1      T       4G      504      1.95      0.00   rh460p(CON)</span><br><span class="line">rbd.test_2                1G        0      0.00      0.00</span><br><span class="line">rbd.testme              500M        0      0.00      0.00</span><br></pre></td></tr></table></figure>
-<p>在Client列中，(CON)表示iSCSI initiator (client)当前已登录iSCSI gateway。 如果显示-multi-，则多个clients映射到单个RBD image。</p>
+            <h1 id="OSD"><a href="#OSD" class="headerlink" title="OSD"></a>OSD</h1><h2 id="换盘操作"><a href="#换盘操作" class="headerlink" title="换盘操作"></a>换盘操作</h2><p>1、确保删除OSD时，集群没有接近near full</p>
+<p>2、检查删除OSD时，是否有数据丢失， ceph osd ok-to-stop {osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">无数据丢失情况</span><br><span class="line">root@ceph:~# ceph osd ok-to-stop 2</span><br><span class="line">OSD(s) 2 are ok to stop without reducing availability or risking data, provided there are no other concurrent failures or interventions.</span><br><span class="line">70 PGs are likely to be degraded (but remain available) as a result.</span><br><span class="line"></span><br><span class="line">有数据丢失情况</span><br><span class="line">root@ceph:~# ceph osd ok-to-stop 2</span><br><span class="line">Error EBUSY: 18 PGs are already too degraded, would become too degraded or might become unavailable</span><br></pre></td></tr></table></figure>
+<p>3、标记OSD out， ceph osd out {osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# ceph osd out 3</span><br><span class="line">marked out osd.3. </span><br><span class="line"> </span><br><span class="line">root@ceph:~# ceph osd tree</span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.08997 root default                          </span><br><span class="line">-3       0.08997     host ceph                         </span><br><span class="line"> 0   ssd 0.02249         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 1   ssd 0.02249         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 2   ssd 0.02249         osd.2     up  1.00000 1.00000 </span><br><span class="line"> 3   ssd 0.02249         osd.3   down        0 1.00000</span><br></pre></td></tr></table></figure>
+<p>4、停止OSD进程， systemctl stop ceph-osd@{osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# systemctl stop ceph-osd@3</span><br><span class="line"></span><br><span class="line">root@ceph:~# ps -ef | grep ceph-osd</span><br><span class="line">ceph        3334       1  0 10:19 ?        00:00:13 /usr/bin/ceph-osd -f --cluster ceph --id 2 --setuser ceph --setgroup ceph</span><br><span class="line">ceph        3336       1  0 10:19 ?        00:00:10 /usr/bin/ceph-osd -f --cluster ceph --id 0 --setuser ceph --setgroup ceph</span><br><span class="line">ceph        3337       1  0 10:19 ?        00:00:10 /usr/bin/ceph-osd -f --cluster ceph --id 1 --setuser ceph --setgroup ceph</span><br></pre></td></tr></table></figure>
+<p>5、从crush map中删除OSD， ceph osd purge {osd-num} –yes-i-really-mean-it</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# ceph osd purge 3 --yes-i-really-mean-it</span><br><span class="line">purged osd.3</span><br><span class="line"></span><br><span class="line">root@ceph:~# ceph osd tree</span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.06747 root default                          </span><br><span class="line">-3       0.06747     host ceph                         </span><br><span class="line"> 0   ssd 0.02249         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 1   ssd 0.02249         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 2   ssd 0.02249         osd.2     up  1.00000 1.00000</span><br></pre></td></tr></table></figure>
+<p>6、从ceph.conf中删除OSD</p>
+<p>7、卸载OSD挂载点， umount /var/lib/ceph/osd/ceph-{osd-num}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /var/lib/ceph/osd/ceph-3</span><br></pre></td></tr></table></figure>
+<p>8、删除/var/lib/ceph/osd/ceph-{osd-num}/目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf /var/lib/ceph/osd/ceph-3/</span><br></pre></td></tr></table></figure>
+<p>9、换盘后，重新添加OSD</p>
 
           
         
@@ -422,7 +417,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -468,7 +463,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

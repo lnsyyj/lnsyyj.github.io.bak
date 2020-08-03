@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/31/近距离探索memcache/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/11/LTP-C-Test-Case教程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/31/近距离探索memcache/" itemprop="url">近距离探索memcache缓存</a></h1>
+                <a class="post-title-link" href="/2018/06/11/LTP-C-Test-Case教程/" itemprop="url">LTP C Test Case教程</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-31T17:22:03+08:00">
-                2018-05-31
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-11T23:19:03+08:00">
+                2018-06-11
               </time>
             
 
@@ -358,47 +358,23 @@
       
         
           
-            <p>近距离探索memcache缓存笔记</p>
-<p>课程地址：<a href="https://www.imooc.com/learn/527" target="_blank" rel="noopener">https://www.imooc.com/learn/527</a></p>
-<p>课程教师：李虎头</p>
-<h2 id="memcache解析"><a href="#memcache解析" class="headerlink" title="memcache解析"></a>memcache解析</h2><p>1-1内容解析</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.知道什么是Memcache</span><br><span class="line">2.知道在什么时候使用Memcache</span><br><span class="line">3.知道怎样使用Memcache优化网站或API</span><br></pre></td></tr></table></figure>
-<p>1-2基础介绍</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Memcache介绍</span><br><span class="line">1.什么是Memcache？</span><br><span class="line">	分布式高速缓存系统</span><br><span class="line"></span><br><span class="line">2.Memcache有什么用？</span><br><span class="line">	缓存层，前端频繁操作后端数据库时，减轻后端数据库压力，前端直接访问缓存层</span><br></pre></td></tr></table></figure>
-<p>1-3理解Memcache</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">只有一张表的数据库</span><br></pre></td></tr></table></figure>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>名字</th>
-<th>类型</th>
-<th>整理</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>1</td>
-<td>key</td>
-<td>varchar(255)</td>
-<td>utf8_general_ci</td>
-</tr>
-<tr>
-<td>2</td>
-<td>value</td>
-<td>text</td>
-<td>utf8_general_ci</td>
-</tr>
-</tbody>
-</table>
-<p>1-4使用场景</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.非持久化存储：对数据存储要求不高</span><br><span class="line">2.分布式存储：不适合单机使用</span><br><span class="line">3.Key/Value存储：格式简单，不支持List、Array数据格式</span><br></pre></td></tr></table></figure>
-<h2 id="memcache的安装"><a href="#memcache的安装" class="headerlink" title="memcache的安装"></a>memcache的安装</h2><p>2-1安装前的说明</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.编译安装 Libevent Memcache(需要先安装Libevent依赖)</span><br><span class="line">2.使用依赖管理工具yum、apt-get</span><br><span class="line">-PS：Memcache和Memcached的区别(建议使用Memcached，它是Memcache的升级版)</span><br></pre></td></tr></table></figure>
-<p>2-2安装服务端实际操作</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">1.编译安装</span><br><span class="line">yum -y install automake libtool wget gcc gcc-c++ &amp;&amp; wget https://github.com/libevent/libevent/archive/release-2.1.8-stable.tar.gz &amp;&amp; tar zxvf release-2.1.8-stable.tar.gz &amp;&amp; cd libevent-release-2.1.8-stable/ &amp;&amp; ./autogen.sh &amp;&amp; ./configure &amp;&amp; make -j 2 &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">wget http://www.memcached.org/files/memcached-1.5.8.tar.gz &amp;&amp; cd memcached-1.5.8 &amp;&amp; ./configure &amp;&amp; make -j 2 &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">[root@cephL memcached-1.5.8]# /usr/local/bin/memcached -h</span><br><span class="line">/usr/local/bin/memcached: error while loading shared libraries: libevent-2.1.so.6: cannot open shared object file: No such file or directory</span><br><span class="line">[root@cephL memcached-1.5.8]# ldd /usr/local/bin/memcached </span><br><span class="line">	linux-vdso.so.1 =&gt;  (0x00007ffdd7d77000)</span><br><span class="line">	libevent-2.1.so.6 =&gt; not found</span><br><span class="line">	libpthread.so.0 =&gt; /lib64/libpthread.so.0 (0x00007f2d78950000)</span><br><span class="line">	libc.so.6 =&gt; /lib64/libc.so.6 (0x00007f2d78583000)</span><br><span class="line">	/lib64/ld-linux-x86-64.so.2 (0x000055b9e254c000)</span><br><span class="line">[root@cephL memcached-1.5.8]# LD_DEBUG=libs /usr/local/bin/memcached -v</span><br><span class="line">     51494:	find library=libevent-2.1.so.6 [0]; searching</span><br><span class="line">     51494:	 search cache=/etc/ld.so.cache</span><br><span class="line">     51494:	 search path=/lib64/tls/x86_64:/lib64/tls:/lib64/x86_64:/lib64:/usr/lib64/tls/x86_64:/usr/lib64/tls:/usr/lib64/x86_64:/usr/lib64		(system search path)</span><br><span class="line">     51494:	  trying file=/lib64/tls/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/lib64/tls/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/lib64/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/lib64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/tls/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/tls/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/libevent-2.1.so.6</span><br><span class="line">     51494:	</span><br><span class="line">/usr/local/bin/memcached: error while loading shared libraries: libevent-2.1.so.6: cannot open shared object file: No such file or directory</span><br><span class="line">[root@cephL memcached-1.5.8]# ll /usr/local/lib/libevent-2.1.so.6</span><br><span class="line">lrwxrwxrwx. 1 root root 21 5月  29 18:48 /usr/local/lib/libevent-2.1.so.6 -&gt; libevent-2.1.so.6.0.2</span><br><span class="line">[root@cephL memcached-1.5.8]# ln -s /usr/local/lib/libevent-2.1.so.6 /usr/lib64/libevent-2.1.so.6</span><br><span class="line">[root@cephL memcached-1.5.8]# /usr/local/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br><span class="line">[root@cephL memcached-1.5.8]# ps -ef | grep memcache</span><br><span class="line">root       51810       1  0 19:04 ?        00:00:00 /usr/local/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br><span class="line"></span><br><span class="line">2.使用yum安装</span><br><span class="line">[root@cephL memcache]# yum install memcached</span><br><span class="line">[root@cephL memcache]# /usr/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br><span class="line"></span><br><span class="line">[root@cephL memcache]# ps -ef | grep memcache</span><br><span class="line">root       40789       1  0 18:34 ?        00:00:00 /usr/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br></pre></td></tr></table></figure>
-<p>2-3客户端的安装</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.安装libmemcached</span><br><span class="line">wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz</span><br><span class="line">tar zxvf libmemcached-1.0.18.tar.gz &amp;&amp; cd libmemcached-1.0.18</span><br><span class="line">./configure --prefix=/usr/lib/libmemcached</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+            <p>LTP测试可以用C或Shell脚本编写。</p>
+<h2 id="Getting-Started"><a href="#Getting-Started" class="headerlink" title="Getting Started"></a>Getting Started</h2><p>Git-clone主LTP repository，如自述文件中所述, 并更改目录到checked-out的Git repository。我们建议安装LTP并运行Quick guide（在自述文件中）中提到的测试之一，以确保您从良好的状态开始。我们还建议克隆Linux kernel repository以供参考，本指南将涉及主线kernel 4.12内的文件和目录。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git</span><br></pre></td></tr></table></figure>
+<p>还有许多其他的repositories可以参考，包括GNU C library glibc和可选的C library musl。一些system calls被部分或完全实现在user land作为标准C  library的一部分。所以在这些情况下，C library是一个重要的参考。glibc是Linux最常用的C library，然而musl通常更容易理解。</p>
+<p>实现system calls的方式因体系结构，以及内核版本和C library版本而异。要找出system calls是否真的在任何机器上访问内核，可以使用strace。这会拦截system calls并打印它们。我们将在后面的教程中使用它。</p>
+<h2 id="Choose-a-System-Call-to-test"><a href="#Choose-a-System-Call-to-test" class="headerlink" title="Choose a System Call to test"></a>Choose a System Call to test</h2><p>我们将使用<code>statx()</code> system call来提供测试的具体示例。在撰写本文时，没有测试Linux内核版本4.11中的system call。Linux system call特定的测试主要包含在testcases/kernel/syscalls目录，但你也可以grep整个LTP repository以检查任何现有system call的用法。</p>
+<p>找到当前未被LTP测试的system call的方法是在内核树中查看include/linux/syscalls.h。</p>
+<h3 id="Find-an-untested-System-call"><a href="#Find-an-untested-System-call" class="headerlink" title="Find an untested System call"></a>Find an untested System call</h3><p>尝试找到一个未经测试的系统调用，它有一个手册页（即man syscall产生一个结果）。Git-clone最新的kernel man-pages repository是一个好主意。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone git://git.kernel.org/pub/scm/docs/man-pages/man-pages.git</span><br></pre></td></tr></table></figure>
+<p>在写这篇文章时，最新的man-pages release和repository HEAD之间的差异超过了100次commits。这代表了大约9周的变化。如果你使用的是稳定的Linux发行版，那么你的man-pages package可能已经有几年了。就像kernel一样，最好有Git repository作为参考。</p>
+<h2 id="Create-the-test-skeleton"><a href="#Create-the-test-skeleton" class="headerlink" title="Create the test skeleton"></a>Create the test skeleton</h2><p>我将调用我的测试statx01.c，在你读这个文件名的时候，可能会采用这个文件名，所以可以根据需要增加文件名中的数字，或者用练习2.1中选择的system call替换statx。（怕被占用）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir testcases/kernel/syscalls/statx</span><br><span class="line">$ cd testcases/kernel/syscalls/statx</span><br><span class="line">$ echo statx &gt;&gt; .gitignore</span><br></pre></td></tr></table></figure>
+<p>接下来打开statx01.c并添加如下。确保将right notice更改为您的name/company，如有必要，更正test name和最低kernel version。我将在下面解释代码的作用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * Copyright (c) 2017 Instruction Ignorer &lt;&quot;can&apos;t&quot;@be.bothered.com&gt;</span><br><span class="line"> *</span><br><span class="line"> * This program is free software: you can redistribute it and/or modify</span><br><span class="line"> * it under the terms of the GNU General Public License as published by</span><br><span class="line"> * the Free Software Foundation, either version 2 of the License, or</span><br><span class="line"> * (at your option) any later version.</span><br><span class="line"> *</span><br><span class="line"> * This program is distributed in the hope that it will be useful,</span><br><span class="line"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"> * GNU General Public License for more details.</span><br><span class="line"> *</span><br><span class="line"> * You should have received a copy of the GNU General Public License</span><br><span class="line"> * along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Test statx</span><br><span class="line"> *</span><br><span class="line"> * All tests should start with a description of _what_ we are testing.</span><br><span class="line"> * Non-trivial explanations of _how_ the code works should also go here.</span><br><span class="line"> * Include relevant links, Git commit hashes and CVE numbers.</span><br><span class="line"> * Inline comments should be avoided.</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">#include &quot;tst_test.h&quot;</span><br><span class="line"></span><br><span class="line">static void run(void)</span><br><span class="line">&#123;</span><br><span class="line">	tst_res(TPASS, &quot;Doing hardly anything is easy&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static struct tst_test test = &#123;</span><br><span class="line">	.test_all = run,</span><br><span class="line">	.min_kver = &quot;4.11&quot;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>从<code>#include</code>语句开始，我们将复制main LTP test library headers。这包括最常见的test API函数和test harness初始化代码。需要注意的是，这是一个完全普通的，独立的C程序，但缺少main()，因为它在tst_test.h中实现。</p>
+<p>我们使用tst_test结构指定运行一部分测试代码。测试编写器可以设置各种回调，包括我们已经设置为运行（）的test.test_all。test writer可以设置各种回调, 包括test.test_all，我们已经设置run()。测试工具将在一个单独的进程（使用fork()）中执行此回调，如果在test.timeout秒后没有返回，则强制终止它。</p>
+<h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p>【1】<a href="https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial" target="_blank" rel="noopener">https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial</a></p>
 
           
         
@@ -443,7 +419,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/76/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/76/">76</a><span class="page-number current">77</span><a class="page-number" href="/page/78/">78</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/78/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/76/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/76/">76</a><span class="page-number current">77</span><a class="page-number" href="/page/78/">78</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/78/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -489,7 +465,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

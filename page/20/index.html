@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/08/CEPH-ISCSI-GATEWAY/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/Ceph-MESSENGER-V2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/08/CEPH-ISCSI-GATEWAY/" itemprop="url">CEPH ISCSI GATEWAY</a></h1>
+                <a class="post-title-link" href="/2019/10/14/Ceph-MESSENGER-V2/" itemprop="url">Ceph MESSENGER V2</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-08T15:14:50+08:00">
-                2019-10-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-14T11:00:56+08:00">
+                2019-10-14
               </time>
             
 
@@ -358,65 +358,86 @@
       
         
           
-            <p>iSCSI gateway将Ceph Storage与iSCSI标准集成在一起，将RADOS Block Device（RBD）images导出为SCSI disks高可用（HA）iSCSI target。iSCSI协议允许客户端（initiators）通过TCP / IP网络将SCSI命令发送到SCSI storage devices（targets）。这允许异构客户端（例如Microsoft Windows）访问Ceph存储群集。</p>
-<p>每个iSCSI gateway都运行Linux IO target kernel subsystem（LIO）以提供iSCSI协议支持。LIO利用userspace直通（TCMU）Ceph的librbd库进行交互，并将RBD images公开给iSCSI客户端。借助Ceph的iSCSI gateway，您可以有效地运行完整的block-storage infrastructure，并具有传统Storage Area Network （SAN） 的所有功能和优势。</p>
-<p><img src="https://docs.ceph.com/docs/master/_images/ditaa-176c606a1d1a5b7415ee811bd62dda640513a33a.png" alt></p>
-<h1 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h1><p>要实现Ceph iSCSI gateway，有一些要求。对于高可用的Ceph iSCSI gateway解决方案，建议使用2到4个iSCSI gateway节点。</p>
-<p>有关硬件建议，请参阅<a href="http://docs.ceph.com/docs/master/start/hardware-recommendations/" target="_blank" rel="noopener">Hardware Recommendation page</a>获取更多详细信息。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意 在iSCSI gateway节点上，RBD images的内存占用量可能会增大。根据映射(mapped)的RBD images的数量，相应地计划内存需求。</span><br></pre></td></tr></table></figure>
-<p>Ceph Monitors或OSD没有特定的iSCSI gateway选项，但是降低默认timers以检测OSD至关重要，它可以降低initiator超时的可能性，这一点很重要。建议为存储集群中的每个OSD节点使用以下配置选项：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[osd]</span><br><span class="line">osd heartbeat grace = 20</span><br><span class="line">osd heartbeat interval = 5</span><br></pre></td></tr></table></figure>
+            <h1 id="WHAT-IS-IT"><a href="#WHAT-IS-IT" class="headerlink" title="WHAT IS IT"></a>WHAT IS IT</h1><p>messenger v2 protocol（msgr2）是Ceph’s on-wire protocol第二次主要修订。它具有几个关键功能：</p>
 <ul>
-<li>Ceph Monitor的在线更新</li>
+<li>安全模式，对通过网络传递的所有数据进行加密</li>
+<li>改进了authentication payloads的封装，未来可以集成新的authentication模式（例如Kerberos）</li>
+<li>改进了早期的advertisement和negotiation（协商）功能，支持未来的protocol（协议）修订</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph tell &lt;daemon_type&gt;.&lt;id&gt; config set &lt;parameter_name&gt; &lt;new_value&gt;</span><br><span class="line"></span><br><span class="line">ceph tell osd.0 config set osd_heartbeat_grace 20</span><br><span class="line">ceph tell osd.0 config set osd_heartbeat_interval 5</span><br></pre></td></tr></table></figure>
+<p>Ceph daemons现在可以绑定到多个端口，从而允许旧版Ceph客户端和支持v2的新客户端连接到同一集群。</p>
+<p>默认情况下，monitors现在绑定到新的v2协议的新IANA分配端口3300（ce4h或0xce4），同时还绑定到旧的默认端口6789（旧的v1协议）。</p>
+<h1 id="ADDRESS-FORMATS"><a href="#ADDRESS-FORMATS" class="headerlink" title="ADDRESS FORMATS"></a>ADDRESS FORMATS</h1><p>在nautilus之前，所有网络地址都呈现为1.2.3.4:567/89012，其中有一个IP地址，一个端口和一个随机数，以唯一地标识网络上的客户端或daemon 。 从nautilus开始，我们现在具有三种不同的地址类型：</p>
 <ul>
-<li>OSD节点的在线更新</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph daemon &lt;daemon_type&gt;.&lt;id&gt; config set osd_client_watch_timeout 15</span><br><span class="line"></span><br><span class="line">ceph daemon osd.0 config set osd_heartbeat_grace 20</span><br><span class="line">ceph daemon osd.0 config set osd_heartbeat_interval 5</span><br></pre></td></tr></table></figure>
-<p>有关设置Ceph的配置选项的更多详细信息，请参阅<a href="http://docs.ceph.com/docs/master/rados/configuration/" target="_blank" rel="noopener">Configuration page</a>。</p>
-<h1 id="Configuring-the-iSCSI-Target"><a href="#Configuring-the-iSCSI-Target" class="headerlink" title="Configuring the iSCSI Target"></a>Configuring the iSCSI Target</h1><p>传统上，对Ceph存储集群的块级访问仅限于QEMU和librbd，这是在OpenStack环境中采用的关键因素。从Ceph Luminous版本开始，块级访问正在扩展，以提供标准的iSCSI支持，从而允许更广泛的平台使用，并有可能打开新的用例。</p>
-<ul>
-<li>Red Hat Enterprise Linux/CentOS 7.5（或更高版本）；Linux内核v4.16（或更高版本）</li>
-<li>使用ceph-ansible或使用command-line interface部署的有效Ceph Storage集群</li>
-<li>iSCSI gateways nodes，可以与OSD nodes同一节点，也可以使用专用节点上</li>
-<li>iSCSI front-end traffic和Ceph back-end traffic使用单独的网络</li>
-</ul>
-<p>安装和配置 Ceph iSCSI gateway的方法： </p>
-<ul>
-<li><p><a href="https://docs.ceph.com/docs/mimic/rbd/iscsi-target-ansible/" target="_blank" rel="noopener">Using Ansible</a></p>
+<li><p>v2：<code>v2:1.2.3.4:578/89012</code>标识daemon绑定到新v2协议的端口</p>
 </li>
-<li><p><a href="https://docs.ceph.com/docs/mimic/rbd/iscsi-target-cli/" target="_blank" rel="noopener">Using the Command Line Interface</a></p>
+<li><p>v1：<code>v1:1.2.3.4:578/89012</code>标识绑定到旧版v1协议的端口的daemon。 以前使用任何前缀显示的任何地址现在都显示为v1: address。</p>
+</li>
+<li><p>TYPE_ANY地址标识表示客户端可以支持两种协议版本。 在nautilus之前，客户端将显示为<code>1.2.3.4:0/123456</code>，其中端口0表示它们是客户端，并且不接受连接。 从Nautilus开始，这些客户端现在在内部由TYPE_ANY address表示，并且仍显示为不带前缀，因为它们可能会使用v2或v1协议连接到daemons，具体取决于daemons使用的协议。</p>
 </li>
 </ul>
-<h1 id="Configuring-the-iSCSI-Initiators"><a href="#Configuring-the-iSCSI-Initiators" class="headerlink" title="Configuring the iSCSI Initiators"></a>Configuring the iSCSI Initiators</h1><ul>
-<li><a href="https://docs.ceph.com/docs/mimic/rbd/iscsi-initiator-linux" target="_blank" rel="noopener">iSCSI Initiator for Linux</a></li>
-<li><a href="https://docs.ceph.com/docs/mimic/rbd/iscsi-initiator-win" target="_blank" rel="noopener">iSCSI Initiator for Microsoft Windows</a></li>
-<li><a href="https://docs.ceph.com/docs/mimic/rbd/iscsi-initiator-esx" target="_blank" rel="noopener">iSCSI Initiator for VMware ESX</a></li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">警告：通过多个iSCSI网关导出RBD image时，不支持使用SCSI persistent group reservations（PGR）和基于SCSI 2 reservations的应用程序。</span><br></pre></td></tr></table></figure>
-<h1 id="Monitoring-the-iSCSI-Gateways"><a href="#Monitoring-the-iSCSI-Gateways" class="headerlink" title="Monitoring the iSCSI Gateways"></a>Monitoring the iSCSI Gateways</h1><p>Ceph为iSCSI gateway环境提供了一个附加工具，以监视导出的RADOS Block Device（RBD）images的性能。</p>
-<p>该gwtop工具是一个类似top的工具，用于显示通过iSCSI导出到客户端的RBD images的聚合性能指标。这些指标来自Performance Metrics Domain Agent（PMDA）。来自Linux-IO target（LIO）PMDA的信息用于列出每个已导出的RBD images以及所连接的客户端及其关联的I / O指标。</p>
-<p><strong>Requirements</strong></p>
+<p>因为daemons现在绑定到多个端口，所以现在用地址向量而不是单个地址来描述它们。 例如，在Nautilus cluster上dump monitor map会有如下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph1 ~]# ceph mon dump</span><br><span class="line">epoch 1</span><br><span class="line">fsid 50fcf227-be32-4bcb-8b41-34ca8370bd16</span><br><span class="line">last_changed 2019-02-25 11:10:46.700821</span><br><span class="line">created 2019-02-25 11:10:46.700821</span><br><span class="line">min_mon_release 14 (nautilus)</span><br><span class="line">0: [v2:10.0.0.10:3300/0,v1:10.0.0.10:6789/0] mon.foo</span><br><span class="line">1: [v2:10.0.0.11:3300/0,v1:10.0.0.11:6789/0] mon.bar</span><br><span class="line">2: [v2:10.0.0.12:3300/0,v1:10.0.0.12:6789/0] mon.baz</span><br></pre></td></tr></table></figure>
+<p>方括号或地址向量表示可以在多个端口（和协议）上访问同一daemon。如果可能，任何连接到该daemon的客户端或其他daemon都将使用v2协议（listed first）； 否则，它将返回到旧版v1协议。 旧版客户端将仅看到v1地址，并且将继续使用v1协议进行连接。</p>
+<p>从Nautilus开始，mon_host配置选项和<code>-m &lt;mon-host&gt;</code>命令行选项支持相同的带括号的地址向量语法。</p>
+<h2 id="BIND-CONFIGURATION-OPTIONS"><a href="#BIND-CONFIGURATION-OPTIONS" class="headerlink" title="BIND CONFIGURATION OPTIONS"></a>BIND CONFIGURATION OPTIONS</h2><p>两个新的配置选项控制是否使用v1 and/or v2协议：</p>
 <ul>
-<li>正在运行的Ceph iSCSI gateway</li>
+<li>ms_bind_msgr1 [default: true]控制daemon是否绑定到使用v1协议的端口</li>
+<li>ms_bind_msgr2 [default: true]控制daemon是否绑定到使用v2协议的端口</li>
 </ul>
-<p><strong>Installing</strong></p>
-<p>1、在每个iSCSI gateway节点安装ceph-iscsi-tools</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install ceph-iscsi-tools</span><br></pre></td></tr></table></figure>
-<p>2、在每个iSCSI gateway节点安装performance co-pilot</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install pcp</span><br></pre></td></tr></table></figure>
-<p>3、在每个iSCSI gateway节点安装LIO PMDA</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install pcp-pmda-lio</span><br></pre></td></tr></table></figure>
-<p>4、在每个iSCSI gateway节点enable并start performance co-pilot service</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl enable pmcd</span><br><span class="line"># systemctl start pmcd</span><br></pre></td></tr></table></figure>
-<p>5、注册pcp-pmda-lio agent</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /var/lib/pcp/pmdas/lio</span><br><span class="line">./Install</span><br></pre></td></tr></table></figure>
-<p>默认情况下，<code>gwtop</code>假定iSCSI gateway configuration object被存储在rbd pool被叫做gateway.conf的RADOS object中。此configuration定义了需要收集性能信息的iSCSI gateways。可以使用<code>-g</code>或<code>-c</code>标志将其覆盖 。gwtop –help获取更多详细信息。</p>
-<p>LIO configuration确定要从performance co-pilot提取性能统计信息的类型。当<code>gwtop</code>启动时，它着眼于LIO configuration，如果发现user-space的磁盘，然后<code>gwtop</code> 自动选择LIO收集器。</p>
-<p><strong>Example gwtop Outputs</strong></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gwtop  2/2 Gateways   CPU% MIN:  4 MAX:  5    Network Total In:    2M  Out:    3M   10:20:00</span><br><span class="line">Capacity:   8G    Disks:   8   IOPS:  503   Clients:  1   Ceph: HEALTH_OK          OSDs:   3</span><br><span class="line">Pool.Image       Src    Size     iops     rMB/s     wMB/s   Client</span><br><span class="line">iscsi.t1703             500M        0      0.00      0.00</span><br><span class="line">iscsi.testme1           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme2           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme3           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme5           500M        0      0.00      0.00</span><br><span class="line">rbd.myhost_1      T       4G      504      1.95      0.00   rh460p(CON)</span><br><span class="line">rbd.test_2                1G        0      0.00      0.00</span><br><span class="line">rbd.testme              500M        0      0.00      0.00</span><br></pre></td></tr></table></figure>
-<p>在<em>Client</em> column，<code>(CON)</code>表示iSCSI initiator (client)当前已登录到iSCSI gateway。如果显示<code>-multi-</code>，则表示多个clients映射到单个RBD image。</p>
+<p>同样，两个选项控制是否使用IPv4和IPv6地址：</p>
+<ul>
+<li>ms_bind_ipv4 [默认值：true]控制daemon是否绑定到IPv4地址</li>
+<li>ms_bind_ipv6 [默认值：false]控制daemon是否绑定到IPv6地址</li>
+</ul>
+<h1 id="CONNECTION-MODES"><a href="#CONNECTION-MODES" class="headerlink" title="CONNECTION MODES"></a>CONNECTION MODES</h1><p>v2协议支持两种连接模式：</p>
+<ul>
+<li><p>crc模式提供：</p>
+<ul>
+<li>建立连接时进行强大的初始身份验证（通过cephx，双方相互认证，防止中间人或窃听者进入）</li>
+<li>CRC32C完整性检查，以防止由于flaky hardware或cosmic rays引起的位翻转</li>
+</ul>
+<p>crc模式不提供：</p>
+<ul>
+<li>加密（网络上的窃听者可以看到所有经过身份验证后的流量）</li>
+<li>免受恶意中间人的攻击（只要他们调整crc32c的值以使其匹配，就可以故意修改流量）</li>
+</ul>
+</li>
+<li><p>secure模式提供：</p>
+<ul>
+<li>建立连接时进行强大的初始身份验证（通过cephx，双方相互认证，防止中间人或窃听者进入）</li>
+<li>对所有认证后流量完全加密，包括加密完整性检查。</li>
+</ul>
+<p>在Nautilus中，secure模式使用<a href="https://en.wikipedia.org/wiki/Galois/Counter_Mode" target="_blank" rel="noopener">AES-GCM</a> stream cipher，这在现代处理器上通常非常快（例如，比SHA-256 cryptographic hash更快）。</p>
+</li>
+</ul>
+<h2 id="CONNECTION-MODE-CONFIGURATION-OPTIONS"><a href="#CONNECTION-MODE-CONFIGURATION-OPTIONS" class="headerlink" title="CONNECTION MODE CONFIGURATION OPTIONS"></a>CONNECTION MODE CONFIGURATION OPTIONS</h2><p>对于大多数连接，有一些选项可以控制使用哪种模式：</p>
+<ul>
+<li>ms_cluster_mode用于Ceph daemons之间的集群内通信的连接模式（或允许的模式）。 如果列出了多个模式，则首选第一个列出的模式。</li>
+<li>ms_service_mode是客户端连接到群集时允许使用的模式的列表。</li>
+<li>ms_client_mode是按优先顺序排列的连接模式列表，供客户端在与Ceph群集通信时使用（或允许）。</li>
+</ul>
+<p>有一组并行的选项专门适用于monitors，允许管理员设置与monitors通信的不同（通常更安全）要求。</p>
+<ul>
+<li>ms_mon_cluster_mode是monitors之间使用的连接模式（或允许的模式）。</li>
+<li>ms_mon_service_mode是客户端或其他Ceph daemons连接到monitors时允许使用的模式的列表。</li>
+<li>ms_mon_client_mode是按优先顺序排列的连接模式列表，供客户端或non-monitor daemons在连接monitors时使用。</li>
+</ul>
+<h1 id="TRANSITIONING-FROM-V1-ONLY-TO-V2-PLUS-V1"><a href="#TRANSITIONING-FROM-V1-ONLY-TO-V2-PLUS-V1" class="headerlink" title="TRANSITIONING FROM V1-ONLY TO V2-PLUS-V1"></a>TRANSITIONING FROM V1-ONLY TO V2-PLUS-V1</h1><p>默认情况下，从Nautilus 14.2.z开始，ms_bind_msgr2为true。 但是，在monitors开始使用v2之前，只有有限的服务可以使用v2地址。</p>
+<p>对于大多数用户，monitors已绑定到v1协议的默认旧版端口6789。 在这种情况下，启用v2非常简单：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph mon enable-msgr2</span><br></pre></td></tr></table></figure>
+<p>如果monitors绑定到non-standard端口，则需要为v2明确指定其端口。例如，如果monitors mon.a绑定到1.2.3.4:1111，并且您想要在端口1112上添加v2，则：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph mon set-addrs a [v2:1.2.3.4:1112,v1:1.2.3.4:1111]</span><br></pre></td></tr></table></figure>
+<p>monitors绑定到v2后，每个daemon将在下一次重新启动时开始使用v2地址。</p>
+<h1 id="UPDATING-CEPH-CONF-AND-MON-HOST"><a href="#UPDATING-CEPH-CONF-AND-MON-HOST" class="headerlink" title="UPDATING CEPH.CONF AND MON_HOST"></a>UPDATING CEPH.CONF AND MON_HOST</h1><p>在Nautilus之前，CLI用户或daemon通常将通过/etc/ceph/ceph.conf中的mon_host选项发现monitors。 此选项的语法从Nautilus开始扩展，以允许支持新的方括号列表格式。 例如，像这样的旧行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon_host = 10.0.0.1:6789,10.0.0.2:6789,10.0.0.3:6789</span><br></pre></td></tr></table></figure>
+<p>可以更改为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon_host = [v2:10.0.0.1:3300/0,v1:10.0.0.1:6789/0],[v2:10.0.0.2:3300/0,v1:10.0.0.2:6789/0],[v2:10.0.0.3:3300/0,v1:10.0.0.3:6789/0]</span><br></pre></td></tr></table></figure>
+<p>但是，使用默认端口（3300和6789）时，可以将其省略：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mon_host = 10.0.0.1,10.0.0.2,10.0.0.3</span><br></pre></td></tr></table></figure>
+<p>一旦在monitors上启用了v2，可能需要更新ceph.conf以不指定任何端口（这通常是最简单的），或者显式指定v2和v1地址。 但是请注意，Nautilus和更高版本才能理解新的带括号语法，因此请不要在尚未升级其ceph packages的主机上进行此更改。</p>
+<p>当更新ceph.conf时，请注意新的<code>ceph config generate-minimal-conf</code>命令（它生成一个简单的配置文件，其中包含足够的信息来访问monitors）而<code>ceph config assimilate-conf</code>（将配置文件选项移动到monitors’配置数据库中）可能会有所帮助。 例如，：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"># ceph config assimilate-conf &lt; /etc/ceph/ceph.conf</span><br><span class="line"># ceph config generate-minimal-config &gt; /etc/ceph/ceph.conf.new</span><br><span class="line"># cat /etc/ceph/ceph.conf.new</span><br><span class="line"># minimal ceph.conf for 0e5a806b-0ce5-4bc6-b949-aa6f68f5c2a3</span><br><span class="line">[global]</span><br><span class="line">        fsid = 0e5a806b-0ce5-4bc6-b949-aa6f68f5c2a3</span><br><span class="line">        mon_host = [v2:10.0.0.1:3300/0,v1:10.0.0.1:6789/0]</span><br><span class="line"># mv /etc/ceph/ceph.conf.new /etc/ceph/ceph.conf</span><br></pre></td></tr></table></figure>
+<h1 id="PROTOCOL"><a href="#PROTOCOL" class="headerlink" title="PROTOCOL"></a>PROTOCOL</h1><p>有关v2 wire protocol的详细说明，请参见<a href="https://docs.ceph.com/docs/nautilus/dev/msgr2/#msgr2-protocol" target="_blank" rel="noopener">msgr2 protocol</a>。</p>
 
           
         
@@ -461,7 +482,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -507,7 +528,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

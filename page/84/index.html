@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/16/ISA-ERASURE-CODE-PLUGIN/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/18/SHEC-ERASURE-CODE-PLUGIN/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/16/ISA-ERASURE-CODE-PLUGIN/" itemprop="url">ISA ERASURE CODE PLUGIN</a></h1>
+                <a class="post-title-link" href="/2018/05/18/SHEC-ERASURE-CODE-PLUGIN/" itemprop="url">SHEC ERASURE CODE PLUGIN</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-16T16:57:03+08:00">
-                2018-05-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-18T14:56:32+08:00">
+                2018-05-18
               </time>
             
 
@@ -358,16 +358,16 @@
       
         
           
-            <p>ISA plugin封装了<a href="https://01.org/intel%C2%AE-storage-acceleration-library-open-source-version/" target="_blank" rel="noopener">ISA</a>库。 它只能在Intel处理器上运行。</p>
-<h2 id="CREATE-AN-ISA-PROFILE"><a href="#CREATE-AN-ISA-PROFILE" class="headerlink" title="CREATE AN ISA PROFILE"></a>CREATE AN ISA PROFILE</h2><p>创建新的isa erasure code profile：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile set &#123;name&#125; \</span><br><span class="line">     plugin=isa \</span><br><span class="line">     technique=&#123;reed_sol_van|cauchy&#125; \</span><br><span class="line">     [k=&#123;data-chunks&#125;] \</span><br><span class="line">     [m=&#123;coding-chunks&#125;] \</span><br><span class="line">     [crush-root=&#123;root&#125;] \</span><br><span class="line">     [crush-failure-domain=&#123;bucket-type&#125;] \</span><br><span class="line">     [crush-device-class=&#123;device-class&#125;] \</span><br><span class="line">     [directory=&#123;directory&#125;] \</span><br><span class="line">     [--force]</span><br></pre></td></tr></table></figure>
+            <p>shec plugin封装了<a href="http://tracker.ceph.com/projects/ceph/wiki/Shingled_Erasure_Code_(SHEC" target="_blank" rel="noopener">multiple SHEC</a>)库。它允许ceph比Reed Solomon codes更有效地恢复数据。</p>
+<h2 id="CREATE-AN-SHEC-PROFILE"><a href="#CREATE-AN-SHEC-PROFILE" class="headerlink" title="CREATE AN SHEC PROFILE"></a>CREATE AN SHEC PROFILE</h2><p>创建一个新的shec erasure code profile：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile set &#123;name&#125; \</span><br><span class="line">     plugin=shec \</span><br><span class="line">     [k=&#123;data-chunks&#125;] \</span><br><span class="line">     [m=&#123;coding-chunks&#125;] \</span><br><span class="line">     [c=&#123;durability-estimator&#125;] \</span><br><span class="line">     [crush-root=&#123;root&#125;] \</span><br><span class="line">     [crush-failure-domain=&#123;bucket-type&#125;] \</span><br><span class="line">     [crush-device-class=&#123;device-class&#125;] \</span><br><span class="line">     [directory=&#123;directory&#125;] \</span><br><span class="line">     [--force]</span><br></pre></td></tr></table></figure>
 <p>其中：</p>
-<p>k={data chunks}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	每个object都分为多个data-chunks parts，每个part存储在不同的OSD上。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	7</span><br></pre></td></tr></table></figure>
+<p>k={data-chunks}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	每个object都分为多个data-chunks parts，每个part存储在不同的OSD上。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	4</span><br></pre></td></tr></table></figure>
 <p>m={coding-chunks}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	计算每个object的coding chunks并将它们存储在不同的OSD上。coding chunks的数量也是在不丢失数据的情况下，允许损失OSD的数量。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	3</span><br></pre></td></tr></table></figure>
-<p>technique={reed_sol_van|cauchy}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Description:	ISA插件有两种Reed Solomon形式（https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction）。</span><br><span class="line">如果设置了reed_sol_van，则为Vandermonde，</span><br><span class="line">如果设置了cauchy（https://en.wikipedia.org/wiki/Vandermonde_matrix），则为Cauchy（https://en.wikipedia.org/wiki/Cauchy_matrix）。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	reed_sol_van</span><br></pre></td></tr></table></figure>
+<p>c={durability-estimator}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Description:	校验chunk的数量，每个data chunk都包含在计算范围内。该数字被用作耐久性估算。例如，如果c = 2，则可以在不丢失数据的情况下down掉2个OSD。</span><br><span class="line">The number of parity chunks each of which includes each data chunk in its calculation range. The number is used as a durability estimator. For instance, if c=2, 2 OSDs can be down without losing data.</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	2</span><br></pre></td></tr></table></figure>
 <p>crush-root={root}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	crush bucket名字用于CRUSH rule的first step。&quot;take&quot;为step的默认值。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	default</span><br></pre></td></tr></table></figure>
 <p>crush-failure-domain={bucket-type}</p>
@@ -378,6 +378,12 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	设置加载erasure code plugin的目录名。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	/usr/lib/ceph/erasure-code</span><br></pre></td></tr></table></figure>
 <p>–force</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description:	用相同的名称覆盖已有的profile。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
+<h2 id="BRIEF-DESCRIPTION-OF-SHEC’S-LAYOUTS"><a href="#BRIEF-DESCRIPTION-OF-SHEC’S-LAYOUTS" class="headerlink" title="BRIEF DESCRIPTION OF SHEC’S LAYOUTS"></a>BRIEF DESCRIPTION OF SHEC’S LAYOUTS</h2><h3 id="SPACE-EFFICIENCY"><a href="#SPACE-EFFICIENCY" class="headerlink" title="SPACE EFFICIENCY"></a>SPACE EFFICIENCY</h3><p>Space efficiency是data chunks与object中所有chunks的比率，表示为k /（k + m）。为了提高space efficiency，您应该增加k或减少m。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">space efficiency of SHEC(4,3,2) = 4/(4+3) = 0.57</span><br><span class="line">SHEC(5,3,2) or SHEC(4,2,2) improves SHEC(4,3,2)&apos;s space efficiency</span><br></pre></td></tr></table></figure>
+<h3 id="DURABILITY"><a href="#DURABILITY" class="headerlink" title="DURABILITY"></a>DURABILITY</h3><p>SHEC（= c）的第三个参数是一个耐久性估算，它近似于在不丢失数据的情况下可以丢失OSD的数量。SHEC（4,3,2）的耐久性估算= 2</p>
+<h3 id="RECOVERY-EFFICIENCY"><a href="#RECOVERY-EFFICIENCY" class="headerlink" title="RECOVERY EFFICIENCY"></a>RECOVERY EFFICIENCY</h3><p>描述recovery efficiency的计算超出了本文件的范围，但至少在不增加c的情况下增加m可以提高恢复效率。（但是，在这种情况下，我们必须牺牲space efficiency。）</p>
+<p>SHEC（4,2,2）→SHEC（4,3,2）：提高了recovery efficiency</p>
+<h2 id="ERASURE-CODE-PROFILE-EXAMPLES"><a href="#ERASURE-CODE-PROFILE-EXAMPLES" class="headerlink" title="ERASURE CODE PROFILE EXAMPLES"></a>ERASURE CODE PROFILE EXAMPLES</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set SHECprofile \</span><br><span class="line">     plugin=shec \</span><br><span class="line">     k=8 m=4 c=3 \</span><br><span class="line">     crush-failure-domain=host</span><br><span class="line">$ ceph osd pool create shecpool 256 256 erasure SHECprofile</span><br></pre></td></tr></table></figure>
           
         
       
@@ -421,7 +427,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/83/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/83/">83</a><span class="page-number current">84</span><a class="page-number" href="/page/85/">85</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/85/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/83/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/83/">83</a><span class="page-number current">84</span><a class="page-number" href="/page/85/">85</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/85/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -467,7 +473,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

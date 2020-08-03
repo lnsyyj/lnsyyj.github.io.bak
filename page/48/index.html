@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/17/docker-4-docker-data-persistence/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/04/DNS基础及域名系统架构-LinuxCast视频教程/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/12/17/docker-4-docker-data-persistence/" itemprop="url">docker-4 docker data persistence</a></h1>
+                <a class="post-title-link" href="/2019/01/04/DNS基础及域名系统架构-LinuxCast视频教程/" itemprop="url">DNS基础及域名系统架构 [LinuxCast视频教程]</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-12-17T23:41:43+08:00">
-                2018-12-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-04T00:21:54+08:00">
+                2019-01-04
               </time>
             
 
@@ -358,21 +358,24 @@
       
         
           
-            <h1 id="Docker的持久化存储和数据共享"><a href="#Docker的持久化存储和数据共享" class="headerlink" title="Docker的持久化存储和数据共享"></a>Docker的持久化存储和数据共享</h1><ul>
-<li><p>基于本地文件系统的volume。可以在执行docker create或docker run时，通过-v参数将主机的目录作为容器的数据卷。这部分功能便是基于本地文件系统的volume管理。</p>
-</li>
-<li><p>基于plugin的volume，支持第三方的存储方案，比如NAS，aws。</p>
-</li>
-</ul>
-<h2 id="volume的类型"><a href="#volume的类型" class="headerlink" title="volume的类型"></a>volume的类型</h2><ul>
-<li><p>受管理的data volume，由docker后台自动创建。</p>
-</li>
-<li><p>绑定挂载的volume，具体挂载位置可以由用户指定。</p>
-</li>
-</ul>
-<h1 id="data-volume"><a href="#data-volume" class="headerlink" title="data volume"></a>data volume</h1><p>启动mysql Container，会在宿主机/var/lib/docker/volumes/目录创建持久化目录。在mysql的Dockerfile中有<code>VOLUME /var/lib/mysql</code>，对应的是Container里面的路径。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql</span><br><span class="line">9f423f85765546cb5f2f748b99e221c371794e9ae2ee910aabc685462506a23e</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume ls</span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume inspect 5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;CreatedAt&quot;: &quot;2018-12-17T16:21:09Z&quot;,</span><br><span class="line">        &quot;Driver&quot;: &quot;local&quot;,</span><br><span class="line">        &quot;Labels&quot;: null,</span><br><span class="line">        &quot;Mountpoint&quot;: &quot;/var/lib/docker/volumes/5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db/_data&quot;,</span><br><span class="line">        &quot;Name&quot;: &quot;5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db&quot;,</span><br><span class="line">        &quot;Options&quot;: null,</span><br><span class="line">        &quot;Scope&quot;: &quot;local&quot;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d --name mysql2 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql</span><br><span class="line">12dc76117789421e6d9fbe43b6ceeb38791b94848baa0506a1f90bbccd9050fc</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume ls</span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42</span><br><span class="line">local               5625ef5f9b225dfab10577dbf0521c4244e6ebc60bc1951befac708b196082db</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume inspect 595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42</span><br><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;CreatedAt&quot;: &quot;2018-12-17T16:24:15Z&quot;,</span><br><span class="line">        &quot;Driver&quot;: &quot;local&quot;,</span><br><span class="line">        &quot;Labels&quot;: null,</span><br><span class="line">        &quot;Mountpoint&quot;: &quot;/var/lib/docker/volumes/595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42/_data&quot;,</span><br><span class="line">        &quot;Name&quot;: &quot;595c8cee9d6483ae8a4e2006e18103298bf02f940ef05d43261071af74aa6a42&quot;,</span><br><span class="line">        &quot;Options&quot;: null,</span><br><span class="line">        &quot;Scope&quot;: &quot;local&quot;</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">以上的方式volume不能很好的区分volume对应哪个应用，可以在启动Container时指定-v参数。</span><br><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d -v mysql:/var/lib/mysql  --name mysql1 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql</span><br><span class="line">6b768f033c3f2c17c2da569ed3a9d4490ac7f3bd17e551a24e0fd7c9f7522ed2</span><br><span class="line">[vagrant@docker-node1 ~]$ docker volume ls</span><br><span class="line">DRIVER              VOLUME NAME</span><br><span class="line">local               mysql</span><br><span class="line">创建mysql1 Container，并在Container中的mysql创建docker database，然后停止并删除Container，这时mysql的volume依然存在。</span><br><span class="line">[vagrant@docker-node1 ~]$ docker exec -it mysql1 /bin/bash</span><br><span class="line">root@6b768f033c3f:/# mysql -uroot</span><br><span class="line">mysql&gt; create database docker;</span><br><span class="line">mysql&gt; exit</span><br><span class="line">root@6b768f033c3f:/# exit</span><br><span class="line">[vagrant@docker-node1 ~]$ docker stop mysql1</span><br><span class="line">[vagrant@docker-node1 ~]$ docker rm $(docker ps -qa)</span><br><span class="line">创建mysql2 Container，并挂载之前名为mysql的volume，发现docker database依然存在，说明volume起作用了。</span><br><span class="line">[vagrant@docker-node1 ~]$ sudo docker run -d -v mysql:/var/lib/mysql  --name mysql2 -e MYSQL_ALLOW_EMPTY_PASSWORD=true mysql</span><br><span class="line">f574294e26818667095b78a7141e8eb5309b7aa27d4b027e6811e4cca3368fdf</span><br><span class="line">[vagrant@docker-node1 ~]$ docker exec -it mysql2 /bin/bash</span><br><span class="line">root@f574294e2681:/# mysql -u root</span><br><span class="line">mysql&gt; show databases;</span><br><span class="line">+--------------------+</span><br><span class="line">| Database           |</span><br><span class="line">+--------------------+</span><br><span class="line">| docker             |</span><br><span class="line">| information_schema |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">+--------------------+</span><br><span class="line">5 rows in set (0.05 sec)</span><br></pre></td></tr></table></figure>
-<h1 id="Bind-Mouting"><a href="#Bind-Mouting" class="headerlink" title="Bind Mouting"></a>Bind Mouting</h1><p>data volume方式需要在Dockerfile中定义VOLUME，bind mouting方式则不需要。在docker run时，指定宿主机目录与Container内目录的对应关系即可（<code>docker run -v /home/aaa:/root/aaa</code>）。</p>
+            <p>域名和IP地址是一一对应的，方便我们记忆。</p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-1.jpg?raw=true" alt></p>
+<p>DNS服务</p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-2.jpg?raw=true" alt></p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-3.jpg?raw=true" alt></p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-4.jpg?raw=true" alt></p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-5.jpg?raw=true" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-6.jpg" alt></p>
+<p><img src="https://github.com/lnsyyj/lnsyyj.github.io/blob/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-6.jpg?raw=true" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-8.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-9.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-10.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-11.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-12.jpg" alt></p>
+<p><img src="https://raw.githubusercontent.com/lnsyyj/lnsyyj.github.io/hexo/Blog/source/_posts/DNS%E5%9F%BA%E7%A1%80%E5%8F%8A%E5%9F%9F%E5%90%8D%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84-LinuxCast%E8%A7%86%E9%A2%91%E6%95%99%E7%A8%8B/DNS-13.jpg" alt></p>
+<p>参考：</p>
+<p>【1】<a href="https://www.youtube.com/channel/UCNxDA1Ip2e_SKsvhKddfQ1w" target="_blank" rel="noopener">https://www.youtube.com/channel/UCNxDA1Ip2e_SKsvhKddfQ1w</a></p>
+<p>【2】<a href="https://zh.wikipedia.org/wiki/%E5%9F%9F%E5%90%8D" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/%E5%9F%9F%E5%90%8D</a></p>
 
           
         
@@ -417,7 +420,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/47/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/47/">47</a><span class="page-number current">48</span><a class="page-number" href="/page/49/">49</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/49/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/47/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/47/">47</a><span class="page-number current">48</span><a class="page-number" href="/page/49/">49</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/49/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -463,7 +466,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

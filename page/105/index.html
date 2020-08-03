@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/17/ElasticSearch-1/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/22/CEPH-MANAGER-DAEMON-Installation-and-Configuration/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/09/17/ElasticSearch-1/" itemprop="url">ElasticSearch(1)</a></h1>
+                <a class="post-title-link" href="/2017/11/22/CEPH-MANAGER-DAEMON-Installation-and-Configuration/" itemprop="url">CEPH MANAGER DAEMON - Installation and Configuration</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T12:46:13+08:00">
-                2017-09-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-22T22:41:01+08:00">
+                2017-11-22
               </time>
             
 
@@ -358,123 +358,79 @@
       
         
           
-            <p>ElasticSearch入门<br>笔记来自：<a href="http://www.imooc.com/video/15762" target="_blank" rel="noopener">http://www.imooc.com/video/15762</a></p>
-<h2 id="ElasticSearch简介"><a href="#ElasticSearch简介" class="headerlink" title="ElasticSearch简介"></a>ElasticSearch简介</h2><p>1、什么是ElasticSearch？</p>
-<pre><code>基于Apache Lucene构建的开源搜索引擎
-采用Java编写，提供简单易用的RESTFul API
-轻松的横向扩展，可支持PB级的结构化或非结构化数据处理
-</code></pre><p>2、应用场景</p>
-<pre><code>海量数据分析引擎
-站内搜索引擎
-数据仓库
-</code></pre><p>3、一线公司实际应用场景</p>
-<pre><code>英国卫报 - 实时分析公众对文章的回应
-维基百科、GitHub - 站内实时搜索
-百度 - 实时日志监控平台
-等等...
-</code></pre><p>4、前置知识</p>
-<pre><code>熟悉用Maven构建项目
-了解Spiring Boot的基本使用
-</code></pre><p>5、环境要求</p>
-<pre><code>IDE工具 IntelliJ IDEA、Eclipse等常规用IDE即可
-Java JDK1.8
-其他依赖 Maven、NodeJs（6.0以上）
-</code></pre><p>6、课程简介</p>
-<pre><code>安装
-基础概念
-基本用法
-高级查询
-实战演练
-课程总结
-</code></pre><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>1、版本问题</p>
-<pre><code>版本历史 1.x-&gt;2.x-&gt;5.x
-版本选择 5.x
-</code></pre><p>2、单实例安装<br>（1）官网下载elasticsearch</p>
-<pre><code>https://www.elastic.co/cn/
+            <p>CEPH MANAGER DAEMON - Installation and Configuration - CEPH-MGR ADMINISTRATOR’S GUIDE</p>
+<p><strong>MANUAL SETUP</strong></p>
+<p>通常，你可以使用ceph-ansible这样的工具来建立一个ceph-mgr守护进程。 下面这些说明描述了如何手动设置ceph-mgr守护进程。</p>
+<p>首先，为守护进程创建一个身份验证密钥：</p>
+<pre><code>ceph auth get-or-create mgr.$name mon &apos;allow profile mgr&apos; osd &apos;allow *&apos; mds &apos;allow *&apos;
+</code></pre><p>该密钥放置到mgr数据路径中，对于集群名“ceph”和mgr $name为“foo”，该路径将是/var/lib/ceph/mgr/ceph-foo。</p>
+<p>启动ceph-mgr守护进程：</p>
+<pre><code>ceph-mgr -i $name
+</code></pre><p>通过查看ceph状态的输出来检查mgr是否已经出现，它现在应该包含一个mgr状态行：</p>
+<pre><code>mgr active: $name
+</code></pre><p><strong>CLIENT AUTHENTICATION</strong></p>
+<p>manager是一个新的守护进程，需要新的CephX功能。 如果您从旧版本的Ceph升级集群，或者使用默认安装/部署工具，则admin client应该自动获得此功能。如果您使用其他地方的工具，则在调用某些ceph集群命令时可能会收到EACCES错误。为了解决这个问题，可以通过修改用户权限来为client的cephx功能添加一个“mgr allow *”。</p>
+<p>（<a href="http://docs.ceph.com/docs/master/rados/operations/user-management/#modify-user-capabilities）" target="_blank" rel="noopener">http://docs.ceph.com/docs/master/rados/operations/user-management/#modify-user-capabilities）</a></p>
+<p><strong>HIGH AVAILABILITY</strong></p>
+<p>一般来说，你应该在每台运行ceph-mon守护进程的主机上设置一个ceph-mgr来达到相同的可用性。默认情况下，首先启动的ceph-mgr实例将被monitors设置为active，而其他的则是standbys。ceph-mgr守护进程中不需要仲裁。如果 active daemon在mon_mgr_beacon_grace（default 30s）规定时间内发送beacon到monitors失败，standby会替代当前active。如果要抢先进行故障切换，可以使用命令ceph mgr fail <mgr name>明确标记ceph-mgr daemon失败。</mgr></p>
+<p><strong>USING MODULES</strong></p>
+<p>使用命令ceph mgr module ls查看哪些模块可用，哪些是当前启用的。使用命令ceph mgr module enable <module>和ceph mgr module disable <module>分别启用模块和禁用模块。<br>如果启用了一个模块，则active ceph-mgr daemon将加载并执行它。当模块在加载时发布它的IP地址，如HTTP server。要查看这些模块的地址，请使用命令ceph mgr services。<br>一些模块也可以实现一个特殊的standby模式，它在standby ceph-mgr daemons以及active daemon。如果client尝试连接到standby，这使得提供服务的模块能够将其client重定向到active daemon。<br>有关每个模块提供的功能的更多信息，请参阅个别管理器模块的文档页面。</module></module></p>
+<p>以下是启用dashboard模块的示例：</p>
+<pre><code>$ ceph mgr module ls
+{
+        &quot;enabled_modules&quot;: [
+                &quot;restful&quot;,
+                &quot;status&quot;
+        ],
+        &quot;disabled_modules&quot;: [
+                &quot;dashboard&quot;
+        ]
+}
 
-yujiang@ubuntu001:~$ wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.0.tar.gz
-</code></pre><p>（2）解压并修改配置文件</p>
-<pre><code>yujiang@ubuntu001:~$ tar zxvf elasticsearch-5.6.0.tar.gz
+$ ceph mgr module enable dashboard
+$ ceph mgr module ls
+{
+        &quot;enabled_modules&quot;: [
+                &quot;restful&quot;,
+                &quot;status&quot;,
+                &quot;dashboard&quot;
+        ],
+        &quot;disabled_modules&quot;: [
+        ]
+}
 
-yujiang@ubuntu001:~$ cd elasticsearch-5.6.0/
+$ ceph mgr services
+{
+        &quot;dashboard&quot;: &quot;http://myserver.com:7789/&quot;,
+        &quot;restful&quot;: &quot;https://myserver.com:8789/&quot;
+}
+</code></pre><p><strong>CALLING MODULE COMMANDS</strong></p>
+<p>在模块实现command line hooks的情况下，这些commands将作为普通的Ceph命令来访问：</p>
+<pre><code>ceph &lt;command | help&gt;
+</code></pre><p>如果你想查看manager处理的命令列表（标准ceph help将显示所有的mon和mgr命令），你可以直接发送一个命令到manager daemon：</p>
+<pre><code>ceph tell mgr help
+</code></pre><p>注意，没有必要去访问一个特定的mgr instance，mgr将自动选择当前的active daemon。</p>
+<p><strong>CONFIGURATION</strong></p>
+<p>OPTION(mgr_module_path, OPT_STR, CEPH_PKGLIBDIR “/mgr”) // 从哪里加载python模块</p>
+<pre><code>mgr module path
+Description:    Path to load modules from
+Type:    String
+Default:    &quot;&lt;library dir&gt;/mgr&quot;
 
-yujiang@ubuntu001:~/elasticsearch-5.6.0$ vi config/elasticsearch.yml
-添加
-network.host: 192.168.30.134
-</code></pre><p>（3）启动elasticsearch</p>
-<pre><code>yujiang@ubuntu001:~$ sudo sysctl -w vm.max_map_count=262144
-或
-yujiang@ubuntu001:~$ sudo vi /etc/sysctl.conf
-vm.max_map_count=262144
+mgr data
+Description:    Path to load daemon data (such as keyring)
+Type:    String
+Default:    &quot;/var/lib/ceph/mgr/$cluster-$id&quot;
 
-yujiang@ubuntu001:~/elasticsearch-5.6.0$ sh ./bin/elasticsearch
-</code></pre><p>（4）打开浏览器</p>
-<pre><code>http://192.168.30.134:9200/
-</code></pre><p>3、实用插件Head安装<br>（1）安装nodejs</p>
-<pre><code>yujiang@ubuntu001:~$ wget https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.xz
-yujiang@ubuntu001:~$ xz -d node-v6.11.3-linux-x64.tar.xz 
-yujiang@ubuntu001:~$ tar -xvf node-v6.11.3-linux-x64.tar 
-yujiang@ubuntu001:~$ sudo ln -s /home/yujiang/node-v6.11.3-linux-x64/bin/node  /usr/bin/node 
-yujiang@ubuntu001:~$ sudo ln -s /home/yujiang/node-v6.11.3-linux-x64/bin/npm  /usr/bin/npm 
-</code></pre><p>（2）修改ElasticSearch配置文件，支持跨域，并在后台运行ElasticSearch</p>
-<pre><code>yujiang@ubuntu001:~/elasticsearch-5.6.0$ vi config/elasticsearch.yml
-添加
-http.cors.enabled: true
-http.cors.allow-origin: &quot;*&quot;
-yujiang@ubuntu001:~/elasticsearch-5.6.0$ sh ./bin/elasticsearch -d
-</code></pre><p>（3）运行elasticsearch-head</p>
-<pre><code>https://github.com/mobz/elasticsearch-head
-yujiang@ubuntu001:~$ wget https://github.com/mobz/elasticsearch-head/archive/master.zip
-yujiang@ubuntu001:~$ unzip master.zip
-yujiang@ubuntu001:~$ cd elasticsearch-head-master/
-yujiang@ubuntu001:~/elasticsearch-head-master$ npm install
-yujiang@ubuntu001:~/elasticsearch-head-master$ npm run start
-</code></pre><p>（4）打开浏览器</p>
-<pre><code>http://192.168.30.134:9100/
+mgr tick period
+Description:    How many seconds between mgr beacons to monitors, and other periodic checks.
+Type:    Integer
+Default:    5
 
-web页面输入
-http://192.168.30.134:9200/
-</code></pre><p>4、分布式安装</p>
-<p>（1）master节点修改配置文件</p>
-<pre><code>yujiang@ubuntu001:~/elasticsearch-5.6.0$ vi config/elasticsearch.yml
-添加 
-cluster.name: escluster
-node.name: master
-node.master: true
-</code></pre><p>（2）slave节点修改配置文件</p>
-<pre><code>cluster.name: escluster
-node.name: slave1
-network.host: 192.168.30.135
-#http.port: 8200
-discovery.zen.ping.unicast.hosts: [&quot;192.168.30.134&quot;]
-yujiang@ubuntu002:~/elasticsearch-5.6.0$ sh ./bin/elasticsearch
-</code></pre><p>（3）安装java jdk</p>
-<pre><code>yujiang@ubuntu002:~$ sudo add-apt-repository ppa:openjdk-r/ppa
-yujiang@ubuntu002:~$ sudo apt-get update 
-yujiang@ubuntu002:~$ sudo apt-get install -f openjdk-8-jdk
-yujiang@ubuntu002:~$ java -version
-openjdk version &quot;1.8.0_131&quot;
-OpenJDK Runtime Environment (build 1.8.0_131-8u131-b11-2ubuntu1.16.04.3-b11)
-OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
-</code></pre><h2 id="ElasticSearch基础概念"><a href="#ElasticSearch基础概念" class="headerlink" title="ElasticSearch基础概念"></a>ElasticSearch基础概念</h2><p>集群和节点</p>
-<pre><code>master + slave1 + slave2 + slave...n
-</code></pre><p>索引</p>
-<pre><code>含有相同属性的文档集合
-</code></pre><p>类型</p>
-<pre><code>索引可以定义一个或多个类型，文档必须属于一个类型
-</code></pre><p>文档</p>
-<pre><code>文档是可以被索引的基本数据单位
-</code></pre><p>分片</p>
-<pre><code>每个索引都有多个分片，每个分片是一个Lucene索引
-分片的好处，加入一个索引的数据量很大，就会造成硬盘压力很大，就会出现搜索瓶颈，可以将索引分成多个分片，从而分担压力，还允许用户进行水平的扩展和拆分，及分布式的操作，可以提高搜索和其他操作的效率
-</code></pre><p>备份</p>
-<pre><code>拷贝一份分片就完成了分片的备份
-当一个主分片失败或者出现问题时，备份分片可以代替工作，从而提高了es的可用性。备份的分片还可以执行搜索的操作，以分摊搜索的压力。es在创建索引时会创建5和分片和1个备份，数量可以修改，分片只有在创建索引的时候指定而不能在后期进行修改，备份是可以动态修改的
-</code></pre><h2 id="ElasticSearch的基本用法"><a href="#ElasticSearch的基本用法" class="headerlink" title="ElasticSearch的基本用法"></a>ElasticSearch的基本用法</h2><p>RESTFul API</p>
-<p>（1）API基本格式</p>
-<pre><code>http://&lt;ip&gt;:&lt;port&gt;/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;
-</code></pre><p>（2）常用HTTP动词</p>
-<pre><code>GET/PUT/POST/DELETE
+mon mgr beacon grace
+Description:    How long after last beacon should a mgr be considered failed
+Type:    Integer
+Default:    30
 </code></pre>
           
         
@@ -519,7 +475,7 @@ OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/104/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/104/">104</a><span class="page-number current">105</span><a class="page-number" href="/page/106/">106</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/106/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/104/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/104/">104</a><span class="page-number current">105</span><a class="page-number" href="/page/106/">106</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/106/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -565,7 +521,7 @@ OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

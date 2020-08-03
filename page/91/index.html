@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/27/Package-flag/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/09/iozone使用/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/27/Package-flag/" itemprop="url">Package flag</a></h1>
+                <a class="post-title-link" href="/2018/05/09/iozone使用/" itemprop="url">iozone使用</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T22:27:39+08:00">
-                2018-04-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-09T17:22:27+08:00">
+                2018-05-09
               </time>
             
 
@@ -358,35 +358,16 @@
       
         
           
-            <h1 id="Package-flag"><a href="#Package-flag" class="headerlink" title="Package flag"></a>Package flag</h1><p>import “flag”</p>
-<p>Package flag实现了command-line flag解析</p>
-<h3 id="Usage"><a href="#Usage" class="headerlink" title="Usage:"></a>Usage:</h3><p>定义flags使用flag.String(), Bool(), Int()等。</p>
-<p>以下声明了一个整型flag，名字是-flagname，存储在指针ip中，类型为*int。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import &quot;flag&quot;</span><br><span class="line">var ip = flag.Int(&quot;flagname&quot;, 1234, &quot;help message for flagname&quot;)</span><br></pre></td></tr></table></figure>
-<p>如果你喜欢，你可以使用Var()函数将flag绑定到一个变量。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var flagvar int</span><br><span class="line">func init() &#123;</span><br><span class="line">	flag.IntVar(&amp;flagvar, &quot;flagname&quot;, 1234, &quot;help message for flagname&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>或者，您可以创建满足Value接口（指针接收器）的自定义flags</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag.Var(&amp;flagVal, &quot;name&quot;, &quot;help message for flagname&quot;)</span><br></pre></td></tr></table></figure>
-<p>对于这样的flags，默认值是变量的初始值。</p>
-<p>所有flags定义后，调用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag.Parse()</span><br></pre></td></tr></table></figure>
-<p>将命令行解析为所定义的flags。</p>
-<p>flags可以直接使用。如果你使用flags本身，它们都是指针；如果你绑定到变量，它们就是值。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(&quot;ip has value &quot;, *ip)</span><br><span class="line">fmt.Println(&quot;flagvar has value &quot;, flagvar)</span><br></pre></td></tr></table></figure>
-<p>解析后，flags后面的参数可作为slice，flag.Args()。或者独立的一个值，flag.Arg(i)。参数索引，从0到flag.NArg() - 1。</p>
-<p>Command line flag语法：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-flag</span><br><span class="line">-flag=x</span><br><span class="line">-flag x  // non-boolean flags only</span><br></pre></td></tr></table></figure>
-<p>可以使用一个或两个减号；它们是等价的。最后一种形式不允许用于boolean flags</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd -x *</span><br></pre></td></tr></table></figure>
-<p>其中*是一个Unix shell通配符，如果有一个名为0或false等文件时它将会更改。您必须使用-flag=false形式来关闭boolean flag。</p>
-<p>flag解析在第一个non-flag参数之前（”-“是一个non-flag参数）或终止符“–”之后停止。</p>
-<p>整数flags接受1234，0664，0x1234并且可能是负数。Boolean flags可能是：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1, 0, t, f, T, F, true, false, TRUE, FALSE, True, False</span><br></pre></td></tr></table></figure>
-<p>Duration flags接受任何有效的time.ParseDuration。</p>
-<p>默认的一组command-line flags由顶层函数控制。FlagSet类型允许您定义独立的flags集，例如在command-line interface中实现子命令。FlagSet的方法类似于command-line flag集的顶层函数。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">// These examples demonstrate more intricate uses of the flag package.</span><br><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;errors&quot;</span><br><span class="line">	&quot;flag&quot;</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;strings&quot;</span><br><span class="line">	&quot;time&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// Example 1: A single string flag called &quot;species&quot; with default value &quot;gopher&quot;.</span><br><span class="line">// 示例1：一个名为“species”的字符串flag，默认值为“gopher”。</span><br><span class="line">var species = flag.String(&quot;species&quot;, &quot;gopher&quot;, &quot;the species we are studying&quot;)</span><br><span class="line"></span><br><span class="line">// Example 2: Two flags sharing a variable, so we can have a shorthand.</span><br><span class="line">// The order of initialization is undefined, so make sure both use the</span><br><span class="line">// same default value. They must be set up with an init function.</span><br><span class="line">// 示例2：两个flags共享一个变量，所以我们可以用简写。</span><br><span class="line">// 初始化的顺序是未定义的，所以确保两者都使用相同的默认值。 它们必须用init函数来设置。</span><br><span class="line">var gopherType string</span><br><span class="line"></span><br><span class="line">func init() &#123;</span><br><span class="line">	const (</span><br><span class="line">		defaultGopher = &quot;pocket&quot;</span><br><span class="line">		usage         = &quot;the variety of gopher&quot;</span><br><span class="line">	)</span><br><span class="line">	flag.StringVar(&amp;gopherType, &quot;gopher_type&quot;, defaultGopher, usage)</span><br><span class="line">	flag.StringVar(&amp;gopherType, &quot;g&quot;, defaultGopher, usage+&quot; (shorthand)&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Example 3: A user-defined flag type, a slice of durations.</span><br><span class="line">type interval []time.Duration</span><br><span class="line"></span><br><span class="line">// String is the method to format the flag&apos;s value, part of the flag.Value interface.</span><br><span class="line">// The String method&apos;s output will be used in diagnostics.</span><br><span class="line">func (i *interval) String() string &#123;</span><br><span class="line">	return fmt.Sprint(*i)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Set is the method to set the flag value, part of the flag.Value interface.</span><br><span class="line">// Set&apos;s argument is a string to be parsed to set the flag.</span><br><span class="line">// It&apos;s a comma-separated list, so we split it.</span><br><span class="line">func (i *interval) Set(value string) error &#123;</span><br><span class="line">	// If we wanted to allow the flag to be set multiple times,</span><br><span class="line">	// accumulating values, we would delete this if statement.</span><br><span class="line">	// That would permit usages such as</span><br><span class="line">	//	-deltaT 10s -deltaT 15s</span><br><span class="line">	// and other combinations.</span><br><span class="line">	if len(*i) &gt; 0 &#123;</span><br><span class="line">		return errors.New(&quot;interval flag already set&quot;)</span><br><span class="line">	&#125;</span><br><span class="line">	for _, dt := range strings.Split(value, &quot;,&quot;) &#123;</span><br><span class="line">		duration, err := time.ParseDuration(dt)</span><br><span class="line">		if err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">		*i = append(*i, duration)</span><br><span class="line">	&#125;</span><br><span class="line">	return nil</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Define a flag to accumulate durations. Because it has a special type,</span><br><span class="line">// we need to use the Var function and therefore create the flag during</span><br><span class="line">// init.</span><br><span class="line"></span><br><span class="line">var intervalFlag interval</span><br><span class="line"></span><br><span class="line">func init() &#123;</span><br><span class="line">	// Tie the command-line flag to the intervalFlag variable and</span><br><span class="line">	// set a usage message.</span><br><span class="line">	flag.Var(&amp;intervalFlag, &quot;deltaT&quot;, &quot;comma-separated list of intervals to use between events&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	// All the interesting pieces are with the variables declared above, but</span><br><span class="line">	// to enable the flag package to see the flags defined there, one must</span><br><span class="line">	// execute, typically at the start of main (not init!):</span><br><span class="line">	//	flag.Parse()</span><br><span class="line">	// We don&apos;t run it here because this is not a main function and</span><br><span class="line">	// the testing suite has already parsed the flags.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>原文：<a href="https://golang.org/pkg/flag/" target="_blank" rel="noopener">https://golang.org/pkg/flag/</a></p>
-
+            <h3 id="yum安装方法"><a href="#yum安装方法" class="headerlink" title="yum安装方法"></a>yum安装方法</h3><p>1、安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y iozone</span><br></pre></td></tr></table></figure>
+<p>2、参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">iozone -l 1 -u 1 -r 16k -s 64g -F</span><br></pre></td></tr></table></figure>
+<p>-l是最小进程数量lower  </p>
+<p>-u是最大进程数量upper</p>
+<p>-r是读写的基本单位，16k作为读写的基本单位，根据模拟应用程序进行合理设置（目的是模拟真实应用）</p>
+<p>-s指定默认读写的大小，建议不要指定的太小，一般指定的是内存的2倍</p>
+<p>-F指定测试文件位置，可以是多个</p>
+<h3 id="编译安装方法"><a href="#编译安装方法" class="headerlink" title="编译安装方法"></a>编译安装方法</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">yum install gcc</span><br><span class="line">wget http://www.iozone.org/src/current/iozone3_471.tar</span><br><span class="line">tar xvf iozone3_471.tar</span><br><span class="line">cd iozone3_471/src/current/</span><br><span class="line"></span><br><span class="line">ARM平台：</span><br><span class="line">make linux-arm</span><br><span class="line">X86平台：</span><br><span class="line">make linux-AMD64</span><br><span class="line"></span><br><span class="line">cp iozone /usr/bin/</span><br><span class="line">./iozone -+u -+d -+p -+t -z -l 1 -u 1 -r 4k -s 1G -F /home/node-3/1-FILE</span><br></pre></td></tr></table></figure>
           
         
       
@@ -430,7 +411,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/90/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/90/">90</a><span class="page-number current">91</span><a class="page-number" href="/page/92/">92</a><span class="space">&hellip;</span><a class="page-number" href="/page/108/">108</a><a class="extend next" rel="next" href="/page/92/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/90/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/90/">90</a><span class="page-number current">91</span><a class="page-number" href="/page/92/">92</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/92/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -476,7 +457,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">108</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
