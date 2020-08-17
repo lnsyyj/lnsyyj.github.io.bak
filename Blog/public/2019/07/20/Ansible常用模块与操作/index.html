@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Ansible,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ansible命令模式如何查看模块帮助12345列出所有模块ansible-doc -l查看指定模块帮助ansible-doc -s MODULE_NAME  ansible命令应用基础12345678语法（新版）ansible &amp;lt;host-pattern&amp;gt; [options]语法（旧版）ansible &amp;lt;host-pattern&amp;gt; [-f forks] [-m modul">
+<meta name="keywords" content="Ansible">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ansible常用模块与操作">
+<meta property="og:url" content="http://yoursite.com/2019/07/20/Ansible常用模块与操作/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="ansible命令模式如何查看模块帮助12345列出所有模块ansible-doc -l查看指定模块帮助ansible-doc -s MODULE_NAME  ansible命令应用基础12345678语法（新版）ansible &amp;lt;host-pattern&amp;gt; [options]语法（旧版）ansible &amp;lt;host-pattern&amp;gt; [-f forks] [-m modul">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-22T04:54:49.582Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ansible常用模块与操作">
+<meta name="twitter:description" content="ansible命令模式如何查看模块帮助12345列出所有模块ansible-doc -l查看指定模块帮助ansible-doc -s MODULE_NAME  ansible命令应用基础12345678语法（新版）ansible &amp;lt;host-pattern&amp;gt; [options]语法（旧版）ansible &amp;lt;host-pattern&amp;gt; [-f forks] [-m modul">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/07/20/Ansible常用模块与操作/">
+
+
+
+
+
+  <title>Ansible常用模块与操作 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/20/Ansible常用模块与操作/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Ansible常用模块与操作</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-20T12:50:26+08:00">
+                2019-07-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h1 id="ansible"><a href="#ansible" class="headerlink" title="ansible"></a>ansible</h1><h2 id="命令模式"><a href="#命令模式" class="headerlink" title="命令模式"></a>命令模式</h2><h3 id="如何查看模块帮助"><a href="#如何查看模块帮助" class="headerlink" title="如何查看模块帮助"></a>如何查看模块帮助</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">列出所有模块</span><br><span class="line">ansible-doc -l</span><br><span class="line"></span><br><span class="line">查看指定模块帮助</span><br><span class="line">ansible-doc -s MODULE_NAME</span><br></pre></td></tr></table></figure>
+
+<h3 id="ansible命令应用基础"><a href="#ansible命令应用基础" class="headerlink" title="ansible命令应用基础"></a>ansible命令应用基础</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">语法（新版）</span><br><span class="line">ansible &lt;host-pattern&gt; [options]</span><br><span class="line"></span><br><span class="line">语法（旧版）</span><br><span class="line">ansible &lt;host-pattern&gt; [-f forks] [-m module_name] [-a args]</span><br><span class="line">	-f forks：启动的并发线程数</span><br><span class="line">	-m module_name：要使用的模块</span><br><span class="line">	-a args：模块特有的参数</span><br></pre></td></tr></table></figure>
+
+<h3 id="常见模块"><a href="#常见模块" class="headerlink" title="常见模块"></a>常见模块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">command：命令模块，默认模块，用于在远程执行命令</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -a &apos;date&apos;</span><br><span class="line">	ansible all -m command -a &apos;date&apos;</span><br><span class="line"></span><br><span class="line">cron：</span><br><span class="line">	state：</span><br><span class="line">		present：安装</span><br><span class="line">		absent：移除</span><br><span class="line">	例如：</span><br><span class="line">	ansible webserver -m cron -a &apos;minute=&quot;*/10&quot; job=&quot;/bin/echo hello&quot; name=&quot;test cron job&quot;&apos;</span><br><span class="line">	ansible webserver -a &apos;crontab -l&apos;</span><br><span class="line">	ansible webserver -m cron -a &apos;minute=&quot;*/10&quot; job=&quot;/bin/echo hello&quot; name=&quot;test cron job&quot; state=absent&apos;</span><br><span class="line"></span><br><span class="line">user：</span><br><span class="line">	name=：指明创建的用户的名字</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -m user -a &apos;name=&quot;user1&quot;&apos;</span><br><span class="line">	ansible all -m user -a &apos;name=&quot;user1&quot; state=absent&apos;</span><br><span class="line"></span><br><span class="line">group：</span><br><span class="line">	例如：</span><br><span class="line">	ansible webserver -m group -a &apos;name=mysql gid=306 system=yes&apos;</span><br><span class="line">	ansible webserver -m user -a &apos;name=mysql uid=306 system=yes group=mysql&apos;</span><br><span class="line">	</span><br><span class="line">copy：</span><br><span class="line">	src=：定义本地源文件路径</span><br><span class="line">	dest=：定义远程目标文件路径</span><br><span class="line">	content=：取代src=，表示直接用此处指定的信息生成为目标文件内容</span><br><span class="line">	例如:</span><br><span class="line">	ansible all -m copy -a &apos;src=/etc/fstab dest=/tmp/fstab.ansible owner=root mode=640&apos;</span><br><span class="line">	ansible all -m copy -a &apos;content=&quot;Hello Ansible\nHi MageEdu&quot; dest=/tmp/test.ansible&apos;</span><br><span class="line"></span><br><span class="line">file：设定文件属性</span><br><span class="line">	path=：指定文件路径，可以使用name或dest来替换</span><br><span class="line">	创建文件的符号链接：</span><br><span class="line">		src=：指明源文件</span><br><span class="line">		path=：指明符号链接文件路径</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -m file -a &apos;owner=mysql group=mysql mode=644 path=/tmp/fstab.ansible&apos;</span><br><span class="line">	ansible all -m file -a &apos;path=/tmp/fstab.link src=/tmp/fstab.ansible state=link&apos;</span><br><span class="line"></span><br><span class="line">ping：测试指定主机是否能连接</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -m ping</span><br><span class="line"></span><br><span class="line">service：指定服务运行状态</span><br><span class="line">	enabled=：是否开机自动启动，取值为true或者false</span><br><span class="line">	name=：服务名称</span><br><span class="line">	state=：状态，取值有started，stopped，restarted</span><br><span class="line">	例如：</span><br><span class="line">	ansible webserver -a &apos;service httpd status&apos;</span><br><span class="line">	ansible webserver -a &apos;chkconfig --list httpd&apos;</span><br><span class="line">	ansible webserver -m service -a &apos;enabled=true name=httpd state=started&apos;</span><br><span class="line">	</span><br><span class="line">shell：在远程主机上运行命令，尤其是用到管道等功能的复杂命令</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -m user -a &apos;name=user1&apos;</span><br><span class="line">	ansible all -m command -a &apos;echo mageedu | passwd --stdin user1&apos; （command模块|管道符无法送过去）</span><br><span class="line">	ansible all -m shell -a &apos;echo mageedu | passwd --stdin user1&apos; （有管道或变量最好使用shell模块）</span><br><span class="line"></span><br><span class="line">script：将本地脚本复制到远程主机并运行</span><br><span class="line">	注意：要使用相对路径指定脚本</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -m script -a &quot;test.sh&quot;</span><br><span class="line"></span><br><span class="line">yum：安装程序包</span><br><span class="line">	name=：指明要安装的程序包，可以带上版本号</span><br><span class="line">	state=：present，latest表示安装，absent表示卸载</span><br><span class="line">	例如：</span><br><span class="line">	ansible all -m yum -a &quot;name=vim&quot;</span><br><span class="line"></span><br><span class="line">setup：收集远程主机的facts</span><br><span class="line">	每个被管理节点在接收并运行管理命令之前，会将自己主机相关信息，如操作系统版本、IP地址等报告给远程的ansible主机</span><br><span class="line">	ansible all -m setup</span><br></pre></td></tr></table></figure>
+
+<h1 id="ansible-playbook预备知识"><a href="#ansible-playbook预备知识" class="headerlink" title="ansible-playbook预备知识"></a>ansible-playbook预备知识</h1><h2 id="YMAL语法"><a href="#YMAL语法" class="headerlink" title="YMAL语法"></a>YMAL语法</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">YAML的语法和其他高阶语言类似，并且可以简单表达清单、散列表、标量等数据结构。其结构（Structure）通过空格来展示，序列（Sequence）里的项用&quot;-&quot;来代表，Map里的键值对用&quot;:&quot;分隔。下面是一个示例。</span><br><span class="line">name: John Smith</span><br><span class="line">age: 41</span><br><span class="line">gender: Male</span><br><span class="line">spouse:</span><br><span class="line">    name: Jane Smith</span><br><span class="line">    age: 37</span><br><span class="line">    gender: Female</span><br><span class="line">children:</span><br><span class="line">    - name: Jimmy Smith</span><br><span class="line">      age: 17</span><br><span class="line">      gender: Male</span><br><span class="line">    - name: Jenny Smith</span><br><span class="line">      age: 13</span><br><span class="line">      gender: Female</span><br></pre></td></tr></table></figure>
+
+<h3 id="YMAL常见的数据类型"><a href="#YMAL常见的数据类型" class="headerlink" title="YMAL常见的数据类型"></a>YMAL常见的数据类型</h3><p><code>list</code> 列表的所有元素均使用”-“开头，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># A list of stasty fruits</span><br><span class="line">- Apple</span><br><span class="line">- Orange</span><br><span class="line">- Strawberry</span><br><span class="line">- Mango</span><br></pre></td></tr></table></figure>
+
+<p><code>dictionary</code> 字典通过key与value进行标识，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># An employee record</span><br><span class="line">name: Example Developer</span><br><span class="line">job: Developer</span><br><span class="line">skill: Elite</span><br><span class="line"></span><br><span class="line">也可以将key: value放置于&#123;&#125;中进行表示，例如：</span><br><span class="line">---</span><br><span class="line"># An employee record</span><br><span class="line">&#123;name: Example Developer, job: Developer, skill: Elite&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="基础元素"><a href="#基础元素" class="headerlink" title="基础元素"></a>基础元素</h2><h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><ul>
+<li>变量命名</li>
+</ul>
+<p>变量名仅能由字母、数字和下划线组成，且只能以字母开头。</p>
+<ul>
+<li>facts</li>
+</ul>
+<p>facts是由正在通信的远程目标主机发回的信息，这些信息被保存在ansible变量中，要获取指定的远程主机所支持的所有facts，可以使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible hostname -m setup</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>register</li>
+</ul>
+<p>把任务的输出定义为变量，然后用于其他任务，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tasks:</span><br><span class="line">    - shell: /usr/bin/foo</span><br><span class="line">      register: foo_result</span><br><span class="line">      ignore_errors: True</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过命令行传递变量</li>
+</ul>
+<p>在运行playbook的时候也可以传递一些变量供playbook使用，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible-playbook test.yml --extra-vars &quot;hosts=www user=mageedu&quot;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过roles传递变量</li>
+</ul>
+<p>当给一个主机应用角色的时候可以传递变量，然后在角色内使用这些变量，示例如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- hosts: webservers</span><br><span class="line">  roles:</span><br><span class="line">    - common</span><br><span class="line">    - &#123; role: foo_app_instance, dir: &apos;/web/htdocs/a.com&apos;, port: 8080 &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Inventory"><a href="#Inventory" class="headerlink" title="Inventory"></a>Inventory</h3><p>ansible主要用在批量主机操作，为了便携的使用其中的部分主机，可以在inventory file中将其分组命名。默认的inventory file为/etc/ansible/hosts。</p>
+<p>inventory file可以有多个，且也可以通过Dynamic Inventory来动态生成。</p>
+<ul>
+<li>inventory文件格式</li>
+</ul>
+<p>inventory文件遵循INI文件风格，中括号中的字符为组名。可以将同一个主机同时归并到多个不同的组中。此外，如果目标主机使用了非默认的SSH端口，还可以在主机名称之后使用冒号加端口号来标明。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[webservers]</span><br><span class="line">www1.magedu.com:2222</span><br><span class="line">www2.magedu.com</span><br><span class="line"></span><br><span class="line">[dbservers]</span><br><span class="line">db1.magedu.com</span><br><span class="line">db2.magedu.com</span><br><span class="line">db3.magedu.com</span><br><span class="line"></span><br><span class="line">如果主机名称遵循相似的命名模式，还可以使用列表的方式标识各主机，例如：</span><br><span class="line">[webservers]</span><br><span class="line">www[01:50].example.com</span><br><span class="line"></span><br><span class="line">[databases]</span><br><span class="line">db-[a:f].example.com</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>主机变量</li>
+</ul>
+<p>可以在inventory中定义主机时为其添加主机变量以便于在playbook中使用，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[webservers]</span><br><span class="line">www1.magedu.com http_port=80 maxRequestsPerChild=808</span><br><span class="line">www2.magedu.com http_port=8080 maxRequestsPerChild=909</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>组变量</li>
+</ul>
+<p>组变量是赋予给指定组内所有主机上的在playbook中可用的变量。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[webservers]</span><br><span class="line">www1.magedu.com</span><br><span class="line">www2.magedu.com</span><br><span class="line"></span><br><span class="line">[webservers:vars]</span><br><span class="line">ntp_server=ntp.magedu.com</span><br><span class="line">nfs_server=nfs.magedu.com</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>组嵌套</li>
+</ul>
+<p>inventory中，组还可以包含其他的组，并且也可以向组中的主机指定变量。不过，这些变量只能在ansible-playbook中使用，而ansible不支持。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[apache]</span><br><span class="line">httpd1.magedu.com</span><br><span class="line">httpd2.magedu.com</span><br><span class="line"></span><br><span class="line">[nginx]</span><br><span class="line">ngx1.magedu.com</span><br><span class="line">ngx2.magedu.com</span><br><span class="line"></span><br><span class="line">[webservers:children]</span><br><span class="line">apache</span><br><span class="line">nginx</span><br><span class="line"></span><br><span class="line">[webservers:vars]</span><br><span class="line">ntp_server=ntp.magedu.com</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>inventory参数</li>
+</ul>
+<p>ansible基于ssh连接inventory中指定的远程主机时，还可以通过参数指定其交互方式，<a href="https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html" target="_blank" rel="noopener">https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html</a></p>
+<h1 id="ansible-playbook"><a href="#ansible-playbook" class="headerlink" title="ansible-playbook"></a>ansible-playbook</h1><p>playbook是由一个或多个play组成的列表，play的主要功能在于将事先归并为一组的主机装扮成事先通过ansible中的task定义好的角色。从根本上来讲，所谓task无非是调用ansible的一个module。将多个play组织在一个playbook中，即可以让它们连同起来按事先编排的机制同唱一台大戏。下面是一个简单示例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">- host: webnodes</span><br><span class="line">  vars:</span><br><span class="line">    http_port: 80</span><br><span class="line">    max_clients: 256</span><br><span class="line">  remote_user: root</span><br><span class="line">  tasks:</span><br><span class="line">  - name: ensure apache is at the latest version</span><br><span class="line">    yum: name=httpd state=latest</span><br><span class="line">  - name: ensure apache is running</span><br><span class="line">    service: name=httpd state=started</span><br><span class="line">  handlers:</span><br><span class="line">    - name: restart apache</span><br><span class="line">      service: name=httpd state=restarted</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Ansible/" rel="tag"># Ansible</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/10/centos-yum-详解/" rel="next" title="centos yum 详解">
+                <i class="fa fa-chevron-left"></i> centos yum 详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/08/Prometheus-alertmanager/" rel="prev" title="Prometheus alertmanager">
+                Prometheus alertmanager <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ansible"><span class="nav-number">1.</span> <span class="nav-text">ansible</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令模式"><span class="nav-number">1.1.</span> <span class="nav-text">命令模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何查看模块帮助"><span class="nav-number">1.1.1.</span> <span class="nav-text">如何查看模块帮助</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ansible命令应用基础"><span class="nav-number">1.1.2.</span> <span class="nav-text">ansible命令应用基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见模块"><span class="nav-number">1.1.3.</span> <span class="nav-text">常见模块</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ansible-playbook预备知识"><span class="nav-number">2.</span> <span class="nav-text">ansible-playbook预备知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#YMAL语法"><span class="nav-number">2.1.</span> <span class="nav-text">YMAL语法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#YMAL常见的数据类型"><span class="nav-number">2.1.1.</span> <span class="nav-text">YMAL常见的数据类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础元素"><span class="nav-number">2.2.</span> <span class="nav-text">基础元素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#变量"><span class="nav-number">2.2.1.</span> <span class="nav-text">变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Inventory"><span class="nav-number">2.2.2.</span> <span class="nav-text">Inventory</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ansible-playbook"><span class="nav-number">3.</span> <span class="nav-text">ansible-playbook</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="performance,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="相关链接Ukraine/Kharkiv（乌克兰/哈尔科夫） https://github.com/Mirantis/disk_perf_test_tool https://github.com/Mirantis/disk_perf_test_tool/wiki http://koder-ua.github.io/ Overview（概览）Wally是一种以分布式方式测量不同类型block stor">
+<meta name="keywords" content="performance">
+<meta property="og:type" content="article">
+<meta property="og:title" content="disk_perf_test_tool 项目">
+<meta property="og:url" content="http://yoursite.com/2018/10/13/disk-perf-test-tool-项目/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="相关链接Ukraine/Kharkiv（乌克兰/哈尔科夫） https://github.com/Mirantis/disk_perf_test_tool https://github.com/Mirantis/disk_perf_test_tool/wiki http://koder-ua.github.io/ Overview（概览）Wally是一种以分布式方式测量不同类型block stor">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-22T04:54:49.702Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="disk_perf_test_tool 项目">
+<meta name="twitter:description" content="相关链接Ukraine/Kharkiv（乌克兰/哈尔科夫） https://github.com/Mirantis/disk_perf_test_tool https://github.com/Mirantis/disk_perf_test_tool/wiki http://koder-ua.github.io/ Overview（概览）Wally是一种以分布式方式测量不同类型block stor">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/10/13/disk-perf-test-tool-项目/">
+
+
+
+
+
+  <title>disk_perf_test_tool 项目 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/disk-perf-test-tool-项目/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">disk_perf_test_tool 项目</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-13T16:54:54+08:00">
+                2018-10-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><p>Ukraine/Kharkiv（乌克兰/哈尔科夫）</p>
+<p><a href="https://github.com/Mirantis/disk_perf_test_tool" target="_blank" rel="noopener">https://github.com/Mirantis/disk_perf_test_tool</a></p>
+<p><a href="https://github.com/Mirantis/disk_perf_test_tool/wiki" target="_blank" rel="noopener">https://github.com/Mirantis/disk_perf_test_tool/wiki</a></p>
+<p><a href="http://koder-ua.github.io/" target="_blank" rel="noopener">http://koder-ua.github.io/</a></p>
+<h2 id="Overview（概览）"><a href="#Overview（概览）" class="headerlink" title="Overview（概览）"></a>Overview（概览）</h2><p>Wally是一种以分布式方式测量不同类型block storages性能的工具，并提供全面的报告。它在分布式和云环境中运行, 但也可以测量单个磁盘。</p>
+<p>Wally在控制的方式中投入了大量精力, 从统计的角度正确的处理结果, 提供你可以依靠、争论和理解的数字。</p>
+<p>Wally不是负载生成工具。它使用众所周知的负载发生器 - [fio]来测试系统并为其提供包装, 这有助于discovering cluster features and settings，install sensors，为测试preparing system，并行运行多个测试节点的复杂test suites并可视化结果。</p>
+<p>主要特点：</p>
+<ul>
+<li>Cluster and storage preparation，获得尽可能多的可重复结果</li>
+<li>与[openstack]，[ceph]和[fuel]集成</li>
+<li>分布式执行测试</li>
+<li>与[fio]紧密结合</li>
+<li>VM产卵在OS测试</li>
+<li>Sensors subsystem，用于在测试期间收集群集设备上的负载</li>
+<li>简单而灵活的配置文件，允许指定集群结构并选择在加载期间收集信息</li>
+<li>综合可视化报告</li>
+<li>资源消耗报告，允许查看用于向客户端提供服务的群集资源量</li>
+<li>瓶颈分析器，有助于找到影响结果的部件</li>
+<li>yaml/cvs基于所有结果的存储，因此您可以轻松地将它们插入到结果处理管道中</li>
+<li>wally可以在故障阶段失败时重新启动测试</li>
+</ul>
+<p>wally不能做什么：</p>
+<ul>
+<li>Deploy/configure storage - 测试系统必须准备好进行测试</li>
+<li>在测试执行期间更新报告。沃利是完全 cli 工具, 没有 UI, 报告在测试完成后生成</li>
+<li>提供交互式报告。所有图/表都是用 matplotlib 并静态生成的。</li>
+</ul>
+<h2 id="Basic-architecture-overview（基本架构概述）"><a href="#Basic-architecture-overview（基本架构概述）" class="headerlink" title="Basic architecture overview（基本架构概述）"></a>Basic architecture overview（基本架构概述）</h2><p>Wally代码主要由3部分组成 - [agent library]，[cephlib] 和 [wally] 本身。Agent library负责提供与群集和测试节点的 [RPC] 连接。Cephlib 包含大部分storage、discovery、sensors、数据处理和可视化代码。Wally本身提供 cli, 负载工具集成, 报告生成和其他部分。</p>
+<p>fio是一个主要的负载工具，很好的集成在wally内。 wally有自己的fio版本，为一些Linux发行版构建。wally也可以使用系统fio，但需要安装最新版本之一。fio配置文件位于wally/suits/io目录中，具有cfg扩展名。default_qd.cfg是具有默认设置的文件，它主要包含所有其他配置。ceph.cfg，hdd.cfg，cinder_iscsi.cfg是一个主要的测试suites。cfg文件是一个fio配置文件，由wally提供了一些额外的功能。测试之前，wally在所选的cfg文件中插入提供的设置，展开cycles，将其拆分为jobs并从测试节点逐个同步执行jobs。</p>
+<p>虽然fio提供了一些这样的功能，但是wally不会使用它们来更精确地控制结果。</p>
+<p>要运行测试需要一个配置文件，其中包含cluster信息，sensors设置，test config和一些其他变量来控制测试执行和处理结果。配置文件的示例位于configs-examples目录中。该目录中的所有配置文件都includes default.yaml，反过来default.yaml中includes logging.yaml。在大多数情况下，您无需更改default.yaml/logging.yaml文件中的任何内容。配置文件详细描述如下。</p>
+<p>wally执行由各个阶段组成, 大多数阶段都映射配置文件模块。主要阶段有:</p>
+<ul>
+<li>群集发现</li>
+<li>通过ssh连接节点</li>
+<li>使用rpc服务器检测节点</li>
+<li>安装sensors和相应的配置文件</li>
+<li>运行测试</li>
+<li>生成报告</li>
+<li>清理</li>
+</ul>
+<h2 id="Wally-motivation（Wally动机）"><a href="#Wally-motivation（Wally动机）" class="headerlink" title="Wally motivation（Wally动机）"></a>Wally motivation（Wally动机）</h2><p>主要测试问题和wally如何为您修复</p>
+<h2 id="Howto-install-wally"><a href="#Howto-install-wally" class="headerlink" title="Howto install wally"></a>Howto install wally</h2><h3 id="Container"><a href="#Container" class="headerlink" title="Container"></a>Container</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/Mirantis/disk_perf_test_tool.git</span><br><span class="line">docker build -t &lt;username&gt;/wally .</span><br></pre></td></tr></table></figure>
+
+<h3 id="Local-installation"><a href="#Local-installation" class="headerlink" title="Local installation"></a>Local installation</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt install g++ ....</span><br><span class="line">pip install XXX python -m wally prepare &lt;&lt; download fio, compile</span><br><span class="line">可根据Dockerfile查看安装过程</span><br></pre></td></tr></table></figure>
+
+<h2 id="Howto-run-a-test"><a href="#Howto-run-a-test" class="headerlink" title="Howto run a test"></a>Howto run a test</h2><p>要运行测试，您需要准备集群和配置文件。<br>如何运行wally：直接使用容器</p>
+<h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><ul>
+<li><code>SSHURI</code> - 格式为 <code>[user[:passwd]@]host[:port][:key_file]</code>的字符串，其中：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">user - str，用户名，默认为当前用户</span><br><span class="line">passwd - str，ssh密码，如果提供了key_file_rr或使用了默认密钥，则可以省略ssh密码</span><br><span class="line">host - str，唯一必填字段。主机名或IP地址</span><br><span class="line">port - int，要连接的ssh服务器端口，默认为22</span><br><span class="line">key_file - str, ssh私有密钥文件（private）的路径。默认~/.ssh/id_rsa by default. 如果端口被省略, 但提供了key_file - 它必须与host分开两列。</span><br><span class="line"></span><br><span class="line">不能同时使用passwd和key_file。</span><br><span class="line">例如：</span><br><span class="line">11.12.23.10:37 - 使用ip 和 ssh 端口, 当前用户和 ~/.ssh/id_rsa key</span><br><span class="line">ceph-1 - 仅使用主机名，默认端口，当前用户和 ~/.ssh/id_rsa key</span><br><span class="line">ceph-12::~/.ssh/keyfile - 使用当前用户和 ~/.ssh/keyfile key</span><br><span class="line">root@master - 以root身份登录并使用 ~/.ssh/id_rsa key</span><br><span class="line">root@127.0.0.1:44 - 以root身份登录，使用44端口 和 ~/.ssh/id_rsa key</span><br><span class="line">user@10.20.20.30::/tmp/keyfile - 以root身份登录 和 /tmp/keyfile key</span><br><span class="line">root:rootpassword@10.20.30.40 - 以root身份登录并使用rootpassword作为ssh密码</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>[XXX]</code> - XXX类型列表</p>
+</li>
+<li><p><code>{XXX: YYY}</code> - 从类型XXX（键key）映射到类型YYY（值value）</p>
+</li>
+<li><p><code>SIZE</code> - 带有K/M/G/T/P或不带的整数。请注意，使用1024 base，10M实际上意味着10MiB == 10485760 Bytes，依此类推。</p>
+</li>
+</ul>
+<h2 id="Default-settings（默认设置）"><a href="#Default-settings（默认设置）" class="headerlink" title="Default settings（默认设置）"></a>Default settings（默认设置）</h2><p>许多配置设置在config-examples/default.yaml文件中已经有可用的默认值，在大多数情况下，用户可以重复使用它们。在你自己的配置文件中，include它：</p>
+<p><code>include: default.yaml</code></p>
+<p>您可以在配置文件中覆盖选定的设置。</p>
+<h2 id="Plain-settings（普通设置）"><a href="#Plain-settings（普通设置）" class="headerlink" title="Plain settings（普通设置）"></a>Plain settings（普通设置）</h2><ul>
+<li><code>discover</code>: [str]</li>
+</ul>
+<p>列表中可能的值：<code>ceph</code>，<code>openstack</code>，<code>fuel</code>，<code>ignore_errors</code>。例：<code>discover: openstack,ceph</code></p>
+<p>为wally提供要发现的集群列表。群集发现用于查找群集节点及其角色，以简化设置配置和其他一些步骤。您始终可以在显式部分中定义或重新定义节点角色。每个群集都需要其他配置部分。ignore_errors意味着忽略丢失的集群。</p>
+<ul>
+<li><code>run_sensors</code>: bool</li>
+</ul>
+<p>设置为true，允许wally在测试期间收集负载信息。 这大大增加了结果大小，但允许wally提供更复杂的报告。</p>
+<ul>
+<li><code>results_storage</code>: str</li>
+</ul>
+<p>要放置结果的默认目录。 对于每个测试，wally将在此目录中生成唯一名称并创建子目录，所有结果和设置将存储其中。 wally必须有rwx权限来访问此目录。</p>
+<p>例如: <code>results_storage: /var/wally</code></p>
+<ul>
+<li><code>sleep</code>: int，默认为零</li>
+</ul>
+<p>告诉wally在X秒内什么都不做。 如果您只需要收集sensors，则非常有用。</p>
+<p>例如：<code>sleep: 60</code></p>
+<h2 id="Section-ceph"><a href="#Section-ceph" class="headerlink" title="Section ceph"></a>Section ceph</h2><p>提供发现ceph集群节点的设置</p>
+<ul>
+<li><code>root_node</code>: str</li>
+</ul>
+<p>必须。 根节点的ssh url。 这可以是任何具有ceph client key的节点（任何节点，您可以在其中运行ceph cli命令）。</p>
+<ul>
+<li><code>cluster</code>: str</li>
+</ul>
+<p>Ceph集群名称。 默认情况下是ceph。</p>
+<ul>
+<li><code>conf</code>: str</li>
+</ul>
+<p>群集配置文件的路径。默认情况下是/etc/ceph/{cluster_name}.conf。</p>
+<ul>
+<li><code>key</code>: str</li>
+</ul>
+<p>client.admin密钥文件的路径。默认情况下是/etc/ceph/{cluster_name}.client.admin.keyring。</p>
+<ul>
+<li><code>ip_remap</code>: {IP: IP}</li>
+</ul>
+<p>如果OSD和Monitor节点在 ceph 中通过内部 ip 地址注册，这在您运行wally的节点是不可见。这允许将non-routable的IP地址映射到可routable的IP地址。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ip_remap:</span><br><span class="line">    10.8.0.4: 172.16.164.71</span><br><span class="line">    10.8.0.3: 172.16.164.72</span><br><span class="line">    10.8.0.2: 172.16.164.73</span><br></pre></td></tr></table></figure>
+
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ceph:</span><br><span class="line">    root_node: ceph-client</span><br><span class="line">    cluster: ceph    # &lt;&lt; optional</span><br><span class="line">    ip_remap:        # &lt;&lt; optional</span><br><span class="line">        10.8.0.4: 172.16.164.71</span><br><span class="line">        10.8.0.3: 172.16.164.72</span><br><span class="line">        10.8.0.2: 172.16.164.73</span><br></pre></td></tr></table></figure>
+
+<h2 id="Section-openstack"><a href="#Section-openstack" class="headerlink" title="Section openstack"></a>Section openstack</h2><p>提供openstack设置，用于发现OS群集和spawn/find测试vm。</p>
+<ul>
+<li><code>skip_preparation</code>: bool</li>
+</ul>
+<p>默认值：true，wally需要准备openstack来生成虚拟机。 如果先前已准备好OS群集，则可以将此设置设置为false以节省一些检查时间。</p>
+<ul>
+<li><code>openrc</code>: 或 str ir {str: str}</li>
+</ul>
+<p>指定源[openstack connection settings]。</p>
+<p><code>openrc: ENV</code> - 从环境变量中获取OS credentials。你需要在wally开始之前导出openrc设置，就像这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ source openrc</span><br><span class="line">$ RUN_WALLY</span><br></pre></td></tr></table></figure>
+
+<p>或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ env OS_USER=.. OS_PROJECT=..  RUN_WALLY</span><br></pre></td></tr></table></figure>
+
+<p><code>openrc: str</code> - 使用openrc文件，位于提供的路径以获取OS connection settings。例如：openrc: /tmp/my_cluster_openrc</p>
+<p><code>openrc: {str: str}</code> - 直接在配置文件中提供connection settings。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openrc:</span><br><span class="line">    OS_USERNAME: USER</span><br><span class="line">    OS_PASSWORD: PASSWD</span><br><span class="line">    OS_TENANT_NAME: KEY_FILE</span><br><span class="line">    OS_AUTH_URL: URL</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>insecure</code>: bool - 在openrc section中提供，覆盖OS_INSECURE设置。</p>
+</li>
+<li><p><code>vms</code>: [SSHURI] vm sshuri的列表，除了使用hostname/ip vm 名称前缀之外。wally将找到所有具有此前缀名称的vm，并将其用作测试节点。例如：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vms:</span><br><span class="line">    - wally@wally_vm</span><br><span class="line">    - root:rootpasswd@test_vm</span><br></pre></td></tr></table></figure>
+
+<p>这将找到所有名为wally_vm*和test_vm的vm，并尝试使用提供的credentials重用它们进行测试。请注意，默认情况下，vm wally使用openstack ssh key，而不是~/.ssh/id_rsa。有关详细信息，请参阅Openstack vm config部分。</p>
+<ul>
+<li>VM spawning选项。此选项控制要为测试生成的新vm的数量以及要使用的配置文件。所有衍生的vm将自动获得testnode角色并将用于测试。wally尝试使用anti-affinity组在所有计算节点上均匀地生成vm。</li>
+</ul>
+<p><code>count</code>: str 或 int. 控制生成多少个vm，可能的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">=X，其中X是int - 根据需要产生尽可能多的vm，以使总测试节点计数不小于X。例如 - 如果你已经有1个明确的测试节点，通过节点提供，并且在之前的测试运行中找到了2个vm并且你设置了count: =4，那么wally将产生一个额外的vm。</span><br><span class="line"></span><br><span class="line">X，其中X是integer整数。 正好生成X新vm。</span><br><span class="line"></span><br><span class="line">xX，其中X是integer整数。 每个compute产生X个vm。例如：copunt: x3 - 每个compute产生3个vm。</span><br></pre></td></tr></table></figure>
+
+<p><code>cfg_name</code>: str，vm config。默认情况下，只有wally_1024配置可用。此配置使用来自<code>https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img</code>的image作为vm镜像，1GiB的RAM，2个vCPU和100GiB卷。 有关详细信息，请参阅Openstack vm config。</p>
+<p><code>network_zone_name</code>: str。 内部ip v4的Network pool。 通常是net04</p>
+<p><code>flt_ip_pool</code>: str。 用于浮动ip v4的Network pool。 通常是net04_ext</p>
+<p><code>skip_preparation</code>: bool，默认为false。默认情况下，在spawn vm之前，wally检查所有必需的先决条件，如vm flavor，image，aa-groups，ssh rules是否准备好并创建遗漏的东西。这告诉wally跳过这个阶段。如果你确定openstack准备好了，你可以设置它在这个阶段节省一些时间，但最好还是保留它以防止问题。</p>
+<h2 id="Section-nodes"><a href="#Section-nodes" class="headerlink" title="Section nodes"></a>Section nodes</h2><p>此section定义要执行的测试suites列表。 每个section都是从suite类型到suite配置的映射。 查看下面不同suites的详细信息。</p>
+<h3 id="fio-suite-config"><a href="#fio-suite-config" class="headerlink" title="fio suite config"></a>fio suite config</h3><ul>
+<li><code>load</code>: str - 必须的选项，负载profile的名称。</li>
+</ul>
+<p>默认下一个profiles可用：</p>
+<p><code>ceph</code> - 适用于各种ceph支持的块设备<br><code>hdd</code> - 本地hdd驱动器<br><code>cinder_iscsi</code> - cinder lvm-over-iscsi卷<br><code>check_distribution</code> - 检查IOPS/latency的分布</p>
+<p>有关详细信息，请参阅fio task files section。</p>
+<ul>
+<li><code>params</code>: {str: Any} - 负载profile的参数列表。子参数：</li>
+</ul>
+<p><code>FILENAME</code>: str，所有profiles都需要。它将用作fio的测试文件。如果测试文件名在不同的测试节点上不同，则需要在开始测试之前在所有测试节点上创建具有相同名称的（sym）链接，并在此处使用链接名称。</p>
+<p><code>FILESIZE</code>: SIZE，文件大小参数。虽然在大多数情况下wally可以正确检测device/file大小，但您不需要测试整个文件。此外，如果文件尚不存在，则需要此参数。</p>
+<p>Non-standard负载可能需要一些其他参数，有关详细信息，请参阅fio task files section。</p>
+<ul>
+<li><p><code>use_system_fio</code>: bool，默认为false。告诉wally使用测试节点本地fio二进制文件，而不是wally附带的。如果wally没有为你发行指定版本的fio，你可能需要这个。默认情况下，最好使用wally的fio。有关详细信息，请参阅HOWTO/Supply fio for you distribution。</p>
+</li>
+<li><p><code>use_sudo</code>: bool，默认为false。Wally将使用sudo在测试节点上运行fio。 通常，如果本地测试节点用户不是root用户，则需要。</p>
+</li>
+<li><p><code>force_prefill</code>: bool，默认为false。在测试之前，告诉wally无条件地用伪随机数据填充测试file/device。默认情况下，首先检查目标是否已包含随机数据并跳过填充步骤。在这一步中，wally填充整个device，因此可能需要很长时间。</p>
+</li>
+<li><p><code>skip_prefill</code>: bool，默认为false。强制wally不用伪随机数据填充目标。如果您正在测试本地hdd/ssd/cinder iscsi，请使用此选项。但是，如果测试ceph backed device或任何具有延迟空间分配的系统设备则不要使用。</p>
+</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- fio:</span><br><span class="line">    load: ceph</span><br><span class="line">    params:</span><br><span class="line">        FILENAME: /dev/vdb</span><br><span class="line">        FILESIZE: 100G</span><br></pre></td></tr></table></figure>
+
+<h3 id="Key-test-profile-str"><a href="#Key-test-profile-str" class="headerlink" title="Key test_profile: str"></a>Key test_profile: str</h3><p>此section允许使用一些预定义的设置集来生成VM和运行测试。config-examples/default.yaml文件中列出了可用的profiles及其设置。下一个profiles默认可用：</p>
+<ul>
+<li><code>openstack_ceph</code> - 每个compute产生1个VM，并针对/dev/vdb运行ceph fio profile </li>
+<li><code>openstack_cinder</code> - 每个compute产生1个VM，并针对/dev/vdb运行ceph_iscsi_vdb fio profile</li>
+<li><code>openstack_nova</code> - 每个compute产生1个VM，并针对/opt/test.bin运行hdd fio profile</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">discover: openstack,ceph</span><br><span class="line">run_sensors: true</span><br><span class="line">results_storage: /var/wally_results</span><br><span class="line"></span><br><span class="line">ceph:</span><br><span class="line">    root_node: localhost</span><br><span class="line"></span><br><span class="line">openstack:</span><br><span class="line">    openrc: ENV  # take creds from environment variable</span><br><span class="line"></span><br><span class="line">test_profile: openstack_ceph</span><br></pre></td></tr></table></figure>
+
+<h2 id="Howto-test"><a href="#Howto-test" class="headerlink" title="Howto test"></a>Howto test</h2><h3 id="Local-block-device"><a href="#Local-block-device" class="headerlink" title="Local block device"></a>Local block device</h3><p>使用config-examples/local_block_device.yml作为模板。将{STORAGE_FOLDER}替换为存放结果的文件夹的路径。确保wally具有对此文件夹的read/write访问权限，或者可以创建它。您可以直接测试device，也可以测试已mount device上的文件。将{STORAGE_DEV_OR_FILE_NAME}替换为正确的路径。在大多数情况下，wally可以正确检测file或block device大小，但通常最好直接设置{STORAGE_OR_FILE_SIZE}。使用的文件越大，对结果的影响越小，将导致不同的缓存，但也会填充更长的时间。</p>
+<p>测试sdb device的示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">run_sensors: false</span><br><span class="line">results_storage: /var/wally</span><br><span class="line"></span><br><span class="line">nodes:</span><br><span class="line">    localhost: testnode</span><br><span class="line"></span><br><span class="line">tests:</span><br><span class="line">  - fio:</span><br><span class="line">      load: hdd</span><br><span class="line">      params:</span><br><span class="line">          FILENAME: /dev/sdb</span><br><span class="line">          FILESIZE: 100G</span><br></pre></td></tr></table></figure>
+
+<p>mount到/opt文件夹的device测试示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">run_sensors: false</span><br><span class="line">results_storage: /var/wally</span><br><span class="line"></span><br><span class="line">nodes:</span><br><span class="line">    localhost: testnode</span><br><span class="line"></span><br><span class="line">tests:</span><br><span class="line">  - fio:</span><br><span class="line">      load: hdd</span><br><span class="line">      params:</span><br><span class="line">          FILENAME: /opt/some_test_file.bin</span><br><span class="line">          FILESIZE: 100G</span><br></pre></td></tr></table></figure>
+
+<p>请注意，测试完成后，wally不会删除文件。</p>
+<h3 id="Ceph-without-openstack-or-other-NAS-SAN"><a href="#Ceph-without-openstack-or-other-NAS-SAN" class="headerlink" title="Ceph without openstack, or other NAS/SAN"></a>Ceph without openstack, or other NAS/SAN</h3><p>wally仅支持rbd/cephfs测试，不支持object协议，例如rados和RGW。Cephfs测试不需要任何特殊准备，除了将其mounte在测试节点上，详情请参阅ceph fs quick start。</p>
+<p>Ceph线性read/write通常受网络限制。例如，如果您在群集中使用10个SATA drives作为storage drives，则聚合线性读取速度可达到~1Gibps或8Gibps，这接近10Gib网络限制。因此，除非你有一个足够带宽的网络测试节点，否则通常最好在多个测试节点并行测试ceph集群。</p>
+<p>Ceph在低QD时通常性能较低，因为在这种模式下，您一次只能使用一个OSD。与此同时，ceph可以扩展到比hdd/ssd drives大得多的QD值，因为在这种情况下，您可以在所有OSD daemons中扩展IO请求。您需要最多(16 * OSD_count) QD用于4k随机读取和大约(12 * OSD_COUNT / REPLICATION_FACTOR)QD用于4k随机写入以摸清群集限制。对于其他blocks块和modes模式，您可能需要不同的设置。如果您使用默认的ceph配置文件，则无需关心此操作。</p>
+<p>有三种测试RBD的方法 - direct，通过使用[krbd]和虚拟机将其mount到节点，由rbd driver提供的volume，内置到qemu。对于最后一个，参考Ceph with openstack section或文档。</p>
+<h3 id="Using-testnode-mounted-rbd-device"><a href="#Using-testnode-mounted-rbd-device" class="headerlink" title="Using testnode mounted rbd device"></a>Using testnode mounted rbd device</h3><p>首先您需要一个pool作为rbd的target。您可以使用默认rbd pool，也可以创建自己的pool。pool需要有很多PG才能有很好的表现。保守估计是(100 * OSD_COUNT / REPLICATION_FACTOR)。创建后ceph可能会警告“too many PG”，这个消息可以安全地被忽略。ceph文档：PLACEMENT GROUPS。</p>
+<ul>
+<li>创建一个pool（有关详细信息，请参阅ceph pools documentation）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd pool create &#123;pool-name&#125; &#123;pg-num&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>等到创建完成，所有PG变为active+clean。</p>
+</li>
+<li><p>在此pool中创建rbd volume，需要选择足够大的volume size以缓解不可避免的OSD节点FS caches。通常(SUM_RAM_SIZE_ON_ALL_OSD * 3)运行良好，并且在读取时仅产生约20％的缓存命中：</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rbd create &#123;vol-name&#125; --size &#123;size&#125; --pool &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>通过kernel rbd device挂载rbd。这是一个棘手的部分。Kernels通常具有旧版本的rbd driver，并且不支持最新的rbd features。这将导致在mount rbd期间出错。首先尝试挂载rbd device：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rbd map &#123;vol-name&#125; --pool &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果失败 - 您需要运行rbd info –pool {pool-name} {vol-name}，并通过rbd feature disable –pool {pool-name} {vol-name} {feature name}禁用features。然后尝试再次mount。</p>
+<ul>
+<li>wally需要对rbd device进行read/write访问。</li>
+</ul>
+<h3 id="Direct-rbd-testing"><a href="#Direct-rbd-testing" class="headerlink" title="Direct rbd testing"></a>Direct rbd testing</h3><p>Direct rbd测试通过rbd driver运行，内置在fio中。使用此driver，fio可以直接生成RBD请求，无需外部rbd driver。这是测试RBD的最快和最可靠的方法，但是使用内部rbd driver您可以绕过一些可以在生产环境中使用的代码层。wally附带的fio版本没有rbd support，因为它不能被静态地构建。要使用它，您需要使用rbd support构建fio，请参阅Use you fio binary部分的学习指南。</p>
+<h3 id="Ceph-with-openstack"><a href="#Ceph-with-openstack" class="headerlink" title="Ceph with openstack"></a>Ceph with openstack</h3><p>最简单的方法是使用预定义的openstack_ceph profile。它为每个计算节点生成一个VM，并在所有计算节点上运行ceph测试suite。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">discover: openstack,ceph</span><br><span class="line">run_sensors: true</span><br><span class="line">results_storage: /var/wally_results</span><br><span class="line"></span><br><span class="line">ceph:</span><br><span class="line">    root_node: localhost</span><br><span class="line"></span><br><span class="line">openstack:</span><br><span class="line">    openrc: ENV  # take creds from environment variable</span><br><span class="line"></span><br><span class="line">test_profile: openstack_ceph</span><br></pre></td></tr></table></figure>
+
+<h3 id="Cinder-lvm-volumes"><a href="#Cinder-lvm-volumes" class="headerlink" title="Cinder lvm volumes"></a>Cinder lvm volumes</h3><p>none</p>
+<h2 id="Howto"><a href="#Howto" class="headerlink" title="Howto"></a>Howto</h2><ul>
+<li>Use you fio binary</li>
+</ul>
+<p>您需要下载fio源代码，在测试节点上编译它以进行linux distribution，使用bz2进行压缩，命名为<code>fio_{DISTRNAME}_{ARCH}.bz2</code>并放入<code>fio_binaries</code>目录。ARCH是目标系统上<code>arch</code>命令的输出。<code>DISTRNAME</code>应与<code>lsb_release -c -s</code>输出相同。</p>
+<p>以下是从master编译最新文件的典型步骤：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ git clone </span><br><span class="line">$ cd fio</span><br><span class="line">$ ./configure --build-static </span><br><span class="line">$ make -jXXX  # Replace XXX with you CPU core count to decrease compilation time</span><br><span class="line">$ bzip2 fio</span><br><span class="line">$ mv fio.bz2 WALLY_FOLDER/fio_binaries/fio_DISTRO_ARCH.bz2</span><br></pre></td></tr></table></figure>
+
+<h2 id="Storage-structure"><a href="#Storage-structure" class="headerlink" title="Storage structure"></a>Storage structure</h2><p>wally保存所有输入configurations，所有收集的数据和测试结果保存到results_storage设置目录的单个子文件夹下。所有文件都是csv(results/sensor files)，yaml/js用于配置non-numeric信息，png/svg用于images和联结原始文本文件，如日志和一些输出。</p>
+<p>以下是每个文件包含的内容：</p>
+<ul>
+<li><p>cli - txt，wally cli in semi-raw formal</p>
+</li>
+<li><p>config.yaml - yaml，完整的最终config，从原始的wally config构建，处理所有替换和cli参数传递。</p>
+</li>
+<li><p>log - txt，wally执行日志。包含某个测试的所有wally运行log，包括restarts和报告生成。</p>
+</li>
+<li><p>result_code - yaml，此文件夹上带有’test’子命令的最后一次执行的退出代码。</p>
+</li>
+<li><p>run_interval - yaml，此文件夹上带有’test’子命令的最后一次执行的[begin_time, end_time]列表。</p>
+</li>
+<li><p>meta - folder，用于统计计算的cached值。</p>
+</li>
+<li><p>nodes - folder，有关测试集群的信息。</p>
+<pre><code>all.yml - yaml，除节点参数外的所有节点的信息
+
+nodes/parameters.js - js，节点参数。参数是单独存储的，因为它们可能是非常多的ceph节点，并且在python中解析的js文件比yaml快得多。</code></pre></li>
+<li><p>report - folder，html/css文件报告和所有图表。可以复制到其他地方。</p>
+<pre><code>index.html - 报告开始页面。
+
+main.css - css文件报告。
+
+XXX/YYY.png or .svg - 图表文件报告。</code></pre></li>
+<li><p>results - 所有fio结果的文件夹</p>
+<pre><code>fio_{SUITE_NAME}_{IDX1}.yml - yaml，每个已执行suite的完整配置。
+
+fio_{SUITE_NAME}_{IDX1}.{JOB_SHORT_DESCR}_{IDX2} - 包含suite中每个job所有数据的文件夹
+
+       {NODE_IP}:{NODE_SSH_PORT}.fio.{TS}.(csv|json) - fio输出文件。TS是解析时间序列（timeseries）名称 - bw或lat或stdout用于输出。</code></pre></li>
+</ul>
+<p>​              info.yml - 社区的原作者没有写完</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/performance/" rel="tag"># performance</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/22/golang笔记一接口/" rel="next" title="golang笔记一接口">
+                <i class="fa fa-chevron-left"></i> golang笔记一接口
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/10/16/The-Ceph-Benchmarking-Tool/" rel="prev" title="The Ceph Benchmarking Tool">
+                The Ceph Benchmarking Tool <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关链接"><span class="nav-number">1.</span> <span class="nav-text">相关链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Overview（概览）"><span class="nav-number">2.</span> <span class="nav-text">Overview（概览）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Basic-architecture-overview（基本架构概述）"><span class="nav-number">3.</span> <span class="nav-text">Basic architecture overview（基本架构概述）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Wally-motivation（Wally动机）"><span class="nav-number">4.</span> <span class="nav-text">Wally motivation（Wally动机）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Howto-install-wally"><span class="nav-number">5.</span> <span class="nav-text">Howto install wally</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Container"><span class="nav-number">5.1.</span> <span class="nav-text">Container</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Local-installation"><span class="nav-number">5.2.</span> <span class="nav-text">Local installation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Howto-run-a-test"><span class="nav-number">6.</span> <span class="nav-text">Howto run a test</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Configuration"><span class="nav-number">7.</span> <span class="nav-text">Configuration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Default-settings（默认设置）"><span class="nav-number">8.</span> <span class="nav-text">Default settings（默认设置）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Plain-settings（普通设置）"><span class="nav-number">9.</span> <span class="nav-text">Plain settings（普通设置）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Section-ceph"><span class="nav-number">10.</span> <span class="nav-text">Section ceph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Section-openstack"><span class="nav-number">11.</span> <span class="nav-text">Section openstack</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Section-nodes"><span class="nav-number">12.</span> <span class="nav-text">Section nodes</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#fio-suite-config"><span class="nav-number">12.1.</span> <span class="nav-text">fio suite config</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Key-test-profile-str"><span class="nav-number">12.2.</span> <span class="nav-text">Key test_profile: str</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Howto-test"><span class="nav-number">13.</span> <span class="nav-text">Howto test</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Local-block-device"><span class="nav-number">13.1.</span> <span class="nav-text">Local block device</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ceph-without-openstack-or-other-NAS-SAN"><span class="nav-number">13.2.</span> <span class="nav-text">Ceph without openstack, or other NAS/SAN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Using-testnode-mounted-rbd-device"><span class="nav-number">13.3.</span> <span class="nav-text">Using testnode mounted rbd device</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Direct-rbd-testing"><span class="nav-number">13.4.</span> <span class="nav-text">Direct rbd testing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ceph-with-openstack"><span class="nav-number">13.5.</span> <span class="nav-text">Ceph with openstack</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cinder-lvm-volumes"><span class="nav-number">13.6.</span> <span class="nav-text">Cinder lvm volumes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Howto"><span class="nav-number">14.</span> <span class="nav-text">Howto</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Storage-structure"><span class="nav-number">15.</span> <span class="nav-text">Storage structure</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+<meta name="google-site-verification" content="XuZNSkAZZ_hygmzGh5A1FylQH9BedoyFXmlYAgj5fd4">
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({
+    google_ad_client: "ca-pub-1720709954166786",
+    enable_page_level_ads: true
+  });
+</script>
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ceph,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="官方原文 参考1 从Luminous之前的版本进行升级（比如jewel版本）12345678必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。 另外，您的集群必须在运行Luminous的同时至少完成了所有PG的一次scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs flags。[root@ceph1 ~]# ceph">
+<meta name="keywords" content="ceph">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph L to N 升级总结">
+<meta property="og:url" content="http://yoursite.com/2019/10/25/ceph-L-to-N-升级总结/index.html">
+<meta property="og:site_name" content="Jiang&#39;s Blog">
+<meta property="og:description" content="官方原文 参考1 从Luminous之前的版本进行升级（比如jewel版本）12345678必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。 另外，您的集群必须在运行Luminous的同时至少完成了所有PG的一次scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs flags。[root@ceph1 ~]# ceph">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-22T04:54:49.698Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ceph L to N 升级总结">
+<meta name="twitter:description" content="官方原文 参考1 从Luminous之前的版本进行升级（比如jewel版本）12345678必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。 另外，您的集群必须在运行Luminous的同时至少完成了所有PG的一次scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs flags。[root@ceph1 ~]# ceph">
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/25/ceph-L-to-N-升级总结/">
+
+
+
+
+
+  <title>ceph L to N 升级总结 | Jiang's Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jiang's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-ads">
+          <a href="/ads.txt" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            ads
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/25/ceph-L-to-N-升级总结/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jiang Yu">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jiang's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ceph L to N 升级总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-25T10:07:08+08:00">
+                2019-10-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle" style="display:block; text-align:center;" data-ad-layout="in-article" data-ad-format="fluid" data-ad-client="ca-pub-1720709954166786" data-ad-slot="7859271626"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+        <p><a href="https://docs.ceph.com/docs/master/releases/nautilus/" target="_blank" rel="noopener">官方原文</a></p>
+<p><a href="https://pve.proxmox.com/wiki/Ceph_Luminous_to_Nautilus" target="_blank" rel="noopener">参考1</a></p>
+<h3 id="从Luminous之前的版本进行升级（比如jewel版本）"><a href="#从Luminous之前的版本进行升级（比如jewel版本）" class="headerlink" title="从Luminous之前的版本进行升级（比如jewel版本）"></a>从Luminous之前的版本进行升级（比如jewel版本）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">必须先升级到Luminous（12.2.z），然后再尝试升级到Nautilus。 另外，您的集群必须在运行Luminous的同时至少完成了所有PG的一次scrub，并在OSD map中设置了recovery_deletes和purged_snapdirs flags。</span><br><span class="line"></span><br><span class="line">[root@ceph1 ~]# ceph osd dump | grep ^flags</span><br><span class="line">flags sortbitwise,recovery_deletes,purged_snapdirs</span><br><span class="line"></span><br><span class="line">recovery_deletes flags：Ceph现在在recovery过程中处理delete操作，而不是在peering过程中。以前，将down或out超过15分钟的OSD带回到群集中会导致placement group peering时间延长。peering过程需要很长时间才能完成，因为delete操作是在合并placement group日志作为peering过程的一部分时内联处理的。结果，对处于peering状态的placement group的操作被blocked。通过此更新，Ceph可以在正常recovery过程中而不是peering过程中处理delete操作。结果可以使peering过程更快完成，并且操作不再blocked。（This was fixed with the help of Red Hat Ceph Storage feature request #1452780 and this was released in 2.4 errata version 10.2.7-32.el7cp.）</span><br><span class="line"></span><br><span class="line">purged_snapdirs flags：一旦snapsets全部转换，则设置purged_snapdirs OSDMap flags，这样可以更轻松地测试upgrade + conversion是否已完成。特别是，micim+将能够更简单地测试该flags，而无需等待完整的PG统计信息来知道升级到luminous以外的版本是否安全。</span><br></pre></td></tr></table></figure>
+
+<h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1、在从Luminous升级到Nautilus的过程中，将monitors升级到Nautilus后，将无法使用Luminous ceph-osd daemon创建新的OSD。避免在升级过程中添加或替换任何OSD。</span><br><span class="line">2、避免在升级过程中创建任何RADOS pools。</span><br><span class="line">3、您可以使用ceph version(s)命令在每个阶段监视升级进度，该命令将告诉您每种ceph daemon正在运行的ceph版本。</span><br></pre></td></tr></table></figure>
+
+<h1 id="自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能"><a href="#自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能" class="headerlink" title="自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能"></a>自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能</h1><h1 id="Ceph节点升级过程"><a href="#Ceph节点升级过程" class="headerlink" title="Ceph节点升级过程"></a>Ceph节点升级过程</h1><p>1、确认OSD map包含recovery_deletes和purged_snapdirs flags（否则，将导致您的monitor daemons在启动时拒绝加入quorum，从而使其无法运行）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd dump | grep ^flags</span><br><span class="line">命令输出：flags sortbitwise,recovery_deletes,purged_snapdirs</span><br><span class="line"></span><br><span class="line">如果没有recovery_deletes和purged_snapdirs flags需要手动触发pg scrub，并等待大约24-48小时（根据数据量评估）</span><br><span class="line">执行命令：ceph pg dump pgs_brief | cut -d &quot; &quot; -f 1 | xargs -n1 ceph pg scrub</span><br></pre></td></tr></table></figure>
+
+<p>2、确保集群稳定，集群状态HEALTH_OK，没有down掉的OSD或无法恢复的OSD。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph health detail</span><br><span class="line">命令输出：HEALTH_OK</span><br><span class="line"></span><br><span class="line">执行命令：ceph osd tree | grep down</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">执行命令：ceph osd tree | grep out</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>3、设置noout flags</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd set noout</span><br><span class="line">命令输出：noout is set</span><br><span class="line"></span><br><span class="line">执行命令：ceph health detail</span><br><span class="line">命令输出：</span><br><span class="line">HEALTH_WARN noout flag(s) set</span><br><span class="line">OSDMAP_FLAGS noout flag(s) set</span><br></pre></td></tr></table></figure>
+
+<p>4、配置centos ceph 14 Luminous mirror</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>5、升级monitors（通过安装新ceph packages并重新启动monitor daemons来升级monitors）</p>
+<p>在<strong>每个monitors主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">5.1、安装monitor packages</span><br><span class="line">执行命令：yum install ceph-mon</span><br><span class="line">命令输出：提示安装ceph-mon以及依赖</span><br><span class="line"></span><br><span class="line">5.2、重启ceph monitor服务</span><br><span class="line">执行命令：systemctl restart ceph-mon.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>monitors启动之后，查找nautilus字符串来验证monitor升级是否完成。确保有min_mon_release 14 (nautilus)字样，如果没有说明尚未升级和重启monitor。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph mon dump | grep min_mon_release</span><br><span class="line">命令输出：</span><br><span class="line">dumped monmap epoch 2</span><br><span class="line">min_mon_release 14 (nautilus)</span><br></pre></td></tr></table></figure>
+
+<p>6、升级ceph-mgr（通过安装新ceph packages并重新启动ceph-mgr daemons来升级ceph-mgr）</p>
+<p>如果使用Ceph Dashboard需要安装ceph-mgr-dashboard package。</p>
+<p>在<strong>每个ceph-mgr主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">6.1、安装ceph-mgr packages</span><br><span class="line">执行命令：yum install ceph-mgr</span><br><span class="line">命令输出：提示安装ceph-mgr以及依赖</span><br><span class="line"></span><br><span class="line">6.2、安装ceph-mgr-dashboard packages</span><br><span class="line">执行命令：yum install ceph-mgr-dashboard</span><br><span class="line">命令输出：提示安装ceph-mgr-dashboard以及依赖</span><br><span class="line"></span><br><span class="line">6.3、重启ceph mgr服务</span><br><span class="line">执行命令：systemctl restart ceph-mgr.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>通过ceph -s验证ceph-mgr daemons是否正在运行（确保mgr状态active，standbys mgr加入）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph -s</span><br><span class="line">命令输出：</span><br><span class="line">...</span><br><span class="line">  services:</span><br><span class="line">    mon: 3 daemons, quorum community-ceph-2,community-ceph-3,community-ceph-1 (age 25m)</span><br><span class="line">    mgr: community-ceph-2(active, since 3d), standbys: community-ceph-3, community-ceph-1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>7、升级ceph-osd（通过安装新ceph packages并重新启动ceph-osd daemons来升级ceph-osd）</p>
+<p>在<strong>每个ceph-osd主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">7.1、安装ceph-osd packages</span><br><span class="line">执行命令：yum install ceph-osd</span><br><span class="line">命令输出：提示安装ceph-osd以及依赖</span><br><span class="line"></span><br><span class="line">7.2、重启ceph osd服务</span><br><span class="line">执行命令：systemctl restart ceph-osd.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>查看OSD升级的进度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd versions</span><br><span class="line">命令输出：</span><br><span class="line">&#123;</span><br><span class="line">   &quot;ceph version 12.2.x (...) luminous (stable)&quot;: 2,</span><br><span class="line">   &quot;ceph version 14.2.4 (...) nautilus (stable)&quot;: 4,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用ceph-volume接管ceph-disk创建的OSD，在<strong>每个OSD主机上</strong>执行，<strong>执行前确保每个OSD都正在运行，无down或out的OSD</strong>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">1、确保OSD运行正常</span><br><span class="line">执行命令：ceph osd tree | grep down</span><br><span class="line">命令输出：空</span><br><span class="line">执行命令：ceph osd tree | grep out</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">2、所有使用ceph-disk创建的并正在运行的OSDs，从OSD data partition或directory中捕获元数据</span><br><span class="line">执行命令：ceph-volume simple scan</span><br><span class="line">命令输出：</span><br><span class="line"></span><br><span class="line">执行命令后，会生成类似/etc/ceph/osd/0-ab0a204a-42e3-4a47-ab4c-0888edf429cb.json文件，文件内容为：</span><br><span class="line">&#123;</span><br><span class="line">    &quot;active&quot;: &quot;ok&quot;, </span><br><span class="line">    &quot;block&quot;: &#123;</span><br><span class="line">        &quot;path&quot;: &quot;/dev/disk/by-partuuid/0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;, </span><br><span class="line">        &quot;uuid&quot;: &quot;0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;</span><br><span class="line">    &#125;, </span><br><span class="line">    &quot;block_uuid&quot;: &quot;0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;, </span><br><span class="line">    &quot;bluefs&quot;: 1, </span><br><span class="line">    &quot;ceph_fsid&quot;: &quot;c4051efa-1997-43ef-8497-fb02bdf08233&quot;, </span><br><span class="line">    &quot;cluster_name&quot;: &quot;ceph&quot;, </span><br><span class="line">    &quot;data&quot;: &#123;</span><br><span class="line">        &quot;path&quot;: &quot;/dev/vdc1&quot;, </span><br><span class="line">        &quot;uuid&quot;: &quot;ab0a204a-42e3-4a47-ab4c-0888edf429cb&quot;</span><br><span class="line">    &#125;, </span><br><span class="line">    &quot;fsid&quot;: &quot;ab0a204a-42e3-4a47-ab4c-0888edf429cb&quot;, </span><br><span class="line">    &quot;keyring&quot;: &quot;AQB1FLFdXVHVARAARTKkxT1xgrDNU/QECUqdxA==&quot;, </span><br><span class="line">    &quot;kv_backend&quot;: &quot;rocksdb&quot;, </span><br><span class="line">    &quot;magic&quot;: &quot;ceph osd volume v026&quot;, </span><br><span class="line">    &quot;mkfs_done&quot;: &quot;yes&quot;, </span><br><span class="line">    &quot;ready&quot;: &quot;ready&quot;, </span><br><span class="line">    &quot;systemd&quot;: &quot;&quot;, </span><br><span class="line">    &quot;type&quot;: &quot;bluestore&quot;, </span><br><span class="line">    &quot;whoami&quot;: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">3、使systemd units可以mount已配置的devices，并启动Ceph OSD</span><br><span class="line">执行命令：ceph-volume simple activate --all</span><br><span class="line">命令输出：</span><br><span class="line">--&gt; activating OSD specified in /etc/ceph/osd/1-fe327306-54a4-4362-870d-92d28cf65e42.json</span><br><span class="line">Running command: ln -snf /dev/vdc2 /var/lib/ceph/osd/ceph-1/block</span><br><span class="line">Running command: chown -R ceph:ceph /dev/vdc2</span><br><span class="line">Running command: systemctl enable ceph-volume@simple-1-fe327306-54a4-4362-870d-92d28cf65e42</span><br><span class="line">Running command: ln -sf /dev/null /etc/systemd/system/ceph-disk@.service</span><br><span class="line">--&gt; All ceph-disk systemd units have been disabled to prevent OSDs getting triggered by UDEV events</span><br><span class="line">Running command: systemctl enable --runtime ceph-osd@1</span><br><span class="line">Running command: systemctl start ceph-osd@1</span><br><span class="line">--&gt; Successfully activated OSD 1 with FSID fe327306-54a4-4362-870d-92d28cf65e42</span><br><span class="line"></span><br><span class="line">4、重启每个OSD主机，确认OSD是否开机自启</span><br><span class="line">执行命令：reboot</span><br><span class="line">命令输出：无</span><br></pre></td></tr></table></figure>
+
+<p>8、升级ceph-mds（通过安装新ceph packages并重新启动ceph-mds daemons来升级ceph-mds）</p>
+<p>在<strong>每个ceph-mds主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">记录rank数量，并将ranks数减少到1，通过ceph mds stat命令输出可以查看rank数量。</span><br><span class="line">&#123;0=ceph3=up:active&#125;代表rank数为1，&#123;0=ceph3=up:active,1=ceph2=up:active&#125;代表rank数为2，以此类推。</span><br><span class="line"></span><br><span class="line">8.1、查看当前rank数量</span><br><span class="line">执行命令：ceph mds stat</span><br><span class="line">命令输出：cephfs-1/1/1 up  &#123;0=ceph3=up:active&#125;, 2 up:standby</span><br><span class="line">如果rank为2，命令输出为：cephfs-2/2/2 up  &#123;0=ceph3=up:active,1=ceph2=up:active&#125;, 1 up:standby</span><br><span class="line"></span><br><span class="line">8.2、查看cephfs名称</span><br><span class="line">执行命令：ceph fs ls</span><br><span class="line">命令输出：name: cephfs, metadata pool: cephfs_metadata, data pools: [cephfs_data ]</span><br><span class="line"></span><br><span class="line">8.3、将ranks数减少到1</span><br><span class="line">执行命令：ceph fs set &lt;fs_name&gt; max_mds 1</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.4、通过定期检查状态，等待集群停用所有non-zero ranks，当&#123;0=ceph3=up:active&#125;时为已停用所有non-zero ranks</span><br><span class="line">执行命令：ceph status</span><br><span class="line">命令输出：cephfs-1/1/1 up  &#123;0=ceph3=up:active&#125;, 2 up:standby</span><br><span class="line"></span><br><span class="line">8.5、使用以下命令使所有standby MDS daemons在适当的主机offline</span><br><span class="line">执行命令：systemctl stop ceph-mds@&lt;daemon_name&gt;</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.6、确认只有一个MDS处于online，并且cephfs只有一个rank 0</span><br><span class="line">执行命令：ceph status</span><br><span class="line">命令输出：</span><br><span class="line">...</span><br><span class="line">    mds: cephfs-1/1/1 up  &#123;0=ceph3=up:active&#125;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">8.7、通过安装新packages并重新启动daemon来升级MDS daemon（在每个mds节点上执行）</span><br><span class="line">执行命令：yum install ceph-mds</span><br><span class="line">命令输出：提示安装ceph-mds以及依赖</span><br><span class="line"></span><br><span class="line">执行命令：systemctl restart ceph-mds.target</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.8、重新启动所有已的offline standby MDS daemons</span><br><span class="line">执行命令：systemctl restart ceph-mds.target</span><br><span class="line">命令输出：空</span><br><span class="line"></span><br><span class="line">8.9、恢复max_mds原始值</span><br><span class="line">执行命令：ceph fs set &lt;fs_name&gt; max_mds &lt;original_max_mds&gt;</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>9、升级ceph-radosgw（通过安装新ceph packages并重新启动ceph-radosgw daemons来升级ceph-radosgw）</p>
+<p>在<strong>每个ceph-radosgw主机上</strong>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">5.1、安装radosgw packages</span><br><span class="line">执行命令：yum install ceph-radosgw</span><br><span class="line">命令输出：提示安装ceph-radosgw以及依赖</span><br><span class="line"></span><br><span class="line">5.2、重启ceph radosgw服务</span><br><span class="line">执行命令：systemctl restart ceph-radosgw.target</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>10、启用所有Nautilus的新功能来完成升级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd require-osd-release nautilus</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<p>11、清除noout flags</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph osd unset noout</span><br><span class="line">命令输出：noout is unset</span><br></pre></td></tr></table></figure>
+
+<p>12、启用新的 v2 network protocol</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph mon enable-msgr2</span><br><span class="line">命令输出：空</span><br></pre></td></tr></table></figure>
+
+<h1 id="Client节点升级过程"><a href="#Client节点升级过程" class="headerlink" title="Client节点升级过程"></a>Client节点升级过程</h1><p>1、Client节点升级package</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：yum install ceph-common librados2 librbd1 python-rbd python-rados -y</span><br><span class="line">命令输出：提示安装ceph-common librados2 librbd1 python-rbd python-rados以及依赖</span><br></pre></td></tr></table></figure>
+
+<p>2、Client节点确认升级后的版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">执行命令：ceph --version</span><br><span class="line">命令输出：ceph version 14.2.4 (75f4de193b3ea58512f204623e6c5a16e6c1e1ba) nautilus (stable)</span><br></pre></td></tr></table></figure>
+
+<h1 id="Ceph端升级后修复"><a href="#Ceph端升级后修复" class="headerlink" title="Ceph端升级后修复"></a>Ceph端升级后修复</h1><h3 id="1、Legacy-BlueStore-stats-reporting-detected-on-6-OSD-s"><a href="#1、Legacy-BlueStore-stats-reporting-detected-on-6-OSD-s" class="headerlink" title="1、Legacy BlueStore stats reporting detected on 6 OSD(s)"></a>1、Legacy BlueStore stats reporting detected on 6 OSD(s)</h3><p>问题描述：</p>
+<p>​    使用ceph -s命令查看集群状态时，出现Legacy BlueStore stats reporting detected on 6 OSD(s)</p>
+<p>解决办法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop ceph-osd@$OSDID</span><br><span class="line">ceph-bluestore-tool repair –path /var/lib/ceph/osd/ceph-$OSDID</span><br><span class="line">systemctl start ceph-osd@$OSDID</span><br></pre></td></tr></table></figure>
+
+<p>参考资料：</p>
+<p>【1】<a href="http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html" target="_blank" rel="noopener">http://lists.ceph.com/pipermail/ceph-users-ceph.com/2019-July/036002.html</a></p>
+<p>关于执行ceph-bluestore-tool repair报错问题确认：<a href="https://tracker.ceph.com/issues/42297" target="_blank" rel="noopener">https://tracker.ceph.com/issues/42297</a></p>
+<h3 id="2、3-monitors-have-not-enabled-msgr2"><a href="#2、3-monitors-have-not-enabled-msgr2" class="headerlink" title="2、3 monitors have not enabled msgr2"></a>2、3 monitors have not enabled msgr2</h3><p>问题描述：</p>
+<p>​    使用ceph -s命令查看集群状态时，出现 3 monitors have not enabled msgr2</p>
+<p>解决办法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph mon enable-msgr2</span><br><span class="line">systemctl restart ceph-mon@ceph1.service</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>感谢支持，打赏￥0.5</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="Jiang Yu 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="Jiang Yu 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+      
+
+
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ceph/" rel="tag"># ceph</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/21/samba/" rel="next" title="samba">
+                <i class="fa fa-chevron-left"></i> samba
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/29/udev设备管理/" rel="prev" title="udev设备管理">
+                udev设备管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Jiang Yu</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">110</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">45</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#从Luminous之前的版本进行升级（比如jewel版本）"><span class="nav-number">1.</span> <span class="nav-text">从Luminous之前的版本进行升级（比如jewel版本）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注意"><span class="nav-number">2.</span> <span class="nav-text">注意</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能"><span class="nav-number"></span> <span class="nav-text">自研管理平台用到的接口，对比输出是否有修改，以免影响前台功能</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ceph节点升级过程"><span class="nav-number"></span> <span class="nav-text">Ceph节点升级过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Client节点升级过程"><span class="nav-number"></span> <span class="nav-text">Client节点升级过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ceph端升级后修复"><span class="nav-number"></span> <span class="nav-text">Ceph端升级后修复</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、Legacy-BlueStore-stats-reporting-detected-on-6-OSD-s"><span class="nav-number">1.</span> <span class="nav-text">1、Legacy BlueStore stats reporting detected on 6 OSD(s)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、3-monitors-have-not-enabled-msgr2"><span class="nav-number">2.</span> <span class="nav-text">2、3 monitors have not enabled msgr2</span></a></li></ol></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jiang Yu</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
