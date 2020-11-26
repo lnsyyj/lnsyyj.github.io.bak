@@ -371,16 +371,20 @@
 <h1 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h1><p>要实现Ceph iSCSI gateway，有一些要求。对于高可用的Ceph iSCSI gateway解决方案，建议使用2到4个iSCSI gateway节点。</p>
 <p>有关硬件建议，请参阅<a href="http://docs.ceph.com/docs/master/start/hardware-recommendations/" target="_blank" rel="noopener">Hardware Recommendation page</a>获取更多详细信息。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意 在iSCSI gateway节点上，RBD images的内存占用量可能会增大。根据映射(mapped)的RBD images的数量，相应地计划内存需求。</span><br></pre></td></tr></table></figure>
+
 <p>Ceph Monitors或OSD没有特定的iSCSI gateway选项，但是降低默认timers以检测OSD至关重要，它可以降低initiator超时的可能性，这一点很重要。建议为存储集群中的每个OSD节点使用以下配置选项：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[osd]</span><br><span class="line">osd heartbeat grace = 20</span><br><span class="line">osd heartbeat interval = 5</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>Ceph Monitor的在线更新</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph tell &lt;daemon_type&gt;.&lt;id&gt; config set &lt;parameter_name&gt; &lt;new_value&gt;</span><br><span class="line"></span><br><span class="line">ceph tell osd.0 config set osd_heartbeat_grace 20</span><br><span class="line">ceph tell osd.0 config set osd_heartbeat_interval 5</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>OSD节点的在线更新</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph daemon &lt;daemon_type&gt;.&lt;id&gt; config set osd_client_watch_timeout 15</span><br><span class="line"></span><br><span class="line">ceph daemon osd.0 config set osd_heartbeat_grace 20</span><br><span class="line">ceph daemon osd.0 config set osd_heartbeat_interval 5</span><br></pre></td></tr></table></figure>
+
 <p>有关设置Ceph的配置选项的更多详细信息，请参阅<a href="http://docs.ceph.com/docs/master/rados/configuration/" target="_blank" rel="noopener">Configuration page</a>。</p>
 <h1 id="Configuring-the-iSCSI-Target"><a href="#Configuring-the-iSCSI-Target" class="headerlink" title="Configuring the iSCSI Target"></a>Configuring the iSCSI Target</h1><p>传统上，对Ceph存储集群的块级访问仅限于QEMU和librbd，这是在OpenStack环境中采用的关键因素。从Ceph Luminous版本开始，块级访问正在扩展，以提供标准的iSCSI支持，从而允许更广泛的平台使用，并有可能打开新的用例。</p>
 <ul>
@@ -402,6 +406,7 @@
 <li><a href="https://docs.ceph.com/docs/mimic/rbd/iscsi-initiator-esx" target="_blank" rel="noopener">iSCSI Initiator for VMware ESX</a></li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">警告：通过多个iSCSI网关导出RBD image时，不支持使用SCSI persistent group reservations（PGR）和基于SCSI 2 reservations的应用程序。</span><br></pre></td></tr></table></figure>
+
 <h1 id="Monitoring-the-iSCSI-Gateways"><a href="#Monitoring-the-iSCSI-Gateways" class="headerlink" title="Monitoring the iSCSI Gateways"></a>Monitoring the iSCSI Gateways</h1><p>Ceph为iSCSI gateway环境提供了一个附加工具，以监视导出的RADOS Block Device（RBD）images的性能。</p>
 <p>该gwtop工具是一个类似top的工具，用于显示通过iSCSI导出到客户端的RBD images的聚合性能指标。这些指标来自Performance Metrics Domain Agent（PMDA）。来自Linux-IO target（LIO）PMDA的信息用于列出每个已导出的RBD images以及所连接的客户端及其关联的I / O指标。</p>
 <p><strong>Requirements</strong></p>
@@ -411,18 +416,24 @@
 <p><strong>Installing</strong></p>
 <p>1、在每个iSCSI gateway节点安装ceph-iscsi-tools</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install ceph-iscsi-tools</span><br></pre></td></tr></table></figure>
+
 <p>2、在每个iSCSI gateway节点安装performance co-pilot</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install pcp</span><br></pre></td></tr></table></figure>
+
 <p>3、在每个iSCSI gateway节点安装LIO PMDA</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install pcp-pmda-lio</span><br></pre></td></tr></table></figure>
+
 <p>4、在每个iSCSI gateway节点enable并start performance co-pilot service</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># systemctl enable pmcd</span><br><span class="line"># systemctl start pmcd</span><br></pre></td></tr></table></figure>
+
 <p>5、注册pcp-pmda-lio agent</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd /var/lib/pcp/pmdas/lio</span><br><span class="line">./Install</span><br></pre></td></tr></table></figure>
+
 <p>默认情况下，<code>gwtop</code>假定iSCSI gateway configuration object被存储在rbd pool被叫做gateway.conf的RADOS object中。此configuration定义了需要收集性能信息的iSCSI gateways。可以使用<code>-g</code>或<code>-c</code>标志将其覆盖 。gwtop –help获取更多详细信息。</p>
 <p>LIO configuration确定要从performance co-pilot提取性能统计信息的类型。当<code>gwtop</code>启动时，它着眼于LIO configuration，如果发现user-space的磁盘，然后<code>gwtop</code> 自动选择LIO收集器。</p>
 <p><strong>Example gwtop Outputs</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">gwtop  2/2 Gateways   CPU% MIN:  4 MAX:  5    Network Total In:    2M  Out:    3M   10:20:00</span><br><span class="line">Capacity:   8G    Disks:   8   IOPS:  503   Clients:  1   Ceph: HEALTH_OK          OSDs:   3</span><br><span class="line">Pool.Image       Src    Size     iops     rMB/s     wMB/s   Client</span><br><span class="line">iscsi.t1703             500M        0      0.00      0.00</span><br><span class="line">iscsi.testme1           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme2           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme3           500M        0      0.00      0.00</span><br><span class="line">iscsi.testme5           500M        0      0.00      0.00</span><br><span class="line">rbd.myhost_1      T       4G      504      1.95      0.00   rh460p(CON)</span><br><span class="line">rbd.test_2                1G        0      0.00      0.00</span><br><span class="line">rbd.testme              500M        0      0.00      0.00</span><br></pre></td></tr></table></figure>
+
 <p>在<em>Client</em> column，<code>(CON)</code>表示iSCSI initiator (client)当前已登录到iSCSI gateway。如果显示<code>-multi-</code>，则表示多个clients映射到单个RBD image。</p>
 
       
@@ -577,7 +588,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

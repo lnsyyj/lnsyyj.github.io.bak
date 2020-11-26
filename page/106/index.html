@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/17/ElasticSearch-1/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/31/vdbench/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/09/17/ElasticSearch-1/" itemprop="url">ElasticSearch(1)</a></h1>
+                <a class="post-title-link" href="/2017/10/31/vdbench/" itemprop="url">vdbench</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T12:46:13+08:00">
-                2017-09-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-31T21:38:14+08:00">
+                2017-10-31
               </time>
             
 
@@ -358,124 +358,35 @@
       
         
           
-            <p>ElasticSearch入门<br>笔记来自：<a href="http://www.imooc.com/video/15762" target="_blank" rel="noopener">http://www.imooc.com/video/15762</a></p>
-<h2 id="ElasticSearch简介"><a href="#ElasticSearch简介" class="headerlink" title="ElasticSearch简介"></a>ElasticSearch简介</h2><p>1、什么是ElasticSearch？</p>
-<pre><code>基于Apache Lucene构建的开源搜索引擎
-采用Java编写，提供简单易用的RESTFul API
-轻松的横向扩展，可支持PB级的结构化或非结构化数据处理
-</code></pre><p>2、应用场景</p>
-<pre><code>海量数据分析引擎
-站内搜索引擎
-数据仓库
-</code></pre><p>3、一线公司实际应用场景</p>
-<pre><code>英国卫报 - 实时分析公众对文章的回应
-维基百科、GitHub - 站内实时搜索
-百度 - 实时日志监控平台
-等等...
-</code></pre><p>4、前置知识</p>
-<pre><code>熟悉用Maven构建项目
-了解Spiring Boot的基本使用
-</code></pre><p>5、环境要求</p>
-<pre><code>IDE工具 IntelliJ IDEA、Eclipse等常规用IDE即可
-Java JDK1.8
-其他依赖 Maven、NodeJs（6.0以上）
-</code></pre><p>6、课程简介</p>
-<pre><code>安装
-基础概念
-基本用法
-高级查询
-实战演练
-课程总结
-</code></pre><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>1、版本问题</p>
-<pre><code>版本历史 1.x-&gt;2.x-&gt;5.x
-版本选择 5.x
-</code></pre><p>2、单实例安装<br>（1）官网下载elasticsearch</p>
-<pre><code>https://www.elastic.co/cn/
+            <p>[root@centos001 vdbench]# lsb_release -a<br>LSB Version:    :core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:desktop-4.1-amd64:desktop-4.1-noarch:languages-4.1-amd64:languages-4.1-noarch:printing-4.1-amd64:printing-4.1-noarch<br>Distributor ID:    CentOS<br>Description:    CentOS Linux release 7.3.1611 (Core)<br>Release:    7.3.1611<br>Codename:    Core</p>
+<h1 id="vdbench单机测试"><a href="#vdbench单机测试" class="headerlink" title="vdbench单机测试"></a>vdbench单机测试</h1><p>1、下载vdbench50406.zip</p>
+<p>2、解压vdbench50406.zip</p>
+<p>3、安装java，jdk<br>[root@centos001 ~]# yum install java-1.8.0-openjdk unzip net-tools iotop -y<br>[root@yujiangcontrol ~]# java -version<br>openjdk version “1.8.0_144”<br>OpenJDK Runtime Environment (build 1.8.0_144-b01)<br>OpenJDK 64-Bit Server VM (build 25.144-b01, mixed mode)</p>
+<p>4、配置vdbench<br>[root@centos001 ~]# unzip vdbench50406.zip<br>[root@centos001 ~]# ./vdbench -t</p>
+<p>5、配置文件<br>[root@centos001 ~]# vi yujiang<br>sd=sd1,lun=/dev/sdb,openflags=o_direct<br>wd=wd1,sd=sd1,seekpct=random,rdpct=0,xfersize=8192<br>rd=rd1,wd=wd*,elapsed=120,interval=10,iorate=max<br>openflags=o_direct 直接对块设备进行读写</p>
+<p>6、执行配置文件<br>[root@centos001 ~]# sudo ./vdbench -f yujiang </p>
+<h1 id="vdbench多机测试"><a href="#vdbench多机测试" class="headerlink" title="vdbench多机测试"></a>vdbench多机测试</h1><p>[root@centos001 vdbench]# cat /etc/hosts<br>192.168.30.100  centos001       centos001.test.com<br>192.168.30.103  plana003        plana003.test.com<br>192.168.30.104  plana004        plana004.test.com<br>192.168.30.105  plana005        plana005.test.com</p>
+<p>1、生成sshkey<br>[root@centos001 vdbench]# ssh-keygen<br>与其他slave节点做ssh互信<br>[root@centos001 vdbench]# ssh-copy-id plana003<br>[root@centos001 vdbench]# ssh-copy-id plana004<br>[root@centos001 vdbench]# ssh-copy-id plana005<br>[root@centos001 vdbench]# ssh plana003.test.com<br>[root@centos001 vdbench]# ssh plana004.test.com<br>[root@centos001 vdbench]# ssh plana005.test.com</p>
+<p>2、把vdbench拷贝到每台slave节点，包括master节点，路径相同<br>/root/vdbench</p>
+<p>3、每台slave机监听，ssh不用监听<br>[root@plana003 vdbench]# ./vdbench rsh<br>[root@plana004 vdbench]# ./vdbench rsh<br>[root@plana005 vdbench]# ./vdbench rsh</p>
+<p>备注：<br>Host Definition (HD)<br>These parameters are ONLY needed when running Vdbench in a multi-host environment or if you want to override the number of JVMs used in a single-host environment.<br>See also Host Definition parameter detail.</p>
+<p>hd=default Sets defaults for all HDs that are entered later<br>hd=localhost Sets values for the current host<br>hd=host_label Specify a host label.<br>system=host_name Host IP address or network name, e.g. xyz.customer.com<br>vdbench=vdbench_dir_name Where to find Vdbench on a remote host if different from current.<br>jvms=nnn How many slaves to use. See Multi JVM execution.<br>shell=rsh | ssh | vdbench How to start a Vdbench slave on a remote system.<br>user=xxxx Userid on remote system Required.<br>clients=nn This host will simulate the running of multiple ‘clients’. Very  useful if you want to simulate numerous clients for file servers  without having all the hardware.<br>mount=”mount xxx …” This mount command is issued on the target host after the  possibly needed mount directories have been created.<br>rg=name Unique name for this Replay Group (RG).<br>devices=(xxx,yyy,….) The device numbers from Swat’s flatfile.bin.gz to be replayed.</p>
+<p>Storage Definition (SD)<br>See also Storage Definition Parameter Detail.<br>This set of parameters identifies each physical or logical volume manager volume or file system  file used in the requested workload. Of course, with a file system file, the file system takes the  responsibility of all I/O: reads and writes can and will be cached (see also openflags=) and  Vdbench will not have control over physical I/O. However, Vdbench can be used to test file  system file performance (See also File system testing).<br>Example: sd=sd1,lun=/dev/rdsk/cxt0d0s0,threads=8</p>
+<p>sd=default Sets defaults for all SDs that are entered later.<br>sd=name Unique name for this Storage Definition (SD).<br>host=name Name of host where this SD can be found. Default ‘localhost’<br>lun=lun_name Name of raw disk or file system file.<br>align=nnn Generate logical byte address in ‘nnn’ byte boundaries, not using default ‘xfersize’ boundaries.<br>count=(nn,mm) Creates a sequence of SD parameters.<br>hitarea=nn See read hit percentage for an explanation. Default 1m.<br>journal=xxx Directory name for journal file for data validation<br>offset=nnn At which offset in a lun to start I/O.<br>openflags=(flag,..) Pass specific flags when opening a lun or file<br>range=(nn,mm) Use only a subset ‘range=nn’: Limit Seek Range of this SD.<br>replay=(group,..) Replay Group(s) using this SD.<br>replay=(nnn,..) Device number(s) to select for Swat Vdbench replay<br>resetbus=nnn Issue ioctl (USCSI_RESET_ALL) every nnn seconds. Solaris only<br>resetlun=nnn Issue ioctl (USCSI_RESET) every nnn seconds. Solaris only<br>size=nn Size of the raw disk or file to use for workload. Optional unless you  want Vdbench to create a disk file for you.<br>streams=(nn,mm) Create independent sequential streams on the same device.<br>threads=nn Maximum number of concurrent outstanding I/O for this SD. Default 8</p>
+<p>Workload Definition (WD)<br>See also Workload Definition Parameter Detail.<br>The Workload Definition parameters describe what kind of workload must be executed using the storage definitions entered.<br>Example: wd=wd1,sd=(sd1,sd2),rdpct=100,xfersize=4k</p>
+<p>wd=default Sets defaults for all WDs that are entered later.<br>wd=name Unique name for this Workload Definition (WD)<br>sd=xx Name(s) of Storage Definition(s) to use<br>host=host_label Which host to run this workload on. Default localhost.<br>iorate=nn Requested fixed I/O rate for this workload.<br>openflags=(flag,..) Pass specific flags when opening a lun or file.<br>priority=nn I/O priority to be used for this workload.<br>range=(nn,nn) Limit seek range to a defined range within an SD.<br>rdpct=nn Read percentage. Default 100.<br>rhpct=nn Read hit percentage. Default 0.<br>seekpct=nn Percentage of random seeks. Default seekpct=100 or seekpct=random.<br>skew=nn Percentage of skew that this workload receives from the total I/O  rate.<br>stride=(min,max) To allow for skip-sequential I/O.<br>threads=nn Only available during SD concatenation.<br>whpct=nn Write hit percentage. Default 0.<br>xfersize=nn Data transfer size. Default 4k.<br>xfersize=(n,m,n,m,..) Specify a distribution list with percentages.<br>xfersize=(min,max,align) Generate xfersize as a random value between min and max.</p>
+<p>Run Definition (RD)<br>See also Run Definition Parameter Detail.<br>The Run Definition parameters define which of the earlier defined workloads need to be  executed, what I/O rates need to be generated, and how long the workload will run. One Run  Definition can result in multiple actual workloads, depending on the parameters used.<br>Example: rd=run1,wd=(wd1,wd2),iorate=1000,elapsed=60,interval=5<br>There is a separate list of RD parameters for file system testing.</p>
+<p>rd=default Sets defaults for all RDs that are entered later.<br>rd=name Unique name for this Run Definition (RD).<br>wd=xx Workload Definitions to use for this run.<br>sd=xxx Which SDs to use for this run (Optional).<br>curve=(nn,nn,..) Data points to generate when creating a performance curve.<br>distribution=(x[,variable] I/O inter arrival time calculations: exponential, uniform, or  deterministic. Default exponential.<br>elapsed=nn Elapsed time for this run in seconds. Default 30 seconds.<br>maxdata=nnn Stop the run after nnn bytes have been read or written, e.g.<br>maxdata=200g. Vdbench will stop at the lower of elapsed= and maxdata=.<br>endcmd=cmd Execute command or script at the end of the last run<br>(for)compratio=nn Multiple runs for each compression percentage.<br>(for)hitarea=nn Multiple runs for each hit area size.<br>(for)hpct=nn Multiple runs for each read hit percentage.<br>(for)rdpct=nn Multiple runs for each read percentage.<br>(for)seekpct=nn Multiple runs for each seek percentage.<br>(for)threads=nn Multiple runs for each thread count.<br>(for)whpct=nn Multiple runs for each write hit percentage.<br>(for)xfersize=nn Multiple runs for each data transfer size.<br>Most forxxx parameters may be abbreviated to their regular name, e.g. xfersize=(..,..)<br>interval=nn Reporting interval in seconds. Default ‘min(elapsed/2,60)’<br>iorate=(nn,nn,nn,…) One or more I/O rates.<br>iorate=curve Create a performance curve.<br>iorate=max Run an uncontrolled workload.<br>iorate=(nn,ss,…) nn,ss: pairs of I/O rates and seconds of duration for this I/O  rate. See also ‘distribution=variable’.<br>openflags=xxxx Pass specific flags when opening a lun or file<br>pause=nn Sleep ‘nn’ seconds before starting next run.<br>replay=(filename,split=split_dir,repeat=nn)<br>-‘filename’: Replay file name used for Swat Vdbench replay</p>
+<ul>
+<li>‘split_dir’: directory used to do the replay file split.</li>
+<li>‘nn’: how often to repeat the replay.<br>startcmd=cmd Execute command or script at the beginning of the first run<br>warmup=nn Override warmup period.</li>
+</ul>
+<p>1、多slave host不同块设备<br>For instance if a lun is /dev/rdsk/a on hosta but it is named /dev/rdsk/b on hostb then you’ll have to tell Vdbench about it.<br>sd=sd1,lun=/dev/rdsk/a,host=hosta,lun=/dev/rdsk/b,host=hostb<br>By default Vdbench assumes that the lun names on each host are identical.</p>
+<p>2、<br>[root@centos001 vdbench]# cat example5<br>hd=default,vdbench=/root/vdbench,user=root,shell=ssh<br>hd=plana003,system=plana003.test.com<br>hd=plana004,system=plana004.test.com<br>hd=plana005,system=plana005.test.com</p>
+<p>sd=sd1,host=<em>,lun=/dev/sdb,size=10m,openflags=o_direct<br>wd=wd1,sd=sd</em>,rdpct=100,xf=4k<br>rd=rd1,wd=wd1,el=3,in=1,io=10,warmup=30<br>解释：<br>hd=default以下hd都使用后面的默认值<br>vdbench到每台slave机的相同目录寻找vdbench程序<br>user以root用户登录远程slave机<br>shell以ssh协议登录<br>hd=plana003远程slave机标签<br>system=plana003.test.com ip地址或者配置hosts文件，用来ssh连接slave机</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line">root@node1:/home/simth/config# cat vdbenchcase1.config</span><br><span class="line">hd=default,vdbench=/home/simth,user=root,shell=ssh</span><br><span class="line">hd=hd1,system=node1</span><br><span class="line">hd=hd2,system=node2</span><br><span class="line">hd=hd3,system=node3</span><br><span class="line"></span><br><span class="line">fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line"></span><br><span class="line">fwd=wd1,fsd=sd*,hd=hd1,operation=write,threads=1,fileio=sequential,fileselect=random,xfersize=16k</span><br><span class="line">fwd=wd2,fsd=sd*,hd=hd2,operation=write,threads=1,fileio=sequential,fileselect=random,xfersize=16k</span><br><span class="line">fwd=wd3,fsd=sd*,hd=hd3,operation=write,threads=1,fileio=sequential,fileselect=random,xfersize=16k</span><br><span class="line"></span><br><span class="line">rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1</span><br><span class="line">rd=rd2,fwd=wd*,fwdrate=122,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">hd=default,vdbench=/home/simth,user=root,shell=ssh</span><br><span class="line">hd=hd1,system=node1</span><br><span class="line">hd=hd2,system=node2</span><br><span class="line">hd=hd3,system=node3</span><br><span class="line"></span><br><span class="line">fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line"></span><br><span class="line">fwd=wd1,fsd=sd*,hd=hd1,operation=read,threads=1,fileio=sequential,fileselect=random,xfersize=1024k</span><br><span class="line">fwd=wd2,fsd=sd*,hd=hd2,operation=read,threads=1,fileio=sequential,fileselect=random,xfersize=1024k</span><br><span class="line">fwd=wd3,fsd=sd*,hd=hd3,operation=read,threads=1,fileio=sequential,fileselect=random,xfersize=1024k</span><br><span class="line"></span><br><span class="line">*rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1</span><br><span class="line">rd=rd2,fwd=wd*,fwdrate=690,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">hd=default,vdbench=/home/simth,user=root,shell=ssh</span><br><span class="line">hd=hd1,system=node1</span><br><span class="line">hd=hd2,system=node2</span><br><span class="line">hd=hd3,system=node3</span><br><span class="line"></span><br><span class="line">fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line"></span><br><span class="line">fwd=wd1,fsd=sd*,hd=hd1,operation=write,fileio=random,threads=8,fileselect=random,xfersize=8k</span><br><span class="line">fwd=wd2,fsd=sd*,hd=hd2,operation=write,fileio=random,threads=8,fileselect=random,xfersize=8k</span><br><span class="line">fwd=wd3,fsd=sd*,hd=hd3,operation=write,fileio=random,threads=8,fileselect=random,xfersize=8k</span><br><span class="line"></span><br><span class="line">*rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1</span><br><span class="line">rd=rd2,fwd=wd*,fwdrate=1014,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">hd=default,vdbench=/home/simth,user=root,shell=ssh</span><br><span class="line">hd=hd1,system=node1</span><br><span class="line">hd=hd2,system=node2</span><br><span class="line">hd=hd3,system=node3</span><br><span class="line"></span><br><span class="line">fsd=sd1,anchor=/home/node-1/node-1-rbd-1,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd2,anchor=/home/node-1/node-1-rbd-2,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd3,anchor=/home/node-1/node-1-rbd-3,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd4,anchor=/home/node-1/node-1-rbd-4,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd5,anchor=/home/node-1/node-1-rbd-5,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd6,anchor=/home/node-1/node-1-rbd-6,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd7,anchor=/home/node-1/node-1-rbd-7,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd8,anchor=/home/node-1/node-1-rbd-8,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd9,anchor=/home/node-1/node-1-rbd-9,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line">fsd=sd10,anchor=/home/node-1/node-1-rbd-10,openflags=o_direct,depth=3,width=3,files=3300,size=(2M,100),shared=yes</span><br><span class="line"></span><br><span class="line">fwd=wd1,fsd=sd*,hd=hd1,operation=read,fileio=random,threads=8,fileselect=random,xfersize=8k</span><br><span class="line">fwd=wd2,fsd=sd*,hd=hd2,operation=read,fileio=random,threads=8,fileselect=random,xfersize=8k</span><br><span class="line">fwd=wd3,fsd=sd*,hd=hd3,operation=read,fileio=random,threads=8,fileselect=random,xfersize=8k</span><br><span class="line"></span><br><span class="line">*rd=rd1,fwd=wd*,fwdrate=max,format=clean,interval=1</span><br><span class="line">rd=rd2,fwd=wd*,fwdrate=11826,format=restart,elapse=3600,maxdata=1800G,interval=5,warmup=30</span><br></pre></td></tr></table></figure>
 
-yujiang@ubuntu001:~$ wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.0.tar.gz
-</code></pre><p>（2）解压并修改配置文件</p>
-<pre><code>yujiang@ubuntu001:~$ tar zxvf elasticsearch-5.6.0.tar.gz
 
-yujiang@ubuntu001:~$ cd elasticsearch-5.6.0/
-
-yujiang@ubuntu001:~/elasticsearch-5.6.0$ vi config/elasticsearch.yml
-添加
-network.host: 192.168.30.134
-</code></pre><p>（3）启动elasticsearch</p>
-<pre><code>yujiang@ubuntu001:~$ sudo sysctl -w vm.max_map_count=262144
-或
-yujiang@ubuntu001:~$ sudo vi /etc/sysctl.conf
-vm.max_map_count=262144
-
-yujiang@ubuntu001:~/elasticsearch-5.6.0$ sh ./bin/elasticsearch
-</code></pre><p>（4）打开浏览器</p>
-<pre><code>http://192.168.30.134:9200/
-</code></pre><p>3、实用插件Head安装<br>（1）安装nodejs</p>
-<pre><code>yujiang@ubuntu001:~$ wget https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.xz
-yujiang@ubuntu001:~$ xz -d node-v6.11.3-linux-x64.tar.xz 
-yujiang@ubuntu001:~$ tar -xvf node-v6.11.3-linux-x64.tar 
-yujiang@ubuntu001:~$ sudo ln -s /home/yujiang/node-v6.11.3-linux-x64/bin/node  /usr/bin/node 
-yujiang@ubuntu001:~$ sudo ln -s /home/yujiang/node-v6.11.3-linux-x64/bin/npm  /usr/bin/npm 
-</code></pre><p>（2）修改ElasticSearch配置文件，支持跨域，并在后台运行ElasticSearch</p>
-<pre><code>yujiang@ubuntu001:~/elasticsearch-5.6.0$ vi config/elasticsearch.yml
-添加
-http.cors.enabled: true
-http.cors.allow-origin: &quot;*&quot;
-yujiang@ubuntu001:~/elasticsearch-5.6.0$ sh ./bin/elasticsearch -d
-</code></pre><p>（3）运行elasticsearch-head</p>
-<pre><code>https://github.com/mobz/elasticsearch-head
-yujiang@ubuntu001:~$ wget https://github.com/mobz/elasticsearch-head/archive/master.zip
-yujiang@ubuntu001:~$ unzip master.zip
-yujiang@ubuntu001:~$ cd elasticsearch-head-master/
-yujiang@ubuntu001:~/elasticsearch-head-master$ npm install
-yujiang@ubuntu001:~/elasticsearch-head-master$ npm run start
-</code></pre><p>（4）打开浏览器</p>
-<pre><code>http://192.168.30.134:9100/
-
-web页面输入
-http://192.168.30.134:9200/
-</code></pre><p>4、分布式安装</p>
-<p>（1）master节点修改配置文件</p>
-<pre><code>yujiang@ubuntu001:~/elasticsearch-5.6.0$ vi config/elasticsearch.yml
-添加 
-cluster.name: escluster
-node.name: master
-node.master: true
-</code></pre><p>（2）slave节点修改配置文件</p>
-<pre><code>cluster.name: escluster
-node.name: slave1
-network.host: 192.168.30.135
-#http.port: 8200
-discovery.zen.ping.unicast.hosts: [&quot;192.168.30.134&quot;]
-yujiang@ubuntu002:~/elasticsearch-5.6.0$ sh ./bin/elasticsearch
-</code></pre><p>（3）安装java jdk</p>
-<pre><code>yujiang@ubuntu002:~$ sudo add-apt-repository ppa:openjdk-r/ppa
-yujiang@ubuntu002:~$ sudo apt-get update 
-yujiang@ubuntu002:~$ sudo apt-get install -f openjdk-8-jdk
-yujiang@ubuntu002:~$ java -version
-openjdk version &quot;1.8.0_131&quot;
-OpenJDK Runtime Environment (build 1.8.0_131-8u131-b11-2ubuntu1.16.04.3-b11)
-OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
-</code></pre><h2 id="ElasticSearch基础概念"><a href="#ElasticSearch基础概念" class="headerlink" title="ElasticSearch基础概念"></a>ElasticSearch基础概念</h2><p>集群和节点</p>
-<pre><code>master + slave1 + slave2 + slave...n
-</code></pre><p>索引</p>
-<pre><code>含有相同属性的文档集合
-</code></pre><p>类型</p>
-<pre><code>索引可以定义一个或多个类型，文档必须属于一个类型
-</code></pre><p>文档</p>
-<pre><code>文档是可以被索引的基本数据单位
-</code></pre><p>分片</p>
-<pre><code>每个索引都有多个分片，每个分片是一个Lucene索引
-分片的好处，加入一个索引的数据量很大，就会造成硬盘压力很大，就会出现搜索瓶颈，可以将索引分成多个分片，从而分担压力，还允许用户进行水平的扩展和拆分，及分布式的操作，可以提高搜索和其他操作的效率
-</code></pre><p>备份</p>
-<pre><code>拷贝一份分片就完成了分片的备份
-当一个主分片失败或者出现问题时，备份分片可以代替工作，从而提高了es的可用性。备份的分片还可以执行搜索的操作，以分摊搜索的压力。es在创建索引时会创建5和分片和1个备份，数量可以修改，分片只有在创建索引的时候指定而不能在后期进行修改，备份是可以动态修改的
-</code></pre><h2 id="ElasticSearch的基本用法"><a href="#ElasticSearch的基本用法" class="headerlink" title="ElasticSearch的基本用法"></a>ElasticSearch的基本用法</h2><p>RESTFul API</p>
-<p>（1）API基本格式</p>
-<pre><code>http://&lt;ip&gt;:&lt;port&gt;/&lt;索引&gt;/&lt;类型&gt;/&lt;文档id&gt;
-</code></pre><p>（2）常用HTTP动词</p>
-<pre><code>GET/PUT/POST/DELETE
-</code></pre>
           
         
       
@@ -519,7 +430,7 @@ OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/105/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/105/">105</a><span class="page-number current">106</span><a class="page-number" href="/page/107/">107</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/107/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/105/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/105/">105</a><span class="page-number current">106</span><a class="page-number" href="/page/107/">107</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/107/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -565,7 +476,7 @@ OpenJDK 64-Bit Server VM (build 25.131-b11, mixed mode)
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

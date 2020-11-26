@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/28/LinuxCast-Linux网络基础配置-笔记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/04/Centos-7-升级内核-Centos-7-upgrade-kernel/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/08/28/LinuxCast-Linux网络基础配置-笔记/" itemprop="url">[LinuxCast]Linux网络基础配置 - 笔记</a></h1>
+                <a class="post-title-link" href="/2019/09/04/Centos-7-升级内核-Centos-7-upgrade-kernel/" itemprop="url">Centos 7 升级内核(Centos 7 upgrade kernel)</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-28T10:54:52+08:00">
-                2019-08-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-09-04T15:23:20+08:00">
+                2019-09-04
               </time>
             
 
@@ -358,86 +358,36 @@
       
         
           
-            <h1 id="以太网连接"><a href="#以太网连接" class="headerlink" title="以太网连接"></a>以太网连接</h1><ul>
-<li><p>在Linux中，以太网接口被命名为：eth0、eth1等，0、1代表网卡编号。</p>
-</li>
-<li><p>通过lspci命令可以查看网卡硬件信息（如果是usb网卡，则可能需要使用lsusb命令）</p>
-</li>
-<li><p>命令ifconfig命令用来查看接口信息</p>
-<p><code>ifconfig -a</code>         查看所有接口</p>
-<p><code>ifconfig eth0</code>    查看特定接口</p>
-</li>
-<li><p>命令ifup、ifdown用来启用、禁用一个接口</p>
-<p><code>ifup eth0</code></p>
-<p><code>ifdown eht0</code></p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@aio1 ~]# ifconfig ens33</span><br><span class="line">ens33: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 9000</span><br><span class="line">        inet 192.168.46.200  netmask 255.255.255.0  broadcast 192.168.46.255</span><br><span class="line">        inet6 fe80::b3f5:7411:df98:1d00  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:1d:7b:de  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 16673  bytes 23150661 (22.0 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 2645  bytes 223690 (218.4 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">RX packets 接收包数量</span><br><span class="line">TX packets 发送包数量</span><br></pre></td></tr></table></figure>
-<h1 id="网络相关配置文件"><a href="#网络相关配置文件" class="headerlink" title="网络相关配置文件"></a>网络相关配置文件</h1><ul>
-<li><p>网卡配置文件</p>
-<p>/etc/sysconfig/network-scripts/ifcfg-ens8f0</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">TYPE=Ethernet									# 类型=以太网</span><br><span class="line">PROXY_METHOD=none								# </span><br><span class="line">BROWSER_ONLY=no									# </span><br><span class="line">BOOTPROTO=none									# 启动协议</span><br><span class="line">DEFROUTE=yes									# </span><br><span class="line">IPV4_FAILURE_FATAL=no							# </span><br><span class="line">IPV6INIT=yes									# </span><br><span class="line">IPV6_AUTOCONF=yes								# </span><br><span class="line">IPV6_DEFROUTE=yes								# </span><br><span class="line">IPV6_FAILURE_FATAL=no							# </span><br><span class="line">IPV6_ADDR_GEN_MODE=stable-privacy				# </span><br><span class="line">NAME=ens33										# </span><br><span class="line">UUID=3434b388-c4db-4130-bf90-3e34115fe2d3		# UUID，统一标识符</span><br><span class="line">DEVICE=ens33									# 设备名称</span><br><span class="line">ONBOOT=yes										# 服务器启动时，自动启用</span><br><span class="line"></span><br><span class="line">IPADDR=192.168.46.200							# IP地址</span><br><span class="line">NETMASK=255.255.255.0							# 子网掩码</span><br><span class="line">GATEWAY=192.168.46.2							# 网关</span><br><span class="line">DNS1=192.168.46.2								# DNS</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>DNS配置文件</p>
-<p>/etc/resolv.conf</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"># Generated by NetworkManager</span><br><span class="line">search localdomain</span><br><span class="line">nameserver 192.168.46.2</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>主机名配置文件</p>
-<p>/etc/sysconfig/network</p>
-</li>
-<li><p>静态主机名配置文件</p>
-<p>/etc/hosts</p>
-</li>
-</ul>
-<h1 id="网络测试命令"><a href="#网络测试命令" class="headerlink" title="网络测试命令"></a>网络测试命令</h1><ul>
-<li><p>测试网络连通性</p>
-<p>ping 192.168.1.1</p>
-<p>ping <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
-</li>
-<li><p>测试DNS解析</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y bind-utils</span><br></pre></td></tr></table></figure>
-<p>host <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">域名到IP地址的解析</span><br><span class="line">[root@dev ~]# host www.baidu.com</span><br><span class="line">www.baidu.com is an alias for www.a.shifen.com.</span><br><span class="line">www.a.shifen.com has address 61.135.169.125</span><br><span class="line">www.a.shifen.com has address 61.135.169.121</span><br></pre></td></tr></table></figure>
-<p>dig <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
-</li>
-<li><p>显示路由表</p>
-<p>ip route</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@aio1 ~]# ip route</span><br><span class="line">default via 192.168.46.2 dev ens33 proto static metric 100 #跟我不在一个网段的，发给default</span><br><span class="line">default via 192.168.46.2 dev ens34 proto static metric 101 </span><br><span class="line">default via 192.168.46.2 dev ens35 proto static metric 102 </span><br><span class="line">default via 192.168.46.2 dev ens36 proto dhcp metric 103 </span><br><span class="line">172.29.232.0/22 dev br-dbaas proto kernel scope link src 172.29.232.100 </span><br><span class="line">192.168.46.0/24 dev ens33 proto kernel scope link src 192.168.46.200 metric 100 </span><br><span class="line">192.168.46.0/24 dev ens36 proto kernel scope link src 192.168.46.137 metric 103 </span><br><span class="line">192.168.46.2 dev ens34 proto static scope link metric 101 </span><br><span class="line">192.168.46.2 dev ens35 proto static scope link metric 102 </span><br><span class="line">192.168.100.0/24 dev ens34 proto kernel scope link src 192.168.100.200 metric 101 </span><br><span class="line">192.168.200.0/24 dev ens35 proto kernel scope link src 192.168.200.200 metric 102</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>追踪到达目标地址的网络路径</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y traceroute</span><br></pre></td></tr></table></figure>
-<p>traceroute <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
-</li>
-<li><p>使用mtr进行网络质量测试（结合了traceroute和ping）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y mtr</span><br></pre></td></tr></table></figure>
-<p>mtr <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
-</li>
-</ul>
-<h1 id="修改主机名"><a href="#修改主机名" class="headerlink" title="修改主机名"></a>修改主机名</h1><ul>
-<li><p>实时修改主机名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hostname train.linuxcast.net</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>永久性修改主机名</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/etc/sysconfig/network</span><br><span class="line"></span><br><span class="line">HOSTNAME=train.linuxcast.net</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="故障排查"><a href="#故障排查" class="headerlink" title="故障排查"></a>故障排查</h1><p>网络故障排查遵循从底层到高层、从自身到外部的流程进行</p>
-<ul>
-<li><p>先查看网络配置信息是否正确</p>
-<p>IP地址</p>
-<p>子网掩码</p>
-<p>网关</p>
-<p>DNS</p>
-</li>
-<li><p>查看到达网关是否连通</p>
-<p>ping 网关IP地址</p>
-</li>
-<li><p>查看DNS解析是否正常</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">host www.baidu.com</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>traceroute <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
-</li>
-</ul>
+            <p>1、查看当前版本kernel (Show current version of kernel)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# uname -r</span><br><span class="line">3.10.0-957.el7.x86_64</span><br></pre></td></tr></table></figure>
+
+<p>2、导入公钥 (Import the public key)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span><br></pre></td></tr></table></figure>
+
+<p>3、为CentOS-7安装ELRepo (install ELRepo for CentOS-7)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum install -y https://www.elrepo.org/elrepo-release-7.0-4.el7.elrepo.noarch.rpm</span><br></pre></td></tr></table></figure>
+
+<p>4、安装yum-plugin-fastestmirror (Install yum-plugin-fastestmirror)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum install -y yum-plugin-fastestmirror</span><br></pre></td></tr></table></figure>
+
+<p>5、查看可以安装的kernel (Show the kernel that can be installed)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum --enablerepo=elrepo-kernel provides kernel</span><br></pre></td></tr></table></figure>
+
+<p>6、安装最新kernel，或安装执行版本的kernel (Install the latest kernel, or install the executable version of the kernel)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum --enablerepo=elrepo-kernel install kernel-ml</span><br><span class="line">or</span><br><span class="line">[root@dev ~]# yum --enablerepo=elrepo-kernel install kernel-lt-4.4.190-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
+<p>7、设置默认的启动内核 (Set the default boot kernel)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# cat /boot/grub2/grub.cfg | grep &quot;CentOS Linux&quot;</span><br><span class="line">menuentry &apos;CentOS Linux (4.4.190-1.el7.elrepo.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (3.10.0-957.21.3.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (3.10.0-862.3.2.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (3.10.0-862.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (0-rescue-167a8b301e76475680ccb38e7d691aab) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-0-rescue-167a8b301e76475680ccb38e7d691aab-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line"></span><br><span class="line">[root@dev ~]# grub2-set-default &quot;CentOS Linux (4.4.190-1.el7.elrepo.x86_64) 7 (Core)&quot;</span><br><span class="line"></span><br><span class="line">[root@dev ~]# grub2-editenv list</span><br><span class="line">saved_entry=CentOS Linux (4.4.190-1.el7.elrepo.x86_64) 7 (Core)</span><br></pre></td></tr></table></figure>
+
+<p>8、重启机器 (Restart the machine)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# reboot</span><br></pre></td></tr></table></figure>
+
+<p>9、重启后验证是否成功 (Verify successful after reboot)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# uname -r</span><br><span class="line">4.4.190-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
+<p>10、删除老kernel，–count flag用于指定要在系统上保留的内核数 (Delete the old kernel, the –count flag is used to specify the number of cores to keep on the system)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum install -y yum-utils</span><br><span class="line"></span><br><span class="line">[root@dev ~]# package-cleanup --oldkernels --count=2</span><br></pre></td></tr></table></figure>
+
 
           
         
@@ -482,7 +432,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/25/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><span class="page-number current">26</span><a class="page-number" href="/page/27/">27</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/27/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/25/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/25/">25</a><span class="page-number current">26</span><a class="page-number" href="/page/27/">27</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/27/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -528,7 +478,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

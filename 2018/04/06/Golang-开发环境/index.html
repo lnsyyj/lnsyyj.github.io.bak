@@ -368,6 +368,7 @@
 <p>2、然后配置Golang的环境变量，配置方法类似于Java环境变量</p>
 <p>持久化方法：编辑 ~/.bash_profile 文件，配置自己的目录，例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">GOPATH=&quot;/Users/yujiang/go&quot;</span><br><span class="line">GOROOT=&quot;/usr/local/go&quot;</span><br><span class="line"></span><br><span class="line"># 测试段</span><br><span class="line">export GOPATH=&quot;/root/gocodes&quot;</span><br><span class="line">export GOROOT=/usr/local/go</span><br><span class="line">export GOBIN=$GOROOT/bin</span><br><span class="line">export GOPKG=$GOROOT/pkg/tool/linux_amd64 </span><br><span class="line">export GOARCH=amd64</span><br><span class="line">export GOOS=linux</span><br><span class="line">export GOPATH=/Golang</span><br><span class="line">export PATH=$PATH:$GOBIN:$GOPKG:$GOPATH/bin</span><br></pre></td></tr></table></figure>
+
 <p>使配置生效<br><code>source ~/.bash_profile</code></p>
 <p><strong>主要的环境变量有:</strong></p>
 <p>GOROOT：你所安装的go可执行文件的目录</p>
@@ -376,7 +377,9 @@
 <p>GOPATH如果配置多个目录，使用<code>go install/go get</code>时，会默认匹配第一个目录，后面的忽略。</p>
 <p><code>GOPATH=&quot;/Users/yujiang/go&quot;</code></p>
 <p>3、工作目录结构</p>
-<p>通常在你的工作目录中，包含3个子目录<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin 存放编译后的二进制文件</span><br><span class="line">src 存放源码文件</span><br><span class="line">pkg 存放编译后的库文件*.a</span><br></pre></td></tr></table></figure></p>
+<p>通常在你的工作目录中，包含3个子目录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bin 存放编译后的二进制文件</span><br><span class="line">src 存放源码文件</span><br><span class="line">pkg 存放编译后的库文件*.a</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -530,7 +533,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

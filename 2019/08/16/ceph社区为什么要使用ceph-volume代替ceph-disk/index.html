@@ -377,8 +377,10 @@
 <p>由于ceph-disk的world-view必须是专门的GPT分区，这意味着它无法与其他技术（如LVM或类似的device mapper devices）一起使用。它最终决定创建一些模块化的东西，从LVM支持开始，并根据需要扩展其他技术。</p>
 <h1 id="GPT-PARTITIONS-ARE-SIMPLE"><a href="#GPT-PARTITIONS-ARE-SIMPLE" class="headerlink" title="GPT PARTITIONS ARE SIMPLE?"></a>GPT PARTITIONS ARE SIMPLE?</h1><p>尽管分区通常很容易理解，但ceph-disk分区并不简单。它需要大量特殊标志才能使它们与device discovery工作流程一起正常工作。以下是创建数据分区的示例调用：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sgdisk --largest-new=1 --change-name=1:ceph data --partition-guid=1:f0fc39fd-eeb2-49f1-b922-a11939cf8a0f --typecode=1:89c57f98-2fe5-4dc0-89c1-f3ad0ceff2be --mbrtogpt -- /dev/sdb</span><br></pre></td></tr></table></figure>
+
 <p>创建这些不仅很难，而且这些分区要求device由 Ceph 独占。例如，在某些情况下，在device加密时将创建一个特殊分区，其中包含未加密的密钥。这是ceph-disk领域的知识，它不会转变对”GPT partitions are simple”的理解。下面是正在创建的特殊分区的示例：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/sbin/sgdisk --new=5:0:+10M --change-name=5:ceph lockbox --partition-guid=5:None --typecode=5:fb3aabf9-d25f-47cc-bf5e-721d181642be --mbrtogpt -- /dev/sdad</span><br></pre></td></tr></table></figure>
+
 <h1 id="MODULARITY"><a href="#MODULARITY" class="headerlink" title="MODULARITY"></a>MODULARITY</h1><p>ceph-volume被设计成一个模块化工具，因为我们预计人们会使用多种方式来配置硬件设备。目前已有两个情况：传统的ceph-disk devices仍然在使用并且有GPT分区（handled by <a href="https://docs.ceph.com/docs/master/ceph-volume/simple/#ceph-volume-simple" target="_blank" rel="noopener">simple</a>）和lvm。</p>
 <p>我们直接从用户空间管理NVMe devices的SPDK devices即将出现，LVM将无法在那里工作，因为根本不涉及内核。</p>
 <h1 id="CEPH-VOLUME-LVM"><a href="#CEPH-VOLUME-LVM" class="headerlink" title="CEPH-VOLUME LVM"></a>CEPH-VOLUME LVM</h1><p>通过使用<a href="https://docs.ceph.com/docs/master/glossary/#term-lvm-tags" target="_blank" rel="noopener">LVM tags</a>，<a href="https://docs.ceph.com/docs/master/ceph-volume/lvm/#ceph-volume-lvm" target="_blank" rel="noopener">lvm</a>子命令能够保存并随后重新发现和查询与OSD相关联的devices，以便可以激活（activate）它们。 这包括对基于LVM的技术（如dm-cache）的支持。</p>
@@ -537,7 +539,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

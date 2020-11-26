@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="问题列表Ceph升级（L to N）引发的问题   问题ID 1     问题出现版本 pre-14.2.3   问题现象 …POOLS:    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL     data">
+<meta name="description" content="问题列表Ceph升级（L to N）引发的问题   问题ID 1    问题出现版本 pre-14.2.3   问题现象 …POOLS:    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL     data">
 <meta name="keywords" content="ceph">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ceph 问题列表">
 <meta property="og:url" content="http://yoursite.com/2019/10/14/ceph-问题列表/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="问题列表Ceph升级（L to N）引发的问题   问题ID 1     问题出现版本 pre-14.2.3   问题现象 …POOLS:    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL     data">
+<meta property="og:description" content="问题列表Ceph升级（L to N）引发的问题   问题ID 1    问题出现版本 pre-14.2.3   问题现象 …POOLS:    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL     data">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-03-22T08:16:36.043Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ceph 问题列表">
-<meta name="twitter:description" content="问题列表Ceph升级（L to N）引发的问题   问题ID 1     问题出现版本 pre-14.2.3   问题现象 …POOLS:    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL     data">
+<meta name="twitter:description" content="问题列表Ceph升级（L to N）引发的问题   问题ID 1    问题出现版本 pre-14.2.3   问题现象 …POOLS:    POOL                           ID      STORED      OBJECTS     USED        %USED     MAX AVAIL     data">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -370,8 +370,7 @@
 <th>1</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td>pre-14.2.3</td>
 </tr>
@@ -385,7 +384,7 @@
 </tr>
 <tr>
 <td>问题原因</td>
-<td>根本原因是，从Nautilus开始，BlueStore维护了每个池的使用情况统计信息，但是它需要对磁盘上的格式进行少量更改。<br>除非您运行ceph-bluestore-tool修复，否则升级后的OSD不会拥有新的统计信息。<br>问题在于，一旦<em> any </em> OSD报告了er-pool统计信息，mon就开始使用新的统计信息（而不是等到<em> all </em> OSD都在这样做）。</td>
+<td>根本原因是，从Nautilus开始，BlueStore维护了每个池的使用情况统计信息，但是它需要对磁盘上的格式进行少量更改。<br>除非您运行ceph-bluestore-tool修复，否则升级后的OSD不会拥有新的统计信息。<br>问题在于，一旦* any * OSD报告了er-pool统计信息，mon就开始使用新的统计信息（而不是等到* all * OSD都在这样做）。</td>
 </tr>
 <tr>
 <td>问题解决办法</td>
@@ -407,8 +406,7 @@
 <td>问题修复版本（社区计划）</td>
 <td>14.2.3</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -416,8 +414,7 @@
 <th>2</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td>14.2.2</td>
 </tr>
@@ -451,9 +448,9 @@
 </tr>
 <tr>
 <td>问题修复版本（社区计划）</td>
+<td></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -461,8 +458,7 @@
 <th>3</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td>14.2.2</td>
 </tr>
@@ -496,9 +492,9 @@
 </tr>
 <tr>
 <td>问题修复版本（社区计划）</td>
+<td></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -506,8 +502,7 @@
 <th>4</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td>14.2.4</td>
 </tr>
@@ -541,9 +536,9 @@
 </tr>
 <tr>
 <td>问题修复版本（社区计划）</td>
+<td></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -551,8 +546,7 @@
 <th>5</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td></td>
 </tr>
@@ -586,9 +580,9 @@
 </tr>
 <tr>
 <td>问题修复版本（社区计划）</td>
+<td></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -596,8 +590,7 @@
 <th></th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td></td>
 </tr>
@@ -631,9 +624,9 @@
 </tr>
 <tr>
 <td>问题修复版本（社区计划）</td>
+<td></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <table>
 <thead>
 <tr>
@@ -641,8 +634,7 @@
 <th></th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>问题出现版本</td>
 <td></td>
 </tr>
@@ -676,9 +668,9 @@
 </tr>
 <tr>
 <td>问题修复版本（社区计划）</td>
+<td></td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 
       
     </div>
@@ -832,7 +824,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

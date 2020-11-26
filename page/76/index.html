@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/11/LTP-C-Test-Case教程/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/06/11/LTP-C-Test-Case教程/" itemprop="url">LTP C Test Case教程</a></h1>
+                <a class="post-title-link" href="/2018/06/15/Repo-for-Microsoft-Windows-and-Linux/" itemprop="url">Repo for Microsoft Windows and Linux</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-11T23:19:03+08:00">
-                2018-06-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-06-15T22:28:18+08:00">
+                2018-06-15
               </time>
             
 
@@ -358,23 +358,66 @@
       
         
           
-            <p>LTP测试可以用C或Shell脚本编写。</p>
-<h2 id="Getting-Started"><a href="#Getting-Started" class="headerlink" title="Getting Started"></a>Getting Started</h2><p>Git-clone主LTP repository，如自述文件中所述, 并更改目录到checked-out的Git repository。我们建议安装LTP并运行Quick guide（在自述文件中）中提到的测试之一，以确保您从良好的状态开始。我们还建议克隆Linux kernel repository以供参考，本指南将涉及主线kernel 4.12内的文件和目录。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git</span><br></pre></td></tr></table></figure>
-<p>还有许多其他的repositories可以参考，包括GNU C library glibc和可选的C library musl。一些system calls被部分或完全实现在user land作为标准C  library的一部分。所以在这些情况下，C library是一个重要的参考。glibc是Linux最常用的C library，然而musl通常更容易理解。</p>
-<p>实现system calls的方式因体系结构，以及内核版本和C library版本而异。要找出system calls是否真的在任何机器上访问内核，可以使用strace。这会拦截system calls并打印它们。我们将在后面的教程中使用它。</p>
-<h2 id="Choose-a-System-Call-to-test"><a href="#Choose-a-System-Call-to-test" class="headerlink" title="Choose a System Call to test"></a>Choose a System Call to test</h2><p>我们将使用<code>statx()</code> system call来提供测试的具体示例。在撰写本文时，没有测试Linux内核版本4.11中的system call。Linux system call特定的测试主要包含在testcases/kernel/syscalls目录，但你也可以grep整个LTP repository以检查任何现有system call的用法。</p>
-<p>找到当前未被LTP测试的system call的方法是在内核树中查看include/linux/syscalls.h。</p>
-<h3 id="Find-an-untested-System-call"><a href="#Find-an-untested-System-call" class="headerlink" title="Find an untested System call"></a>Find an untested System call</h3><p>尝试找到一个未经测试的系统调用，它有一个手册页（即man syscall产生一个结果）。Git-clone最新的kernel man-pages repository是一个好主意。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git clone git://git.kernel.org/pub/scm/docs/man-pages/man-pages.git</span><br></pre></td></tr></table></figure>
-<p>在写这篇文章时，最新的man-pages release和repository HEAD之间的差异超过了100次commits。这代表了大约9周的变化。如果你使用的是稳定的Linux发行版，那么你的man-pages package可能已经有几年了。就像kernel一样，最好有Git repository作为参考。</p>
-<h2 id="Create-the-test-skeleton"><a href="#Create-the-test-skeleton" class="headerlink" title="Create the test skeleton"></a>Create the test skeleton</h2><p>我将调用我的测试statx01.c，在你读这个文件名的时候，可能会采用这个文件名，所以可以根据需要增加文件名中的数字，或者用练习2.1中选择的system call替换statx。（怕被占用）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir testcases/kernel/syscalls/statx</span><br><span class="line">$ cd testcases/kernel/syscalls/statx</span><br><span class="line">$ echo statx &gt;&gt; .gitignore</span><br></pre></td></tr></table></figure>
-<p>接下来打开statx01.c并添加如下。确保将right notice更改为您的name/company，如有必要，更正test name和最低kernel version。我将在下面解释代码的作用。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">/*</span><br><span class="line"> * Copyright (c) 2017 Instruction Ignorer &lt;&quot;can&apos;t&quot;@be.bothered.com&gt;</span><br><span class="line"> *</span><br><span class="line"> * This program is free software: you can redistribute it and/or modify</span><br><span class="line"> * it under the terms of the GNU General Public License as published by</span><br><span class="line"> * the Free Software Foundation, either version 2 of the License, or</span><br><span class="line"> * (at your option) any later version.</span><br><span class="line"> *</span><br><span class="line"> * This program is distributed in the hope that it will be useful,</span><br><span class="line"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</span><br><span class="line"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span><br><span class="line"> * GNU General Public License for more details.</span><br><span class="line"> *</span><br><span class="line"> * You should have received a copy of the GNU General Public License</span><br><span class="line"> * along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">/*</span><br><span class="line"> * Test statx</span><br><span class="line"> *</span><br><span class="line"> * All tests should start with a description of _what_ we are testing.</span><br><span class="line"> * Non-trivial explanations of _how_ the code works should also go here.</span><br><span class="line"> * Include relevant links, Git commit hashes and CVE numbers.</span><br><span class="line"> * Inline comments should be avoided.</span><br><span class="line"> */</span><br><span class="line"></span><br><span class="line">#include &quot;tst_test.h&quot;</span><br><span class="line"></span><br><span class="line">static void run(void)</span><br><span class="line">&#123;</span><br><span class="line">	tst_res(TPASS, &quot;Doing hardly anything is easy&quot;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">static struct tst_test test = &#123;</span><br><span class="line">	.test_all = run,</span><br><span class="line">	.min_kver = &quot;4.11&quot;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>从<code>#include</code>语句开始，我们将复制main LTP test library headers。这包括最常见的test API函数和test harness初始化代码。需要注意的是，这是一个完全普通的，独立的C程序，但缺少main()，因为它在tst_test.h中实现。</p>
-<p>我们使用tst_test结构指定运行一部分测试代码。测试编写器可以设置各种回调，包括我们已经设置为运行（）的test.test_all。test writer可以设置各种回调, 包括test.test_all，我们已经设置run()。测试工具将在一个单独的进程（使用fork()）中执行此回调，如果在test.timeout秒后没有返回，则强制终止它。</p>
-<h2 id="原文"><a href="#原文" class="headerlink" title="原文"></a>原文</h2><p>【1】<a href="https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial" target="_blank" rel="noopener">https://github.com/linux-test-project/ltp/wiki/C-Test-Case-Tutorial</a></p>
+            <p>这是E.S.R.Labs Repo —— 就像Google Repo，但它也可以在Microsoft Windows运行。Repo是Google建立在Git之上的repository管理工具。必要时，Repo会统一许多Git repositories上传到版本控制系统，并使部分开发工作流程自动化。Repo并不意味着取代Git，只是为了更容易在多个repositories的环境中使用Git。repo command是一个可执行的Python脚本，您可以将其放在任何路径。在处理源文件时，您将使用Repo进行跨网络操作。例如，使用Repo命令，可以将多个repositories中的文件下载到本地工作目录中。</p>
+<h2 id="Setup-steps-for-Microsoft-Windows"><a href="#Setup-steps-for-Microsoft-Windows" class="headerlink" title="Setup steps for Microsoft Windows"></a>Setup steps for Microsoft Windows</h2><p>修复权限以允许创建符号链接</p>
+<p>如果您是Administrators group的member，则必须关闭<a href="https://support.microsoft.com/en-us/products/windows?os=windows-10" target="_blank" rel="noopener">User Access Control</a> (UAC)，然后重新启动计算机。</p>
+<p>否则，您必须调整您的用户权限才能获得<a href="https://stackoverflow.com/questions/6722589/using-windows-mklink-for-linking-2-files" target="_blank" rel="noopener">SeCreateSymbolicLinkPrivilege</a>权限。editrights工具是作为Microsoft Windows的git-repo的一部分提供的。</p>
+<p>Highly experimental（除开发此功能外，请勿使用！）：如果您不想使用符号链接，而是文件夹和文件的硬链接（hardlinks），则必须在<code>~/.gitconfig</code>中设置以下内容:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[portable]</span><br><span class="line">      windowsNoSymlinks = true</span><br></pre></td></tr></table></figure>
+
+<p>这不需要上述所说的设置权限。</p>
+<p>已知问题：硬链接被git销毁，例如，当你删除一个branch时（breaks .git/config）。这会破坏project workspace！</p>
+<h3 id="Download-and-install-Git"><a href="#Download-and-install-Git" class="headerlink" title="Download and install Git"></a>Download and install Git</h3><p>下载Git（<a href="http://git-scm.com/downloads）" target="_blank" rel="noopener">http://git-scm.com/downloads）</a></p>
+<p>将Git添加到path环境变量中：例如C:\Program Files (x86)\Git\cmd;</p>
+<p>将MinGW添加到path环境变量中：例如C:\Program Files (x86)\Git\bin;</p>
+<h3 id="Download-and-install-Python"><a href="#Download-and-install-Python" class="headerlink" title="Download and install Python"></a>Download and install Python</h3><p>下载Python 2.7+（<a href="https://www.python.org/downloads/）" target="_blank" rel="noopener">https://www.python.org/downloads/）</a></p>
+<p>将Python添加到path环境变量中：例如C:\Python27;</p>
+<p>注意：git-repo在实验环境支持Python 3.x</p>
+<h3 id="使用Windows-Command-Shell或Git-Bash下载并安装Repo"><a href="#使用Windows-Command-Shell或Git-Bash下载并安装Repo" class="headerlink" title="使用Windows Command Shell或Git Bash下载并安装Repo"></a>使用Windows Command Shell或Git Bash下载并安装Repo</h3><p>Windows Command Shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">md %USERPROFILE%\bin</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; %USERPROFILE%/bin/repo</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo.cmd &gt; %USERPROFILE%/bin/repo.cmd</span><br></pre></td></tr></table></figure>
+
+<p>Windows PowerShell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">md $env:USERPROFILE\bin</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; $env:USERPROFILE/bin/repo</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo.cmd &gt; $env:USERPROFILE/bin/repo.cmd</span><br></pre></td></tr></table></figure>
+
+<p>Git Bash</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir ~/bin</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; ~/bin/repo</span><br><span class="line">curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo.cmd &gt; ~/bin/repo.cmd</span><br></pre></td></tr></table></figure>
+
+<p>将Repo添加path环境变量：%USERPROFILE%\bin;</p>
+<p>创建一个指向％USERPROFILE％的HOME环境变量（OpenSSH需要找到它的.ssh目录）。</p>
+<p>创建一个GIT_EDITOR环境变量，其中包含一个editor可执行文件作为值。为此，首先将editor可执行文件的主目录添加到path环境变量中。例如，GIT_EDITOR可以设置为”notepad++.exe”，”gvim.exe”。</p>
+<h3 id="Setup-steps-for-Linux"><a href="#Setup-steps-for-Linux" class="headerlink" title="Setup steps for Linux"></a>Setup steps for Linux</h3><p>下载并安装Git和Python</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install git-core</span><br><span class="line">sudo apt-get install python</span><br></pre></td></tr></table></figure>
+
+<p>下载并安装Repo</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir ~/bin</span><br><span class="line">$ PATH=~/bin:$PATH</span><br><span class="line">$ curl https://raw.githubusercontent.com/esrlabs/git-repo/stable/repo &gt; ~/bin/repo</span><br><span class="line">$ chmod a+x ~/bin/repo</span><br></pre></td></tr></table></figure>
+
+<h3 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h3><p>有关git-repo用法的更多详细说明，请访问<a href="http://source.android.com/source/using-repo.html" target="_blank" rel="noopener">git</a>-repo。</p>
+<h3 id="常见问题解答"><a href="#常见问题解答" class="headerlink" title="常见问题解答"></a>常见问题解答</h3><ul>
+<li>我无法看到repo状态的任何颜色</li>
+</ul>
+<p>用于repo状态的pager默认设置为less，除非另外配置，否则将忽略转义序列。您可以将环境变量LESS设置为-FRSX以减少处理颜色。 （您可能还想将LESSCHARSET设置为utf-8）</p>
+<p>它仍然不起作用！</p>
+<p>对pager有更多的选择。它的行为并不像less一样，但它对你来说可能已经足够了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global core.pager more</span><br></pre></td></tr></table></figure>
+
+<p>或者，环境变量GIT_PAGER可以设置为more。</p>
+<ul>
+<li>在使用repo init初始化我的repo时，我在Windows Command Shell中遇到WindowsError</li>
+</ul>
+<p>如果在输出开始时出现警告，表示GPG不可用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">warning: gpg (GnuPG) is not available.</span><br><span class="line">warning: Installing it is strongly encouraged.</span><br></pre></td></tr></table></figure>
+
+<p>你必须添加gpg.exe到你的PATH变量。可执行文件可以在Git安装文件夹<code>$GIT\usr\bin</code>中找到。当你使用Git Bash时，<code>$Git\usr\bin</code>文件夹已经被添加到你的PATH中。</p>
+<h3 id="Developer-Information"><a href="#Developer-Information" class="headerlink" title="Developer Information"></a>Developer Information</h3><p>与official google repo同步</p>
+<p>为了与official google repo git同步，这里是与official google repo的tag v1.12.33同步的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># add google git-repo remote with tag</span><br><span class="line">git remote add googlesource https://android.googlesource.com/tools/repo/</span><br><span class="line">git checkout v1.12.33 -b google-latest</span><br><span class="line"></span><br><span class="line"># checkout basis for resync</span><br><span class="line">git checkout google-git-repo-base -b update</span><br><span class="line">git merge --allow-unrelated-histories -Xtheirs --squash google-latest</span><br><span class="line">git commit -m &quot;Update: google git-repo v1.12.33&quot;</span><br><span class="line">git rebase stable</span><br><span class="line"></span><br><span class="line"># solve conflicts; keep portability in mind</span><br><span class="line"></span><br><span class="line">git checkout stable</span><br><span class="line">git rebase update</span><br><span class="line"></span><br><span class="line"># cleanup</span><br><span class="line">git branch -D update</span><br><span class="line">git branch -D google-latest</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建一个新的签名版本"><a href="#创建一个新的签名版本" class="headerlink" title="创建一个新的签名版本"></a>创建一个新的签名版本</h3><p>用于创建新版本repo的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git tag -s -u KEYID v0.4.16 -m &quot;COMMENT&quot;</span><br><span class="line">git push origin stable:stable</span><br><span class="line">git push origin v0.4.16</span><br></pre></td></tr></table></figure>
+
+<p>替换KEYID（类似0x ..）</p>
+<p>v0.4.16（两次）</p>
+<p>用更多的解释替换COMMENT</p>
 
           
         
@@ -419,7 +462,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/75/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/75/">75</a><span class="page-number current">76</span><a class="page-number" href="/page/77/">77</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/77/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/75/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/75/">75</a><span class="page-number current">76</span><a class="page-number" href="/page/77/">77</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/77/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -465,7 +508,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

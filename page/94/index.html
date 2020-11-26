@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/使用Vundle管理Vim插件/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/18/使用gopkg-in管理import的第三方package/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/17/使用Vundle管理Vim插件/" itemprop="url">使用Vundle管理Vim插件</a></h1>
+                <a class="post-title-link" href="/2018/04/18/使用gopkg-in管理import的第三方package/" itemprop="url">使用gopkg.in管理import的第三方package</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-17T19:17:49+08:00">
-                2018-04-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T14:42:15+08:00">
+                2018-04-18
               </time>
             
 
@@ -358,20 +358,23 @@
       
         
           
-            <p>工欲善其事，必先利其器。这篇文章记录怎样在Linux上使用Vundle管理Vim插件，提高效率。</p>
-<p>步骤很简单，大体如下：</p>
-<h3 id="系统环境"><a href="#系统环境" class="headerlink" title="系统环境"></a>系统环境</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# yum install -y redhat-lsb</span><br><span class="line">[root@centos7 ~]# lsb_release -a</span><br><span class="line">LSB Version:	:core-4.1-amd64:core-4.1-noarch:cxx-4.1-amd64:cxx-4.1-noarch:desktop-4.1-amd64:desktop-4.1-noarch:languages-4.1-amd64:languages-4.1-noarch:printing-4.1-amd64:printing-4.1-noarch</span><br><span class="line">Distributor ID:	CentOS</span><br><span class="line">Description:	CentOS Linux release 7.4.1708 (Core) </span><br><span class="line">Release:	7.4.1708</span><br><span class="line">Codename:	Core</span><br></pre></td></tr></table></figure>
-<h3 id="Install-vim-and-git"><a href="#Install-vim-and-git" class="headerlink" title="Install vim and git"></a>Install vim and git</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# yum install -y git vim</span><br></pre></td></tr></table></figure>
-<h3 id="Set-up-Vundle"><a href="#Set-up-Vundle" class="headerlink" title="Set up Vundle"></a>Set up Vundle</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim</span><br></pre></td></tr></table></figure>
-<h3 id="Configure-Plugins"><a href="#Configure-Plugins" class="headerlink" title="Configure Plugins"></a>Configure Plugins</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">set nocompatible              &quot; be iMproved, required</span><br><span class="line">filetype off                  &quot; required</span><br><span class="line"></span><br><span class="line">&quot; set the runtime path to include Vundle and initialize</span><br><span class="line">set rtp+=~/.vim/bundle/Vundle.vim</span><br><span class="line">call vundle#begin()</span><br><span class="line">&quot; alternatively, pass a path where Vundle should install plugins</span><br><span class="line">&quot;call vundle#begin(&apos;~/some/path/here&apos;)</span><br><span class="line"></span><br><span class="line">&quot; let Vundle manage Vundle, required</span><br><span class="line">Plugin &apos;VundleVim/Vundle.vim&apos;</span><br><span class="line"></span><br><span class="line">&quot; All of your Plugins must be added before the following line</span><br><span class="line">call vundle#end()            &quot; required</span><br><span class="line">filetype plugin indent on    &quot; required</span><br><span class="line">&quot; To ignore plugin indent changes, instead use:</span><br><span class="line">&quot;filetype plugin on</span><br><span class="line">&quot;</span><br><span class="line">&quot; Brief help</span><br><span class="line">&quot; :PluginList       - lists configured plugins</span><br><span class="line">&quot; :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate</span><br><span class="line">&quot; :PluginSearch foo - searches for foo; append `!` to refresh local cache</span><br><span class="line">&quot; :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal</span><br><span class="line">&quot;</span><br><span class="line">&quot; see :h vundle for more details or wiki for FAQ</span><br><span class="line">&quot; Put your non-Plugin stuff after this line</span><br></pre></td></tr></table></figure>
-<p>打开~/.vimrc，并添加你要安装的Plugins</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">call vundle#begin()</span><br><span class="line">&quot; 在其之间添加你要安装的Plugins，例如我这里安装一个NERDTree</span><br><span class="line">Plugin &apos;scrooloose/nerdtree&apos;</span><br><span class="line">call vundle#end()</span><br></pre></td></tr></table></figure>
-<h3 id="Install-Plugins"><a href="#Install-Plugins" class="headerlink" title="Install Plugins"></a>Install Plugins</h3><p>启动vim并运行:PluginInstall</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">:PluginInstall</span><br></pre></td></tr></table></figure>
-<p>配置已安装NERDTree插件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# vim ~/.vimrc</span><br><span class="line">添加以下，注意&lt;F2&gt;后面有空格，配置好以后，使用vim打开任意文件就可以使用F2来调出NERDTree了</span><br><span class="line">map &lt;F2&gt; :NERDTreeToggle&lt;CR&gt;</span><br></pre></td></tr></table></figure>
-<p>当然vim不止这一个插件，这里只是介绍一下怎样配置，其他好玩的插件请自己发掘。</p>
-<h3 id="vim常用选项"><a href="#vim常用选项" class="headerlink" title="vim常用选项"></a>vim常用选项</h3><p><a href="http://gohom.win/2015/06/08/Vim-Setup/" target="_blank" rel="noopener">http://gohom.win/2015/06/08/Vim-Setup/</a></p>
+            <p>在近期项目中，想针对Prometheus的ceph_exporter做定制化修改，但是遇到了一些麻烦。</p>
+<p>使用<code>go get github.com/digitalocean/ceph_exporter</code> 命令down下来的代码和GitHub上的master分支或tag中的代码都不一样，这是为什么呢？如果<code>go get</code>指向目标Repository的master分支，那么master分支怎样保证任何时刻都是可用的呢？于是带着疑问开始寻找答案。</p>
+<h3 id="package管理工具"><a href="#package管理工具" class="headerlink" title="package管理工具"></a>package管理工具</h3><p>当你在代码中引用package时，通常使用看起来像URL的导入路径，例如github.com/jpoehls/gophermail。当使用go build构建代码时，Go工具使用此路径在GOPATH中查找这些软件package，如果找不到，则失败。</p>
+<p>如何拉取这些package？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1、手动下载。你可以使用git clone这些package到你的GOPATH中。</span><br><span class="line">2、使用go get命令( download and install packages and dependencies )。go get只是简单地将导入路径作为URL来对待，并尝试通过HTTP或HTTPS来下载它。它足够聪明，可以处理Git，Mercurial，Bazaar和Subversion。Go对GitHub和Bitbucket等常用的代码管理站点有特殊的支持，同时也支持自定义URL。</span><br></pre></td></tr></table></figure>
+
+<p>如何管理GitHub中单个Repository中的多个Versions？</p>
+<p>有一种解决方法，可以让你在同一个Repository中，保存软件package的多个版本，并使用branches/tags来区分它们。<code>go get</code>支持自定义URL，你可以将版本号插入到package的导入路径中。这意味着需要编写一个代理服务，用于解析URL，并将请求代理到存储Repository的branch/tag上。</p>
+<p>幸运的是，有人已经为我们做了这些工作。<a href="http://labix.org/gopkg.in" target="_blank" rel="noopener">GoPkg.in</a>完全符合上述内容。</p>
+<p>例如：</p>
+<p>使用此方法管理gophermail package。这意味着，不是使用github.com/jpoehls/gophermail导入软件package，而是使用gopkg.in/jpoehls/gophermail.v0。.v0是因为gophermail还没有达到1.0。当我发布1.0并声明稳定的API时，导入路径将更改为gopkg.in/jpoehls/gophermail.v1。</p>
+<p>弄到这，好像和下面Prometheus的ceph_exporter输出没太大关系啊。。。。。。。。等我再研究研究。。。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# go version</span><br><span class="line">go version go1.10 linux/amd64</span><br><span class="line">[root@centos7 ~]# go get -v github.com/digitalocean/ceph_exporter</span><br><span class="line">github.com/digitalocean/ceph_exporter (download)</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/ceph/go-ceph/rados</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/beorn7/perks/quantile</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/golang/protobuf/proto</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/client_model/go</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/matttproud/golang_protobuf_extensions/pbutil</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/common/model</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/common/expfmt</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/procfs/xfs</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/procfs</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/client_golang/prometheus</span><br><span class="line">github.com/digitalocean/ceph_exporter/collectors</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/client_golang/prometheus/promhttp</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/gopkg.in/yaml.v2</span><br></pre></td></tr></table></figure>
+
+<p>参考链接：</p>
+<p>【1】<a href="http://zduck.com/2014/go-and-package-versioning" target="_blank" rel="noopener">http://zduck.com/2014/go-and-package-versioning</a><br>【2】<a href="https://stackoverflow.com/questions/24855081/how-do-i-import-a-specific-version-of-a-package-using-go-get" target="_blank" rel="noopener">https://stackoverflow.com/questions/24855081/how-do-i-import-a-specific-version-of-a-package-using-go-get</a></p>
+<p>【3】<a href="https://ieevee.com/tech/2017/07/10/go-import.html" target="_blank" rel="noopener">https://ieevee.com/tech/2017/07/10/go-import.html</a></p>
 
           
         
@@ -416,7 +419,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/93/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/93/">93</a><span class="page-number current">94</span><a class="page-number" href="/page/95/">95</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/95/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/93/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/93/">93</a><span class="page-number current">94</span><a class="page-number" href="/page/95/">95</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/95/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -462,7 +465,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

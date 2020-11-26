@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/09/Linux-NFS文件共享/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/15/redis笔记/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/01/09/Linux-NFS文件共享/" itemprop="url">Linux NFS文件共享</a></h1>
+                <a class="post-title-link" href="/2019/01/15/redis笔记/" itemprop="url">redis笔记</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-09T22:21:13+08:00">
-                2019-01-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-15T01:16:51+08:00">
+                2019-01-15
               </time>
             
 
@@ -358,64 +358,55 @@
       
         
           
-            <h1 id="NFS"><a href="#NFS" class="headerlink" title="NFS"></a>NFS</h1><p>NFS（Network File System）是Linux系统之间（类Unix系统之间）使用最为广泛的文件共享协议，不同于ftp或http，需要将文件下载后使用，NFS方式的共享是可以直接使用而不需要下载的。</p>
-<h1 id="NFS协议"><a href="#NFS协议" class="headerlink" title="NFS协议"></a>NFS协议</h1><p>参考<a href="https://zh.wikipedia.org/wiki/%E7%BD%91%E7%BB%9C%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F" target="_blank" rel="noopener">Wiki</a></p>
-<h2 id="NFSv1"><a href="#NFSv1" class="headerlink" title="NFSv1"></a>NFSv1</h2><p>只在SUN公司内部用作实验目的</p>
-<h2 id="NFSv2"><a href="#NFSv2" class="headerlink" title="NFSv2"></a>NFSv2</h2><ul>
-<li>基于UDP</li>
-<li>由于 32-bit 的限制，NFSv2 只允读写文件起始2G大小的内容</li>
-</ul>
-<h2 id="NFSv3"><a href="#NFSv3" class="headerlink" title="NFSv3"></a>NFSv3</h2><p>其主要目的是解决NFSv2进行同步写操作的性能问题。</p>
-<ul>
-<li>支持 64 bit 文件大小和偏移量，即突破 2GB 文件大小的限制</li>
-<li>支持服务端的异步写操作，提升写入性能</li>
-<li>在许多响应报文中额外增加文件属性，避免用到这些属性时重新获取</li>
-<li>增加READDIRPLUS调用，用于在遍历目录时获取文件描述符和文件属性</li>
-<li>增加了将TCP作为传输层的支持</li>
-</ul>
-<h2 id="NFSv4"><a href="#NFSv4" class="headerlink" title="NFSv4"></a>NFSv4</h2><p>协议的实现/开发工作不再是由SUN公司主导开发，而是改为由互联网工程任务组（IETF）开发。</p>
-<ul>
-<li>性能提升</li>
-<li>强制安全策略</li>
-<li>引入有状态的协议</li>
-</ul>
-<h2 id="NFSv4-1"><a href="#NFSv4-1" class="headerlink" title="NFSv4.1"></a>NFSv4.1</h2><ul>
-<li>为并行访问可横向扩展的集群服务（pNFS扩展）提供协议支持</li>
-</ul>
-<h2 id="NFSv4-2"><a href="#NFSv4-2" class="headerlink" title="NFSv4.2"></a>NFSv4.2</h2><p>NFSv4.2 当前正在开发中</p>
-<h1 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h1><p>假设一个Unix风格的场景，其中一台计算机（客户端）需要访问存储在其他机器上的数据（NFS 服务器）：</p>
-<p>1、服务端实现 NFS 守护进程，默认运行 nfsd，用来使得数据可以被客户端访问。<br>2、服务端系统管理员可以决定哪些资源可以被访问，导出目录的名字和参数，通常使用 /etc/exports 配置文件 和 exportfs 命令。<br>3、服务端安全-管理员保证它可以组织和认证合法的客户端。<br>4、服务端网络配置保证可以跟客户端透过防火墙进行协商。<br>5、客户端请求导出的数据，通常调用一个 mount 命令。<br>6、如果一切顺利，客户端的用户就可以通过已经挂载的文件系统查看和访问服务端的文件了。<br>提醒：NFS自动挂载可以通过—可能是 /etc/fstab 或者自动安装管理进程。</p>
-<h2 id="环境信息"><a href="#环境信息" class="headerlink" title="环境信息"></a>环境信息</h2><p>NFS服务端IP地址为：192.168.56.101</p>
-<p>NFS客户端IP地址为：192.168.56.240</p>
-<h2 id="NFS服务端"><a href="#NFS服务端" class="headerlink" title="NFS服务端"></a>NFS服务端</h2><p>1、在Centos7上安装软件包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# yum install -y nfs-utils rpcbind</span><br></pre></td></tr></table></figure>
-<p>2、创建共享目录并更改权限</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# mkdir /var/nfsshare &amp;&amp; chmod -R 755 /var/nfsshare</span><br><span class="line"></span><br><span class="line">[root@centos ~]# chown nfsnobody:nfsnobody /var/nfsshare</span><br><span class="line">[root@centos ~]# ll -l /var/</span><br><span class="line">drwxr-xr-x.  2 nfsnobody nfsnobody    6 1月   9 10:41 nfsshare</span><br></pre></td></tr></table></figure>
-<p>3、启动服务并设置开机自启</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# systemctl enable rpcbind &amp;&amp; systemctl enable nfs-server &amp;&amp; systemctl enable nfs-lock &amp;&amp; systemctl enable nfs-idmap &amp;&amp; systemctl start rpcbind &amp;&amp; systemctl start nfs-server &amp;&amp; systemctl start nfs-lock &amp;&amp; systemctl start nfs-idmap</span><br><span class="line"></span><br><span class="line">重启所有服务命令</span><br><span class="line">[root@centos ~]# systemctl enable rpcbind &amp;&amp; systemctl enable nfs-server &amp;&amp; systemctl enable nfs-lock &amp;&amp; systemctl enable nfs-idmap &amp;&amp; systemctl restart rpcbind &amp;&amp; systemctl restart nfs-server &amp;&amp; systemctl restart nfs-lock &amp;&amp; systemctl restart nfs-idmap</span><br><span class="line"></span><br><span class="line">无需重启NFS服务，使exports文件生效</span><br><span class="line">[root@centos ~]# exportfs -ra</span><br></pre></td></tr></table></figure>
-<p>4、编辑/etc/exports文件，通过网络共享NFS目录</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意：192.168.56.240是NFS客户端IP</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# vi /etc/exports</span><br><span class="line">/var/nfsshare    192.168.56.240(rw,sync,no_root_squash,no_all_squash)</span><br><span class="line">/home            192.168.56.240(rw,sync,no_root_squash,no_all_squash)</span><br><span class="line"></span><br><span class="line"># 配置文件分三段</span><br><span class="line"># 第一段是将要共享出去的本地目录</span><br><span class="line"># 第二段是允许访问的主机(可以是一个IP也可以是一个IP段192.168.56.0/24)</span><br><span class="line"># 第三段是权限</span><br><span class="line"></span><br><span class="line">客户端							示例</span><br><span class="line">使用IP地址指定单一主机		10.20.30.40</span><br><span class="line">使用IP地址指定范围主机		172.16.0.0/16</span><br><span class="line">使用IP地址指定范围主机		192.168.1.*</span><br><span class="line">使用域名指定单一主机			Test.ice.apple</span><br><span class="line">使用域名指定范围主机			*.ice.apple</span><br><span class="line">使用通配符指定所有主机			*</span><br><span class="line"></span><br><span class="line">参数						说明</span><br><span class="line">ro						设置共享权限为只读</span><br><span class="line">rw						设置共享权限为读写</span><br><span class="line">root_squash				共享目录的使用者是root时，将被映射为匿名账号（nobody）</span><br><span class="line">no_root_squash			当使用NFS服务器共享目录的使用者是root时，将不被映射为匿名账号</span><br><span class="line">all_squash				将所有使用NFS服务器共享目录的使用者都映射为匿名账号</span><br><span class="line">anonuid					设置匿名账号的UID</span><br><span class="line">anongid					设置匿名账号的GID</span><br><span class="line">sync					将数据同步写入内存和硬盘。这可能导致效率降低</span><br><span class="line">async					先将数据保存在内存中，而不是直接保存在硬盘</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">选项含义：</span><br><span class="line">	rw                  允许对共享目录进行读写</span><br><span class="line">	sync                实时同步共享目录</span><br><span class="line">	no_root_squash      允许root访问</span><br><span class="line">	no_all_squash       允许用户授权</span><br><span class="line"></span><br><span class="line">默认选项如下：</span><br><span class="line">	ro                  只读共享</span><br><span class="line">	sync                所有操作返回前必须已经写入磁盘</span><br><span class="line">	wdelay              延迟写操作，等待更多的写操作一起执行</span><br><span class="line">	root_squash         防止远程root用户使用root权限对共享进行访问。NFS客户端连接服务端时如果使用的是root的话，那么对服务端分享的目录来说，拥有匿名用户权限，通常他将使用nobody或nfsnobody身份。</span><br><span class="line">	</span><br><span class="line">常用选项：</span><br><span class="line">	rw                  读写共享</span><br><span class="line">	async               操作可以延迟写入硬盘，立即响应，可提高速度</span><br><span class="line">	no_wdelay           关闭写延迟，需要与sync选项同时使用</span><br><span class="line">	no_root_squash      关闭root_squash，NFS客户端连接服务端时如果使用的是root的话，那么对服务端分享的目录来说，也拥有root权限。显然开启这项是不安全的。</span><br><span class="line">	secure              此选项要求请求源自小于IPPORT_RESERVED（1024）的Internet端口。限制客户端只能从小于1024的tcp/ip端口连接nfs服务器（默认设置）</span><br><span class="line">	insecure            此选项接受所有端口，允许客户端从大于1024的tcp/ip端口连接服务器</span><br></pre></td></tr></table></figure>
-<p>5、重启服务</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# systemctl restart nfs-server</span><br></pre></td></tr></table></figure>
-<p>6、修改防火墙</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# firewall-cmd --permanent --zone=public --add-service=nfs</span><br><span class="line">[root@centos ~]# firewall-cmd --permanent --zone=public --add-service=mountd</span><br><span class="line">[root@centos ~]# firewall-cmd --permanent --zone=public --add-service=rpc-bind</span><br><span class="line">[root@centos ~]# firewall-cmd --reload</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">挂载选项：</span><br><span class="line">	ro                  只读挂载</span><br><span class="line">	rw                  读写挂载</span><br><span class="line">	vers=4              指定使用NFSv4方式挂载</span><br></pre></td></tr></table></figure>
-<h2 id="NFS客户端"><a href="#NFS客户端" class="headerlink" title="NFS客户端"></a>NFS客户端</h2><p>1、在Centos7上安装软件包</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@docker ~]# yum install -y nfs-utils</span><br></pre></td></tr></table></figure>
-<p>2、创建NFS挂载点</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@docker ~]# mkdir -p /mnt/nfs/home</span><br><span class="line">[root@docker ~]# mkdir -p /mnt/nfs/var/nfsshare</span><br></pre></td></tr></table></figure>
-<p>3、挂载服务端的NFS共享目录到客户端</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@docker ~]# mount -t nfs 192.168.56.101:/home /mnt/nfs/home/</span><br><span class="line">[root@docker ~]# mount -t nfs 192.168.56.101:/var/nfsshare /mnt/nfs/var/nfsshare/</span><br></pre></td></tr></table></figure>
-<p>4、检查</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@docker ~]# df -Tkh</span><br><span class="line">文件系统                     类型      容量  已用  可用 已用% 挂载点</span><br><span class="line">192.168.56.101:/home         nfs4       17G  4.6G   13G   27% /mnt/nfs/home</span><br><span class="line">192.168.56.101:/var/nfsshare nfs4       17G  4.6G   13G   27% /mnt/nfs/var/nfsshare</span><br></pre></td></tr></table></figure>
-<p>5、读写文件</p>
-<p>在客户端向挂载点写入文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@docker ~]# touch /mnt/nfs/var/nfsshare/test_nfs</span><br><span class="line">[root@docker ~]# ll /mnt/nfs/var/nfsshare/</span><br><span class="line">总用量 0</span><br><span class="line">-rw-r--r--. 1 root root 0 1月   9 11:01 test_nfs</span><br></pre></td></tr></table></figure>
-<p>在服务端检查写入的文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# ll /var/nfsshare/</span><br><span class="line">总用量 0</span><br><span class="line">-rw-r--r--. 1 root root 0 1月   9 11:01 test_nfs</span><br></pre></td></tr></table></figure>
-<h1 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a>参考文章</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">【1】https://www.linuxidc.com/Linux/2013-10/91137.htm</span><br></pre></td></tr></table></figure>
+            <p>对于redis的用处不必多说，互联网上有很多资料。文章只做为笔记使用，记录redis操作与学习过程。</p>
+<h1 id="redis安装"><a href="#redis安装" class="headerlink" title="redis安装"></a>redis安装</h1><p>安装redis很简单，<code>https://redis.io/download</code>官方文档有教程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# wget http://download.redis.io/releases/redis-5.0.3.tar.gz &amp;&amp; tar xzf redis-5.0.3.tar.gz &amp;&amp; cd redis-5.0.3 &amp;&amp; make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+<h1 id="redis启动方式"><a href="#redis启动方式" class="headerlink" title="redis启动方式"></a>redis启动方式</h1><p>非守护进程启动方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# redis-server</span><br><span class="line"></span><br><span class="line">或者传递一些配置参数</span><br><span class="line">[root@centos ~]# redis-server --port 6380</span><br></pre></td></tr></table></figure>
+
+<p>守护进程启动方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">配置文件中开启daemonize yes</span><br><span class="line">[root@centos ~]# redis-server &lt;configPath&gt;</span><br><span class="line"></span><br><span class="line">[root@centos ~]# mkdir -p /var/log/redis</span><br><span class="line">[root@centos redis-5.0.3]# vim myredis.conf </span><br><span class="line">port 6379</span><br><span class="line">daemonize yes</span><br><span class="line">logfile &quot;redis.log&quot;</span><br><span class="line">dir &quot;/var/log/redis&quot;</span><br><span class="line"></span><br><span class="line">[root@centos redis-5.0.3]# redis-server ./myredis.conf </span><br><span class="line">[root@centos ~]# ps -ef | grep redis</span><br><span class="line">root      2447     1  0 11:01 ?        00:00:00 redis-server *:6379</span><br></pre></td></tr></table></figure>
+
+<h1 id="redis常用配置"><a href="#redis常用配置" class="headerlink" title="redis常用配置"></a>redis常用配置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">daemonize	是否是守护进程(no|yes)</span><br><span class="line">port		redis对外端口号</span><br><span class="line">logfile		redis系统日志</span><br><span class="line">dir			redis工作目录</span><br><span class="line"></span><br><span class="line">redis默认端口是6379</span><br></pre></td></tr></table></figure>
+
+<p>从默认配置文件中导出常用的配置项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">去掉&quot;#&quot;，去掉空格</span><br><span class="line">[root@centos redis-5.0.3]# cat redis.conf | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; myredis.conf</span><br></pre></td></tr></table></figure>
+
+<h1 id="redis-API"><a href="#redis-API" class="headerlink" title="redis API"></a>redis API</h1><p>通过<code>redis-cli</code>命令进入客户端，测试API</p>
+<h2 id="通用命令"><a href="#通用命令" class="headerlink" title="通用命令"></a>通用命令</h2><h3 id="通用命令-1"><a href="#通用命令-1" class="headerlink" title="通用命令"></a>通用命令</h3><p>keys [pattern]（一般不在生产环境使用，O(n)，redis单线程会阻塞其他命令）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set hello world</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set php good</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set java best</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys *</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;java&quot;</span><br><span class="line">3) &quot;php&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; mset 1 1 2 2 3 3 4 4 5 5 12 12 13 13 123 123 1234 1234</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys 1*</span><br><span class="line">1) &quot;1&quot;</span><br><span class="line">2) &quot;12&quot;</span><br><span class="line">3) &quot;13&quot;</span><br><span class="line">4) &quot;123&quot;</span><br><span class="line">5) &quot;1234&quot;</span><br><span class="line">127.0.0.1:6379&gt; keys 1[2-3]*</span><br><span class="line">1) &quot;12&quot;</span><br><span class="line">2) &quot;13&quot;</span><br><span class="line">3) &quot;123&quot;</span><br><span class="line">4) &quot;1234&quot;</span><br><span class="line">127.0.0.1:6379&gt; keys 12?</span><br><span class="line">1) &quot;123&quot;</span><br></pre></td></tr></table></figure>
+
+<p>dbsize</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set hello world</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set php good</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set java best</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys *</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;java&quot;</span><br><span class="line">3) &quot;php&quot;</span><br><span class="line">127.0.0.1:6379&gt; dbsize</span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure>
+
+<p>exists key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>del key [key …]</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>expire key seconds</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>type key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="数据结构和内部编码"><a href="#数据结构和内部编码" class="headerlink" title="数据结构和内部编码"></a>数据结构和内部编码</h3><h3 id="单线程架构"><a href="#单线程架构" class="headerlink" title="单线程架构"></a>单线程架构</h3><p>字符串类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>哈希类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>列表类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>集合类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>有序集合类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
 
           
         
@@ -460,7 +451,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/41/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/41/">41</a><span class="page-number current">42</span><a class="page-number" href="/page/43/">43</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/43/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/41/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/41/">41</a><span class="page-number current">42</span><a class="page-number" href="/page/43/">43</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/43/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -506,7 +497,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

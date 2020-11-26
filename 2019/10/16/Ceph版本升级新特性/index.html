@@ -398,7 +398,8 @@
 </ul>
 <p>而且，Ceph Dashboard现在被拆分到ceph-mgr-dashboard的package。 如果您的package management software在安装ceph-mgr时失败，则可能需要单独安装ceph-mgr-dashboard。</p>
 <ul>
-<li>RADOS<ul>
+<li><p>RADOS</p>
+<ul>
 <li>现在可以随时减少每个pool的placement groups (PGs)数，并且可以根据群集利用率或管理员提示<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler" target="_blank" rel="noopener">自动调整PG数</a>。</li>
 <li>新的<a href="https://docs.ceph.com/docs/master/rados/configuration/msgr2/#msgr2" target="_blank" rel="noopener">v2 wire protocol</a>支持线路加密</li>
 <li>群集可以跟踪OSD和Monitor daemons消耗的物理<a href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices" target="_blank" rel="noopener">存储设备</a>以及运行状况指标（即SMART），并且群集可以通过预先训练的预测模型或者基于云预测服务来<a href="https://docs.ceph.com/docs/master/mgr/diskprediction/#diskprediction" target="_blank" rel="noopener">报告预测的HDD或SSD故障</a>。</li>
@@ -409,7 +410,8 @@
 <li>增加了一个实验性的（耦合层） <a href="https://www.usenix.org/conference/fast18/presentation/vajha" target="_blank" rel="noopener">Coupled-Layer “Clay” erasure code</a> plugin，该plugin可减少大多数recovery操作所需的网络带宽和IO。</li>
 </ul>
 </li>
-<li>RGW<ul>
+<li><p>RGW</p>
+<ul>
 <li>S3 lifecycle可以在storage classes与tiering层之间转换</li>
 <li>Beast取代了civetweb成为默认的web frontend，从而提高了整体性能。</li>
 <li>支持新的publish/subscribe基础架构，允许RGW将events推送至serverless frameworks如knative或data pipelies如Kafka。</li>
@@ -439,17 +441,20 @@
 <li>支持pool中的单独image namespaces，以便进行租户隔离。</li>
 </ul>
 </li>
-<li>Misc<ul>
+<li><p>Misc</p>
+<ul>
 <li>Ceph 拥有一组新的<a href="https://docs.ceph.com/docs/master/mgr/orchestrator_cli/#orchestrator-cli-module" target="_blank" rel="noopener">orchestrator modules</a>，可直接与外部orchestrators像ceph-ansible, DeepSea, Rook, or simply ssh通过一致的CLI interface(and, eventually, Dashboard) 进行交互。</li>
 </ul>
 </li>
 </ul>
 <h1 id="V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><a href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS" class="headerlink" title="V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS"></a>V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</h1><ul>
-<li>Dashboard<ul>
+<li><p>Dashboard</p>
+<ul>
 <li>Ceph Luminous中引入的（只读）Ceph manager dashboard已由<a href="https://openattic.org/" target="_blank" rel="noopener">openATTIC</a> Ceph management tool新实现取代，提供了具有<a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">许多其他管理功能</a>。</li>
 </ul>
 </li>
-<li>RADOS<ul>
+<li><p>RADOS</p>
+<ul>
 <li>现在，配置选项可以由monitor集中存储和管理。</li>
 <li>进行recovery或rebalancing操作时，monitor daemon占用的disk space大大减少。</li>
 <li>当OSD从最近的故障中恢复时，异步恢复功能可减少请求的tail latency（少量响应的延迟高于均值，我们把这些响应称为尾延迟）。</li>
@@ -637,7 +642,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

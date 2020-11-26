@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGINDashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。 ENABLINGdashboard模块启用： ceph mgr module enable dashboard CONFIGURATION 像大多数Web应用程序一样，dashboard">
+<meta name="description" content="CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGINDashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。 ENABLINGdashboard模块启用： ceph mgr module enable dashboardCONFIGURATION 像大多数Web应用程序一样，dashboard">
 <meta name="keywords" content="CEPH-MGR">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CEPH MANAGER DAEMON - Dashboard plugin">
 <meta property="og:url" content="http://yoursite.com/2017/11/25/CEPH-MANAGER-DAEMON-Dashboard-plugin/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGINDashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。 ENABLINGdashboard模块启用： ceph mgr module enable dashboard CONFIGURATION 像大多数Web应用程序一样，dashboard">
+<meta property="og:description" content="CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGINDashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。 ENABLINGdashboard模块启用： ceph mgr module enable dashboardCONFIGURATION 像大多数Web应用程序一样，dashboard">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-03-22T08:16:35.963Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CEPH MANAGER DAEMON - Dashboard plugin">
-<meta name="twitter:description" content="CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGINDashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。 ENABLINGdashboard模块启用： ceph mgr module enable dashboard CONFIGURATION 像大多数Web应用程序一样，dashboard">
+<meta name="twitter:description" content="CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGINDashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。 ENABLINGdashboard模块启用： ceph mgr module enable dashboardCONFIGURATION 像大多数Web应用程序一样，dashboard">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -365,15 +365,12 @@
 </script>
         <p>CEPH MANAGER DAEMON - Dashboard plugin - DASHBOARD PLUGIN<br>Dashboard 插件使用ceph-mgr托管的Web server，可以可视化集群的统计信息。</p>
 <p><strong>ENABLING</strong><br>dashboard模块启用：</p>
-<pre><code>ceph mgr module enable dashboard
-</code></pre><p><strong>CONFIGURATION</strong></p>
+<pre><code>ceph mgr module enable dashboard</code></pre><p><strong>CONFIGURATION</strong></p>
 <p>像大多数Web应用程序一样，dashboard 绑定到主机名和端口。默认情况下，ceph-mgr daemon托管的dashboard（即当前active manager）将绑定到主机上任何可用的IPv4或IPv6地址的7000端口。<br>由于每个ceph-mgr都拥有自己的dashboard instance，因此可能需要单独配置它们。hostname 和port 可以通过配置key facility进行更改：</p>
 <pre><code>ceph config-key set mgr/dashboard/$name/server_addr $IP
-ceph config-key set mgr/dashboard/$name/server_port $PORT
-</code></pre><p>其中$name是托管此dashboard Web应用程序的ceph-mgr的ID。<br>这些设置也可以在集群范围内配置，而不是管理员特定的。 例如：<br>    ceph config-key set mgr/dashboard/server_addr $IP<br>    ceph config-key set mgr/dashboard/server_port $PORT<br>如果未配置端口，则Web应用程序将绑定到7000端口。<br>如果未配置地址，则Web应用将绑定到::，其对应于所有可用的IPv4和IPv6地址。</p>
+ceph config-key set mgr/dashboard/$name/server_port $PORT</code></pre><p>其中$name是托管此dashboard Web应用程序的ceph-mgr的ID。<br>这些设置也可以在集群范围内配置，而不是管理员特定的。 例如：<br>    ceph config-key set mgr/dashboard/server_addr $IP<br>    ceph config-key set mgr/dashboard/server_port $PORT<br>如果未配置端口，则Web应用程序将绑定到7000端口。<br>如果未配置地址，则Web应用将绑定到::，其对应于所有可用的IPv4和IPv6地址。</p>
 <p>您可以为所有URLs配置prefix：</p>
-<pre><code>ceph config-key set mgr/dashboard/url_prefix $PREFIX
-</code></pre><p>所以你可以访问dashboard http://$IP:$PORT/$PREFIX/.</p>
+<pre><code>ceph config-key set mgr/dashboard/url_prefix $PREFIX</code></pre><p>所以你可以访问dashboard http://$IP:$PORT/$PREFIX/.</p>
 <p><strong>LOAD BALANCER</strong><br>请注意，dashboard 将只在当时处于active状态的管理器上启动。查询Ceph集群状态以查看哪个管理器处于active状态（例如，ceph mgr dump）。为了使仪表板可通过一致的URL访问，无论哪个管理器daemon当前处于active状态，您可能需要在前端设置一个负载平衡器，以将流量引导至任何可用的管理器endpoint。 如果你使用HTTP反向代理转发到dashboard的subpath，则需要配置url_prefix（请参见上文）。</p>
 
       
@@ -519,7 +516,7 @@ ceph config-key set mgr/dashboard/$name/server_port $PORT
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

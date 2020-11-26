@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="1、查看当前版本kernel (Show current version of kernel) 12[root@dev ~]# uname -r3.10.0-957.el7.x86_64 2、导入公钥 (Import the public key) 1[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org 3">
+<meta name="description" content="1、查看当前版本kernel (Show current version of kernel) 12[root@dev ~]# uname -r3.10.0-957.el7.x86_64  2、导入公钥 (Import the public key) 1[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org">
 <meta name="keywords" content="linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Centos 7 升级内核(Centos 7 upgrade kernel)">
 <meta property="og:url" content="http://yoursite.com/2019/09/04/Centos-7-升级内核-Centos-7-upgrade-kernel/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="1、查看当前版本kernel (Show current version of kernel) 12[root@dev ~]# uname -r3.10.0-957.el7.x86_64 2、导入公钥 (Import the public key) 1[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org 3">
+<meta property="og:description" content="1、查看当前版本kernel (Show current version of kernel) 12[root@dev ~]# uname -r3.10.0-957.el7.x86_64  2、导入公钥 (Import the public key) 1[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-03-22T08:16:35.963Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Centos 7 升级内核(Centos 7 upgrade kernel)">
-<meta name="twitter:description" content="1、查看当前版本kernel (Show current version of kernel) 12[root@dev ~]# uname -r3.10.0-957.el7.x86_64 2、导入公钥 (Import the public key) 1[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org 3">
+<meta name="twitter:description" content="1、查看当前版本kernel (Show current version of kernel) 12[root@dev ~]# uname -r3.10.0-957.el7.x86_64  2、导入公钥 (Import the public key) 1[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -365,24 +365,34 @@
 </script>
         <p>1、查看当前版本kernel (Show current version of kernel)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# uname -r</span><br><span class="line">3.10.0-957.el7.x86_64</span><br></pre></td></tr></table></figure>
+
 <p>2、导入公钥 (Import the public key)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org</span><br></pre></td></tr></table></figure>
+
 <p>3、为CentOS-7安装ELRepo (install ELRepo for CentOS-7)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum install -y https://www.elrepo.org/elrepo-release-7.0-4.el7.elrepo.noarch.rpm</span><br></pre></td></tr></table></figure>
+
 <p>4、安装yum-plugin-fastestmirror (Install yum-plugin-fastestmirror)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum install -y yum-plugin-fastestmirror</span><br></pre></td></tr></table></figure>
+
 <p>5、查看可以安装的kernel (Show the kernel that can be installed)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum --enablerepo=elrepo-kernel provides kernel</span><br></pre></td></tr></table></figure>
+
 <p>6、安装最新kernel，或安装执行版本的kernel (Install the latest kernel, or install the executable version of the kernel)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum --enablerepo=elrepo-kernel install kernel-ml</span><br><span class="line">or</span><br><span class="line">[root@dev ~]# yum --enablerepo=elrepo-kernel install kernel-lt-4.4.190-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
 <p>7、设置默认的启动内核 (Set the default boot kernel)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# cat /boot/grub2/grub.cfg | grep &quot;CentOS Linux&quot;</span><br><span class="line">menuentry &apos;CentOS Linux (4.4.190-1.el7.elrepo.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (3.10.0-957.21.3.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (3.10.0-862.3.2.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (3.10.0-862.el7.x86_64) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-3.10.0-862.el7.x86_64-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line">menuentry &apos;CentOS Linux (0-rescue-167a8b301e76475680ccb38e7d691aab) 7 (Core)&apos; --class centos --class gnu-linux --class gnu --class os --unrestricted $menuentry_id_option &apos;gnulinux-0-rescue-167a8b301e76475680ccb38e7d691aab-advanced-a66de569-ad95-4599-9f1e-37c19744ace0&apos; &#123;</span><br><span class="line"></span><br><span class="line">[root@dev ~]# grub2-set-default &quot;CentOS Linux (4.4.190-1.el7.elrepo.x86_64) 7 (Core)&quot;</span><br><span class="line"></span><br><span class="line">[root@dev ~]# grub2-editenv list</span><br><span class="line">saved_entry=CentOS Linux (4.4.190-1.el7.elrepo.x86_64) 7 (Core)</span><br></pre></td></tr></table></figure>
+
 <p>8、重启机器 (Restart the machine)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# reboot</span><br></pre></td></tr></table></figure>
+
 <p>9、重启后验证是否成功 (Verify successful after reboot)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# uname -r</span><br><span class="line">4.4.190-1.el7.elrepo.x86_64</span><br></pre></td></tr></table></figure>
+
 <p>10、删除老kernel，–count flag用于指定要在系统上保留的内核数 (Delete the old kernel, the –count flag is used to specify the number of cores to keep on the system)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@dev ~]# yum install -y yum-utils</span><br><span class="line"></span><br><span class="line">[root@dev ~]# package-cleanup --oldkernels --count=2</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -527,7 +537,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

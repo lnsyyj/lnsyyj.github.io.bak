@@ -361,17 +361,23 @@
             <h1 id="OSD"><a href="#OSD" class="headerlink" title="OSD"></a>OSD</h1><h2 id="换盘操作"><a href="#换盘操作" class="headerlink" title="换盘操作"></a>换盘操作</h2><p>1、确保删除OSD时，集群没有接近near full</p>
 <p>2、检查删除OSD时，是否有数据丢失， ceph osd ok-to-stop {osd-num}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">无数据丢失情况</span><br><span class="line">root@ceph:~# ceph osd ok-to-stop 2</span><br><span class="line">OSD(s) 2 are ok to stop without reducing availability or risking data, provided there are no other concurrent failures or interventions.</span><br><span class="line">70 PGs are likely to be degraded (but remain available) as a result.</span><br><span class="line"></span><br><span class="line">有数据丢失情况</span><br><span class="line">root@ceph:~# ceph osd ok-to-stop 2</span><br><span class="line">Error EBUSY: 18 PGs are already too degraded, would become too degraded or might become unavailable</span><br></pre></td></tr></table></figure>
+
 <p>3、标记OSD out， ceph osd out {osd-num}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# ceph osd out 3</span><br><span class="line">marked out osd.3. </span><br><span class="line"> </span><br><span class="line">root@ceph:~# ceph osd tree</span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.08997 root default                          </span><br><span class="line">-3       0.08997     host ceph                         </span><br><span class="line"> 0   ssd 0.02249         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 1   ssd 0.02249         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 2   ssd 0.02249         osd.2     up  1.00000 1.00000 </span><br><span class="line"> 3   ssd 0.02249         osd.3   down        0 1.00000</span><br></pre></td></tr></table></figure>
+
 <p>4、停止OSD进程， systemctl stop ceph-osd@{osd-num}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# systemctl stop ceph-osd@3</span><br><span class="line"></span><br><span class="line">root@ceph:~# ps -ef | grep ceph-osd</span><br><span class="line">ceph        3334       1  0 10:19 ?        00:00:13 /usr/bin/ceph-osd -f --cluster ceph --id 2 --setuser ceph --setgroup ceph</span><br><span class="line">ceph        3336       1  0 10:19 ?        00:00:10 /usr/bin/ceph-osd -f --cluster ceph --id 0 --setuser ceph --setgroup ceph</span><br><span class="line">ceph        3337       1  0 10:19 ?        00:00:10 /usr/bin/ceph-osd -f --cluster ceph --id 1 --setuser ceph --setgroup ceph</span><br></pre></td></tr></table></figure>
+
 <p>5、从crush map中删除OSD， ceph osd purge {osd-num} –yes-i-really-mean-it</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">root@ceph:~# ceph osd purge 3 --yes-i-really-mean-it</span><br><span class="line">purged osd.3</span><br><span class="line"></span><br><span class="line">root@ceph:~# ceph osd tree</span><br><span class="line">ID CLASS WEIGHT  TYPE NAME     STATUS REWEIGHT PRI-AFF </span><br><span class="line">-1       0.06747 root default                          </span><br><span class="line">-3       0.06747     host ceph                         </span><br><span class="line"> 0   ssd 0.02249         osd.0     up  1.00000 1.00000 </span><br><span class="line"> 1   ssd 0.02249         osd.1     up  1.00000 1.00000 </span><br><span class="line"> 2   ssd 0.02249         osd.2     up  1.00000 1.00000</span><br></pre></td></tr></table></figure>
+
 <p>6、从ceph.conf中删除OSD</p>
 <p>7、卸载OSD挂载点， umount /var/lib/ceph/osd/ceph-{osd-num}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">umount /var/lib/ceph/osd/ceph-3</span><br></pre></td></tr></table></figure>
+
 <p>8、删除/var/lib/ceph/osd/ceph-{osd-num}/目录</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rm -rf /var/lib/ceph/osd/ceph-3/</span><br></pre></td></tr></table></figure>
+
 <p>9、换盘后，重新添加OSD</p>
 
           
@@ -417,7 +423,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -463,7 +469,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

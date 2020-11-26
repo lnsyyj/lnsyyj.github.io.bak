@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/18/使用gopkg-in管理import的第三方package/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/27/Package-flag/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/04/18/使用gopkg-in管理import的第三方package/" itemprop="url">使用gopkg.in管理import的第三方package</a></h1>
+                <a class="post-title-link" href="/2018/04/27/Package-flag/" itemprop="url">Package flag</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T14:42:15+08:00">
-                2018-04-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-27T22:27:39+08:00">
+                2018-04-27
               </time>
             
 
@@ -358,21 +358,43 @@
       
         
           
-            <p>在近期项目中，想针对Prometheus的ceph_exporter做定制化修改，但是遇到了一些麻烦。</p>
-<p>使用<code>go get github.com/digitalocean/ceph_exporter</code> 命令down下来的代码和GitHub上的master分支或tag中的代码都不一样，这是为什么呢？如果<code>go get</code>指向目标Repository的master分支，那么master分支怎样保证任何时刻都是可用的呢？于是带着疑问开始寻找答案。</p>
-<h3 id="package管理工具"><a href="#package管理工具" class="headerlink" title="package管理工具"></a>package管理工具</h3><p>当你在代码中引用package时，通常使用看起来像URL的导入路径，例如github.com/jpoehls/gophermail。当使用go build构建代码时，Go工具使用此路径在GOPATH中查找这些软件package，如果找不到，则失败。</p>
-<p>如何拉取这些package？</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1、手动下载。你可以使用git clone这些package到你的GOPATH中。</span><br><span class="line">2、使用go get命令( download and install packages and dependencies )。go get只是简单地将导入路径作为URL来对待，并尝试通过HTTP或HTTPS来下载它。它足够聪明，可以处理Git，Mercurial，Bazaar和Subversion。Go对GitHub和Bitbucket等常用的代码管理站点有特殊的支持，同时也支持自定义URL。</span><br></pre></td></tr></table></figure>
-<p>如何管理GitHub中单个Repository中的多个Versions？</p>
-<p>有一种解决方法，可以让你在同一个Repository中，保存软件package的多个版本，并使用branches/tags来区分它们。<code>go get</code>支持自定义URL，你可以将版本号插入到package的导入路径中。这意味着需要编写一个代理服务，用于解析URL，并将请求代理到存储Repository的branch/tag上。</p>
-<p>幸运的是，有人已经为我们做了这些工作。<a href="http://labix.org/gopkg.in" target="_blank" rel="noopener">GoPkg.in</a>完全符合上述内容。</p>
-<p>例如：</p>
-<p>使用此方法管理gophermail package。这意味着，不是使用github.com/jpoehls/gophermail导入软件package，而是使用gopkg.in/jpoehls/gophermail.v0。.v0是因为gophermail还没有达到1.0。当我发布1.0并声明稳定的API时，导入路径将更改为gopkg.in/jpoehls/gophermail.v1。</p>
-<p>弄到这，好像和下面Prometheus的ceph_exporter输出没太大关系啊。。。。。。。。等我再研究研究。。。。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# go version</span><br><span class="line">go version go1.10 linux/amd64</span><br><span class="line">[root@centos7 ~]# go get -v github.com/digitalocean/ceph_exporter</span><br><span class="line">github.com/digitalocean/ceph_exporter (download)</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/ceph/go-ceph/rados</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/beorn7/perks/quantile</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/golang/protobuf/proto</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/client_model/go</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/matttproud/golang_protobuf_extensions/pbutil</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/common/model</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/common/expfmt</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/procfs/xfs</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/procfs</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/client_golang/prometheus</span><br><span class="line">github.com/digitalocean/ceph_exporter/collectors</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/github.com/prometheus/client_golang/prometheus/promhttp</span><br><span class="line">github.com/digitalocean/ceph_exporter/vendor/gopkg.in/yaml.v2</span><br></pre></td></tr></table></figure>
-<p>参考链接：</p>
-<p>【1】<a href="http://zduck.com/2014/go-and-package-versioning" target="_blank" rel="noopener">http://zduck.com/2014/go-and-package-versioning</a><br>【2】<a href="https://stackoverflow.com/questions/24855081/how-do-i-import-a-specific-version-of-a-package-using-go-get" target="_blank" rel="noopener">https://stackoverflow.com/questions/24855081/how-do-i-import-a-specific-version-of-a-package-using-go-get</a></p>
-<p>【3】<a href="https://ieevee.com/tech/2017/07/10/go-import.html" target="_blank" rel="noopener">https://ieevee.com/tech/2017/07/10/go-import.html</a></p>
+            <h1 id="Package-flag"><a href="#Package-flag" class="headerlink" title="Package flag"></a>Package flag</h1><p>import “flag”</p>
+<p>Package flag实现了command-line flag解析</p>
+<h3 id="Usage"><a href="#Usage" class="headerlink" title="Usage:"></a>Usage:</h3><p>定义flags使用flag.String(), Bool(), Int()等。</p>
+<p>以下声明了一个整型flag，名字是-flagname，存储在指针ip中，类型为*int。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import &quot;flag&quot;</span><br><span class="line">var ip = flag.Int(&quot;flagname&quot;, 1234, &quot;help message for flagname&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>如果你喜欢，你可以使用Var()函数将flag绑定到一个变量。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var flagvar int</span><br><span class="line">func init() &#123;</span><br><span class="line">	flag.IntVar(&amp;flagvar, &quot;flagname&quot;, 1234, &quot;help message for flagname&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>或者，您可以创建满足Value接口（指针接收器）的自定义flags</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag.Var(&amp;flagVal, &quot;name&quot;, &quot;help message for flagname&quot;)</span><br></pre></td></tr></table></figure>
+
+<p>对于这样的flags，默认值是变量的初始值。</p>
+<p>所有flags定义后，调用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flag.Parse()</span><br></pre></td></tr></table></figure>
+
+<p>将命令行解析为所定义的flags。</p>
+<p>flags可以直接使用。如果你使用flags本身，它们都是指针；如果你绑定到变量，它们就是值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">fmt.Println(&quot;ip has value &quot;, *ip)</span><br><span class="line">fmt.Println(&quot;flagvar has value &quot;, flagvar)</span><br></pre></td></tr></table></figure>
+
+<p>解析后，flags后面的参数可作为slice，flag.Args()。或者独立的一个值，flag.Arg(i)。参数索引，从0到flag.NArg() - 1。</p>
+<p>Command line flag语法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-flag</span><br><span class="line">-flag=x</span><br><span class="line">-flag x  // non-boolean flags only</span><br></pre></td></tr></table></figure>
+
+<p>可以使用一个或两个减号；它们是等价的。最后一种形式不允许用于boolean flags</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd -x *</span><br></pre></td></tr></table></figure>
+
+<p>其中*是一个Unix shell通配符，如果有一个名为0或false等文件时它将会更改。您必须使用-flag=false形式来关闭boolean flag。</p>
+<p>flag解析在第一个non-flag参数之前（”-“是一个non-flag参数）或终止符“–”之后停止。</p>
+<p>整数flags接受1234，0664，0x1234并且可能是负数。Boolean flags可能是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1, 0, t, f, T, F, true, false, TRUE, FALSE, True, False</span><br></pre></td></tr></table></figure>
+
+<p>Duration flags接受任何有效的time.ParseDuration。</p>
+<p>默认的一组command-line flags由顶层函数控制。FlagSet类型允许您定义独立的flags集，例如在command-line interface中实现子命令。FlagSet的方法类似于command-line flag集的顶层函数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">// These examples demonstrate more intricate uses of the flag package.</span><br><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;errors&quot;</span><br><span class="line">	&quot;flag&quot;</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;strings&quot;</span><br><span class="line">	&quot;time&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// Example 1: A single string flag called &quot;species&quot; with default value &quot;gopher&quot;.</span><br><span class="line">// 示例1：一个名为“species”的字符串flag，默认值为“gopher”。</span><br><span class="line">var species = flag.String(&quot;species&quot;, &quot;gopher&quot;, &quot;the species we are studying&quot;)</span><br><span class="line"></span><br><span class="line">// Example 2: Two flags sharing a variable, so we can have a shorthand.</span><br><span class="line">// The order of initialization is undefined, so make sure both use the</span><br><span class="line">// same default value. They must be set up with an init function.</span><br><span class="line">// 示例2：两个flags共享一个变量，所以我们可以用简写。</span><br><span class="line">// 初始化的顺序是未定义的，所以确保两者都使用相同的默认值。 它们必须用init函数来设置。</span><br><span class="line">var gopherType string</span><br><span class="line"></span><br><span class="line">func init() &#123;</span><br><span class="line">	const (</span><br><span class="line">		defaultGopher = &quot;pocket&quot;</span><br><span class="line">		usage         = &quot;the variety of gopher&quot;</span><br><span class="line">	)</span><br><span class="line">	flag.StringVar(&amp;gopherType, &quot;gopher_type&quot;, defaultGopher, usage)</span><br><span class="line">	flag.StringVar(&amp;gopherType, &quot;g&quot;, defaultGopher, usage+&quot; (shorthand)&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Example 3: A user-defined flag type, a slice of durations.</span><br><span class="line">type interval []time.Duration</span><br><span class="line"></span><br><span class="line">// String is the method to format the flag&apos;s value, part of the flag.Value interface.</span><br><span class="line">// The String method&apos;s output will be used in diagnostics.</span><br><span class="line">func (i *interval) String() string &#123;</span><br><span class="line">	return fmt.Sprint(*i)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Set is the method to set the flag value, part of the flag.Value interface.</span><br><span class="line">// Set&apos;s argument is a string to be parsed to set the flag.</span><br><span class="line">// It&apos;s a comma-separated list, so we split it.</span><br><span class="line">func (i *interval) Set(value string) error &#123;</span><br><span class="line">	// If we wanted to allow the flag to be set multiple times,</span><br><span class="line">	// accumulating values, we would delete this if statement.</span><br><span class="line">	// That would permit usages such as</span><br><span class="line">	//	-deltaT 10s -deltaT 15s</span><br><span class="line">	// and other combinations.</span><br><span class="line">	if len(*i) &gt; 0 &#123;</span><br><span class="line">		return errors.New(&quot;interval flag already set&quot;)</span><br><span class="line">	&#125;</span><br><span class="line">	for _, dt := range strings.Split(value, &quot;,&quot;) &#123;</span><br><span class="line">		duration, err := time.ParseDuration(dt)</span><br><span class="line">		if err != nil &#123;</span><br><span class="line">			return err</span><br><span class="line">		&#125;</span><br><span class="line">		*i = append(*i, duration)</span><br><span class="line">	&#125;</span><br><span class="line">	return nil</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Define a flag to accumulate durations. Because it has a special type,</span><br><span class="line">// we need to use the Var function and therefore create the flag during</span><br><span class="line">// init.</span><br><span class="line"></span><br><span class="line">var intervalFlag interval</span><br><span class="line"></span><br><span class="line">func init() &#123;</span><br><span class="line">	// Tie the command-line flag to the intervalFlag variable and</span><br><span class="line">	// set a usage message.</span><br><span class="line">	flag.Var(&amp;intervalFlag, &quot;deltaT&quot;, &quot;comma-separated list of intervals to use between events&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	// All the interesting pieces are with the variables declared above, but</span><br><span class="line">	// to enable the flag package to see the flags defined there, one must</span><br><span class="line">	// execute, typically at the start of main (not init!):</span><br><span class="line">	//	flag.Parse()</span><br><span class="line">	// We don&apos;t run it here because this is not a main function and</span><br><span class="line">	// the testing suite has already parsed the flags.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>原文：<a href="https://golang.org/pkg/flag/" target="_blank" rel="noopener">https://golang.org/pkg/flag/</a></p>
 
           
         
@@ -417,7 +439,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/92/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/92/">92</a><span class="page-number current">93</span><a class="page-number" href="/page/94/">94</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/94/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/92/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/92/">92</a><span class="page-number current">93</span><a class="page-number" href="/page/94/">94</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/94/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -463,7 +485,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -374,22 +374,30 @@
 </ul>
 <h2 id="OSD-ERASURE-CODE-PROFILE-SET"><a href="#OSD-ERASURE-CODE-PROFILE-SET" class="headerlink" title="OSD ERASURE-CODE-PROFILE SET"></a>OSD ERASURE-CODE-PROFILE SET</h2><p>创建新的erasure code profile：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile set &#123;name&#125; \</span><br><span class="line">     [&#123;directory=directory&#125;] \</span><br><span class="line">     [&#123;plugin=plugin&#125;] \</span><br><span class="line">     [&#123;stripe_unit=stripe_unit&#125;] \</span><br><span class="line">     [&#123;key=value&#125; ...] \</span><br><span class="line">     [--force]</span><br></pre></td></tr></table></figure>
+
 <p>其中：</p>
 <p>{directory=directory}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	设置加载erasure code plugin的目录名。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	/usr/lib/ceph/erasure-code</span><br></pre></td></tr></table></figure>
+
 <p>{plugin=plugin}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	使用erasure code plugin计算coding chunks和recover missing chunks。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	jerasure</span><br></pre></td></tr></table></figure>
+
 <p>{stripe_unit=stripe_unit}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description:	data chunk中每个stripe的数据量。例如，具有2个data chunks并且StruPeyUng=4K的profile将在chunk 0中放置0-4K，在chunk 1中放置4K-8K，然后再在chunk 0中放置8K-12K。4K的倍数可以获得最佳的性能。当创建pool时，默认值取自monitor config中的osd_pool_erasure_code_stripe_unit。使用此profile的pool的stripe_width将是data chunks数乘以此stripe_unit的数量。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
+
 <p>{key=value}</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description:	其余的key/value对semantic由erasure code plugin定义。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
+
 <p>–force</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description:	以相同的名称覆盖现有的profile，并允许设置非4K对齐的stripe_unit。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
+
 <h2 id="OSD-ERASURE-CODE-PROFILE-RM"><a href="#OSD-ERASURE-CODE-PROFILE-RM" class="headerlink" title="OSD ERASURE-CODE-PROFILE RM"></a>OSD ERASURE-CODE-PROFILE RM</h2><p>删除一个erasure code profile：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile rm &#123;name&#125;</span><br></pre></td></tr></table></figure>
+
 <p>如果profile被某个pool引用，删除将失败。</p>
 <h2 id="OSD-ERASURE-CODE-PROFILE-GET"><a href="#OSD-ERASURE-CODE-PROFILE-GET" class="headerlink" title="OSD ERASURE-CODE-PROFILE GET"></a>OSD ERASURE-CODE-PROFILE GET</h2><p>显示一个erasure code profile：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile get &#123;name&#125;</span><br></pre></td></tr></table></figure>
+
 <h2 id="OSD-ERASURE-CODE-PROFILE-LS"><a href="#OSD-ERASURE-CODE-PROFILE-LS" class="headerlink" title="OSD ERASURE-CODE-PROFILE LS"></a>OSD ERASURE-CODE-PROFILE LS</h2><p>列出所有erasure code profiles的名称：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile ls</span><br></pre></td></tr></table></figure>
       
@@ -544,7 +552,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

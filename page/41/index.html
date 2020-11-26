@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/01/15/redis笔记/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/03/Visual-Studio-Code-常用插件/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/01/15/redis笔记/" itemprop="url">redis笔记</a></h1>
+                <a class="post-title-link" href="/2019/03/03/Visual-Studio-Code-常用插件/" itemprop="url">Visual Studio Code 常用插件</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-15T01:16:51+08:00">
-                2019-01-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-03T18:42:23+08:00">
+                2019-03-03
               </time>
             
 
@@ -358,39 +358,9 @@
       
         
           
-            <p>对于redis的用处不必多说，互联网上有很多资料。文章只做为笔记使用，记录redis操作与学习过程。</p>
-<h1 id="redis安装"><a href="#redis安装" class="headerlink" title="redis安装"></a>redis安装</h1><p>安装redis很简单，<code>https://redis.io/download</code>官方文档有教程。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# wget http://download.redis.io/releases/redis-5.0.3.tar.gz &amp;&amp; tar xzf redis-5.0.3.tar.gz &amp;&amp; cd redis-5.0.3 &amp;&amp; make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
-<h1 id="redis启动方式"><a href="#redis启动方式" class="headerlink" title="redis启动方式"></a>redis启动方式</h1><p>非守护进程启动方式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@centos ~]# redis-server</span><br><span class="line"></span><br><span class="line">或者传递一些配置参数</span><br><span class="line">[root@centos ~]# redis-server --port 6380</span><br></pre></td></tr></table></figure>
-<p>守护进程启动方式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">配置文件中开启daemonize yes</span><br><span class="line">[root@centos ~]# redis-server &lt;configPath&gt;</span><br><span class="line"></span><br><span class="line">[root@centos ~]# mkdir -p /var/log/redis</span><br><span class="line">[root@centos redis-5.0.3]# vim myredis.conf </span><br><span class="line">port 6379</span><br><span class="line">daemonize yes</span><br><span class="line">logfile &quot;redis.log&quot;</span><br><span class="line">dir &quot;/var/log/redis&quot;</span><br><span class="line"></span><br><span class="line">[root@centos redis-5.0.3]# redis-server ./myredis.conf </span><br><span class="line">[root@centos ~]# ps -ef | grep redis</span><br><span class="line">root      2447     1  0 11:01 ?        00:00:00 redis-server *:6379</span><br></pre></td></tr></table></figure>
-<h1 id="redis常用配置"><a href="#redis常用配置" class="headerlink" title="redis常用配置"></a>redis常用配置</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">daemonize	是否是守护进程(no|yes)</span><br><span class="line">port		redis对外端口号</span><br><span class="line">logfile		redis系统日志</span><br><span class="line">dir			redis工作目录</span><br><span class="line"></span><br><span class="line">redis默认端口是6379</span><br></pre></td></tr></table></figure>
-<p>从默认配置文件中导出常用的配置项</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">去掉&quot;#&quot;，去掉空格</span><br><span class="line">[root@centos redis-5.0.3]# cat redis.conf | grep -v &quot;#&quot; | grep -v &quot;^$&quot; &gt; myredis.conf</span><br></pre></td></tr></table></figure>
-<h1 id="redis-API"><a href="#redis-API" class="headerlink" title="redis API"></a>redis API</h1><p>通过<code>redis-cli</code>命令进入客户端，测试API</p>
-<h2 id="通用命令"><a href="#通用命令" class="headerlink" title="通用命令"></a>通用命令</h2><h3 id="通用命令-1"><a href="#通用命令-1" class="headerlink" title="通用命令"></a>通用命令</h3><p>keys [pattern]（一般不在生产环境使用，O(n)，redis单线程会阻塞其他命令）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set hello world</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set php good</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set java best</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys *</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;java&quot;</span><br><span class="line">3) &quot;php&quot;</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; mset 1 1 2 2 3 3 4 4 5 5 12 12 13 13 123 123 1234 1234</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys 1*</span><br><span class="line">1) &quot;1&quot;</span><br><span class="line">2) &quot;12&quot;</span><br><span class="line">3) &quot;13&quot;</span><br><span class="line">4) &quot;123&quot;</span><br><span class="line">5) &quot;1234&quot;</span><br><span class="line">127.0.0.1:6379&gt; keys 1[2-3]*</span><br><span class="line">1) &quot;12&quot;</span><br><span class="line">2) &quot;13&quot;</span><br><span class="line">3) &quot;123&quot;</span><br><span class="line">4) &quot;1234&quot;</span><br><span class="line">127.0.0.1:6379&gt; keys 12?</span><br><span class="line">1) &quot;123&quot;</span><br></pre></td></tr></table></figure>
-<p>dbsize</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; set hello world</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set php good</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; set java best</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; keys *</span><br><span class="line">1) &quot;hello&quot;</span><br><span class="line">2) &quot;java&quot;</span><br><span class="line">3) &quot;php&quot;</span><br><span class="line">127.0.0.1:6379&gt; dbsize</span><br><span class="line">(integer) 3</span><br></pre></td></tr></table></figure>
-<p>exists key</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>del key [key …]</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>expire key seconds</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>type key</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<h3 id="数据结构和内部编码"><a href="#数据结构和内部编码" class="headerlink" title="数据结构和内部编码"></a>数据结构和内部编码</h3><h3 id="单线程架构"><a href="#单线程架构" class="headerlink" title="单线程架构"></a>单线程架构</h3><p>字符串类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>哈希类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>列表类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>集合类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>有序集合类型</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+            <p>Mac下常用插件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1、vscode-icons：根据文件不同类型，显示不同图标</span><br><span class="line">(1)安装后激活：shift + command + p</span><br><span class="line">(2)激活vscode-icons</span><br><span class="line"></span><br><span class="line">2、Project Manager：管理多个项目</span><br><span class="line">(1)首先save项目：shift + command + p --&gt; Project Manager Save Project</span><br><span class="line">(2)可以编辑：shift + command + p --&gt; Project Manager Edit Project</span><br><span class="line">(3)列出所有项目，在不同的项目之间切换：alt + command + p</span><br><span class="line"></span><br><span class="line">3、Code Runner：快速运行测试代码的插件</span><br></pre></td></tr></table></figure>
+
 
           
         
@@ -435,7 +405,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/40/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/40/">40</a><span class="page-number current">41</span><a class="page-number" href="/page/42/">42</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/42/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/40/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/40/">40</a><span class="page-number current">41</span><a class="page-number" href="/page/42/">42</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/42/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -481,7 +451,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

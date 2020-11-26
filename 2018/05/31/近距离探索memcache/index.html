@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="近距离探索memcache缓存笔记 课程地址：https://www.imooc.com/learn/527 课程教师：李虎头 memcache解析1-1内容解析 1231.知道什么是Memcache2.知道在什么时候使用Memcache3.知道怎样使用Memcache优化网站或API 1-2基础介绍 123456Memcache介绍1.什么是Memcache？	分布式高速缓存系统2.Memcac">
+<meta name="description" content="近距离探索memcache缓存笔记 课程地址：https://www.imooc.com/learn/527 课程教师：李虎头 memcache解析1-1内容解析 1231.知道什么是Memcache2.知道在什么时候使用Memcache3.知道怎样使用Memcache优化网站或API  1-2基础介绍 123456Memcache介绍1.什么是Memcache？	分布式高速缓存系统2.Memca">
 <meta name="keywords" content="memcache">
 <meta property="og:type" content="article">
 <meta property="og:title" content="近距离探索memcache缓存">
 <meta property="og:url" content="http://yoursite.com/2018/05/31/近距离探索memcache/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="近距离探索memcache缓存笔记 课程地址：https://www.imooc.com/learn/527 课程教师：李虎头 memcache解析1-1内容解析 1231.知道什么是Memcache2.知道在什么时候使用Memcache3.知道怎样使用Memcache优化网站或API 1-2基础介绍 123456Memcache介绍1.什么是Memcache？	分布式高速缓存系统2.Memcac">
+<meta property="og:description" content="近距离探索memcache缓存笔记 课程地址：https://www.imooc.com/learn/527 课程教师：李虎头 memcache解析1-1内容解析 1231.知道什么是Memcache2.知道在什么时候使用Memcache3.知道怎样使用Memcache优化网站或API  1-2基础介绍 123456Memcache介绍1.什么是Memcache？	分布式高速缓存系统2.Memca">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-03-22T08:16:36.108Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="近距离探索memcache缓存">
-<meta name="twitter:description" content="近距离探索memcache缓存笔记 课程地址：https://www.imooc.com/learn/527 课程教师：李虎头 memcache解析1-1内容解析 1231.知道什么是Memcache2.知道在什么时候使用Memcache3.知道怎样使用Memcache优化网站或API 1-2基础介绍 123456Memcache介绍1.什么是Memcache？	分布式高速缓存系统2.Memcac">
+<meta name="twitter:description" content="近距离探索memcache缓存笔记 课程地址：https://www.imooc.com/learn/527 课程教师：李虎头 memcache解析1-1内容解析 1231.知道什么是Memcache2.知道在什么时候使用Memcache3.知道怎样使用Memcache优化网站或API  1-2基础介绍 123456Memcache介绍1.什么是Memcache？	分布式高速缓存系统2.Memca">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -368,10 +368,13 @@
 <p>课程教师：李虎头</p>
 <h2 id="memcache解析"><a href="#memcache解析" class="headerlink" title="memcache解析"></a>memcache解析</h2><p>1-1内容解析</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.知道什么是Memcache</span><br><span class="line">2.知道在什么时候使用Memcache</span><br><span class="line">3.知道怎样使用Memcache优化网站或API</span><br></pre></td></tr></table></figure>
+
 <p>1-2基础介绍</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Memcache介绍</span><br><span class="line">1.什么是Memcache？</span><br><span class="line">	分布式高速缓存系统</span><br><span class="line"></span><br><span class="line">2.Memcache有什么用？</span><br><span class="line">	缓存层，前端频繁操作后端数据库时，减轻后端数据库压力，前端直接访问缓存层</span><br></pre></td></tr></table></figure>
+
 <p>1-3理解Memcache</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">只有一张表的数据库</span><br></pre></td></tr></table></figure>
+
 <table>
 <thead>
 <tr>
@@ -381,8 +384,7 @@
 <th>整理</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>1</td>
 <td>key</td>
 <td>varchar(255)</td>
@@ -394,16 +396,19 @@
 <td>text</td>
 <td>utf8_general_ci</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <p>1-4使用场景</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.非持久化存储：对数据存储要求不高</span><br><span class="line">2.分布式存储：不适合单机使用</span><br><span class="line">3.Key/Value存储：格式简单，不支持List、Array数据格式</span><br></pre></td></tr></table></figure>
+
 <h2 id="memcache的安装"><a href="#memcache的安装" class="headerlink" title="memcache的安装"></a>memcache的安装</h2><p>2-1安装前的说明</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1.编译安装 Libevent Memcache(需要先安装Libevent依赖)</span><br><span class="line">2.使用依赖管理工具yum、apt-get</span><br><span class="line">-PS：Memcache和Memcached的区别(建议使用Memcached，它是Memcache的升级版)</span><br></pre></td></tr></table></figure>
+
 <p>2-2安装服务端实际操作</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">1.编译安装</span><br><span class="line">yum -y install automake libtool wget gcc gcc-c++ &amp;&amp; wget https://github.com/libevent/libevent/archive/release-2.1.8-stable.tar.gz &amp;&amp; tar zxvf release-2.1.8-stable.tar.gz &amp;&amp; cd libevent-release-2.1.8-stable/ &amp;&amp; ./autogen.sh &amp;&amp; ./configure &amp;&amp; make -j 2 &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">wget http://www.memcached.org/files/memcached-1.5.8.tar.gz &amp;&amp; cd memcached-1.5.8 &amp;&amp; ./configure &amp;&amp; make -j 2 &amp;&amp; make install</span><br><span class="line"></span><br><span class="line">[root@cephL memcached-1.5.8]# /usr/local/bin/memcached -h</span><br><span class="line">/usr/local/bin/memcached: error while loading shared libraries: libevent-2.1.so.6: cannot open shared object file: No such file or directory</span><br><span class="line">[root@cephL memcached-1.5.8]# ldd /usr/local/bin/memcached </span><br><span class="line">	linux-vdso.so.1 =&gt;  (0x00007ffdd7d77000)</span><br><span class="line">	libevent-2.1.so.6 =&gt; not found</span><br><span class="line">	libpthread.so.0 =&gt; /lib64/libpthread.so.0 (0x00007f2d78950000)</span><br><span class="line">	libc.so.6 =&gt; /lib64/libc.so.6 (0x00007f2d78583000)</span><br><span class="line">	/lib64/ld-linux-x86-64.so.2 (0x000055b9e254c000)</span><br><span class="line">[root@cephL memcached-1.5.8]# LD_DEBUG=libs /usr/local/bin/memcached -v</span><br><span class="line">     51494:	find library=libevent-2.1.so.6 [0]; searching</span><br><span class="line">     51494:	 search cache=/etc/ld.so.cache</span><br><span class="line">     51494:	 search path=/lib64/tls/x86_64:/lib64/tls:/lib64/x86_64:/lib64:/usr/lib64/tls/x86_64:/usr/lib64/tls:/usr/lib64/x86_64:/usr/lib64		(system search path)</span><br><span class="line">     51494:	  trying file=/lib64/tls/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/lib64/tls/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/lib64/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/lib64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/tls/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/tls/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/x86_64/libevent-2.1.so.6</span><br><span class="line">     51494:	  trying file=/usr/lib64/libevent-2.1.so.6</span><br><span class="line">     51494:	</span><br><span class="line">/usr/local/bin/memcached: error while loading shared libraries: libevent-2.1.so.6: cannot open shared object file: No such file or directory</span><br><span class="line">[root@cephL memcached-1.5.8]# ll /usr/local/lib/libevent-2.1.so.6</span><br><span class="line">lrwxrwxrwx. 1 root root 21 5月  29 18:48 /usr/local/lib/libevent-2.1.so.6 -&gt; libevent-2.1.so.6.0.2</span><br><span class="line">[root@cephL memcached-1.5.8]# ln -s /usr/local/lib/libevent-2.1.so.6 /usr/lib64/libevent-2.1.so.6</span><br><span class="line">[root@cephL memcached-1.5.8]# /usr/local/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br><span class="line">[root@cephL memcached-1.5.8]# ps -ef | grep memcache</span><br><span class="line">root       51810       1  0 19:04 ?        00:00:00 /usr/local/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br><span class="line"></span><br><span class="line">2.使用yum安装</span><br><span class="line">[root@cephL memcache]# yum install memcached</span><br><span class="line">[root@cephL memcache]# /usr/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br><span class="line"></span><br><span class="line">[root@cephL memcache]# ps -ef | grep memcache</span><br><span class="line">root       40789       1  0 18:34 ?        00:00:00 /usr/bin/memcached -d -l 127.0.0.1 -p 11211 -m 150 -u root</span><br></pre></td></tr></table></figure>
+
 <p>2-3客户端的安装</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1.安装libmemcached</span><br><span class="line">wget https://launchpad.net/libmemcached/1.0/1.0.18/+download/libmemcached-1.0.18.tar.gz</span><br><span class="line">tar zxvf libmemcached-1.0.18.tar.gz &amp;&amp; cd libmemcached-1.0.18</span><br><span class="line">./configure --prefix=/usr/lib/libmemcached</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -557,7 +562,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

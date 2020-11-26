@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="Python pipPython pip安装 12345yum -y install python-setuptoolseasy install pip或者curl &amp;quot;https://bootstrap.pypa.io/get-pip.py&amp;quot; -o &amp;quot;get-pip.py&amp;quot;python get-pip.py Python pip更新包 12345pip in">
+<meta name="description" content="Python pipPython pip安装 12345yum -y install python-setuptoolseasy install pip或者curl &amp;quot;https://bootstrap.pypa.io/get-pip.py&amp;quot; -o &amp;quot;get-pip.py&amp;quot;python get-pip.py  Python pip更新包 12345pip i">
 <meta name="keywords" content="Linux">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux常用操作">
 <meta property="og:url" content="http://yoursite.com/2019/07/02/Linux常用操作/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="Python pipPython pip安装 12345yum -y install python-setuptoolseasy install pip或者curl &amp;quot;https://bootstrap.pypa.io/get-pip.py&amp;quot; -o &amp;quot;get-pip.py&amp;quot;python get-pip.py Python pip更新包 12345pip in">
+<meta property="og:description" content="Python pipPython pip安装 12345yum -y install python-setuptoolseasy install pip或者curl &amp;quot;https://bootstrap.pypa.io/get-pip.py&amp;quot; -o &amp;quot;get-pip.py&amp;quot;python get-pip.py  Python pip更新包 12345pip i">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-07-17T04:05:46.993Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Linux常用操作">
-<meta name="twitter:description" content="Python pipPython pip安装 12345yum -y install python-setuptoolseasy install pip或者curl &amp;quot;https://bootstrap.pypa.io/get-pip.py&amp;quot; -o &amp;quot;get-pip.py&amp;quot;python get-pip.py Python pip更新包 12345pip in">
+<meta name="twitter:description" content="Python pipPython pip安装 12345yum -y install python-setuptoolseasy install pip或者curl &amp;quot;https://bootstrap.pypa.io/get-pip.py&amp;quot; -o &amp;quot;get-pip.py&amp;quot;python get-pip.py  Python pip更新包 12345pip i">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -365,26 +365,39 @@
 </script>
         <h3 id="Python-pip"><a href="#Python-pip" class="headerlink" title="Python pip"></a>Python pip</h3><p>Python pip安装</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum -y install python-setuptools</span><br><span class="line">easy install pip</span><br><span class="line">或者</span><br><span class="line">curl &quot;https://bootstrap.pypa.io/get-pip.py&quot; -o &quot;get-pip.py&quot;</span><br><span class="line">python get-pip.py</span><br></pre></td></tr></table></figure>
+
 <p>Python pip更新包</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">pip install --upgrade setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line"></span><br><span class="line">更新包是遇到类似问题，需要重新装</span><br><span class="line">ERROR: Cannot uninstall &apos;pyparsing&apos;. It is a distutils installed project and thus we cannot accurately determine which files belong to it which would lead to only a partial uninstall.</span><br><span class="line">sudo pip install -I tox -i https://pypi.tuna.tsinghua.edu.cn/simple</span><br></pre></td></tr></table></figure>
+
 <p>Python pip国内源指定</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">pip install setuptools -i https://pypi.tuna.tsinghua.edu.cn/simple</span><br><span class="line"></span><br><span class="line">或者在 ~/.pip/pip.conf 中添加</span><br><span class="line">[global]</span><br><span class="line">index-url=http://pypi.douban.com/simple/</span><br><span class="line">#index-url=https://pypi.tuna.tsinghua.edu.cn/simple</span><br></pre></td></tr></table></figure>
+
 <p>Python开源项目编译安装</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1、下载开源项目源代码</span><br><span class="line">2、安装依赖</span><br><span class="line">pip install -r requirements.txt</span><br><span class="line">3、安装开源项目</span><br><span class="line">python setup.py install</span><br></pre></td></tr></table></figure>
+
 <p>Python安装.whl文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install some-package.whl</span><br></pre></td></tr></table></figure>
+
 <p>安装python3</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum -y install python36 python36-tools</span><br><span class="line"></span><br><span class="line">安装python3的pip</span><br><span class="line">curl &quot;https://bootstrap.pypa.io/get-pip.py&quot; -o &quot;get-pip.py&quot;</span><br><span class="line">python3.6 get-pip.py</span><br></pre></td></tr></table></figure>
+
 <h3 id="Centos-7升级GCC-7"><a href="#Centos-7升级GCC-7" class="headerlink" title="Centos 7升级GCC 7"></a>Centos 7升级GCC 7</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1、确定g++默认使用的C++标准：</span><br><span class="line">g++ -dM -E -x c++ /dev/null | grep -F __cplusplus</span><br><span class="line"></span><br><span class="line">2、安装devtoolset-7</span><br><span class="line">yum install -y centos-release-scl &amp;&amp; yum install -y devtoolset-7-gcc-c++</span><br><span class="line"></span><br><span class="line">3、使用GCC 7</span><br><span class="line">scl enable devtoolset-7 bash</span><br></pre></td></tr></table></figure>
+
 <h3 id="Centos安装扩展源"><a href="#Centos安装扩展源" class="headerlink" title="Centos安装扩展源"></a>Centos安装扩展源</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y epel-release</span><br></pre></td></tr></table></figure>
+
 <h3 id="Linux批量创建嵌套目录"><a href="#Linux批量创建嵌套目录" class="headerlink" title="Linux批量创建嵌套目录"></a>Linux批量创建嵌套目录</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -pv roles/vdbench/&#123;tasks,templates,meta,defaults,vars,files,plugins,handler&#125;</span><br></pre></td></tr></table></figure>
+
 <h3 id="压缩"><a href="#压缩" class="headerlink" title="压缩"></a>压缩</h3><ul>
 <li>tar.gz格式</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">压缩（把ceph-14.2.1目录压缩为ceph-14.2.1.tar.gz）：tar zcf ceph-14.2.1.tar.gz ceph-14.2.1</span><br><span class="line">解压缩：tar zxf ceph-14.2.1.tar.gz</span><br></pre></td></tr></table></figure>
+
 <h3 id="iperf检查网络带宽"><a href="#iperf检查网络带宽" class="headerlink" title="iperf检查网络带宽"></a>iperf检查网络带宽</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sudo yum install -y epel-release</span><br><span class="line">sudo yum install -y iperf</span><br><span class="line">服务端</span><br><span class="line">	iperf -s -p 12345 -i 1 -M</span><br><span class="line">客户端</span><br><span class="line">	iperf -c 192.168.1.10 -p 12345 -i 1 -t 600 -w 100M</span><br></pre></td></tr></table></figure>
+
 <h3 id="ubuntu-1804添加repository"><a href="#ubuntu-1804添加repository" class="headerlink" title="ubuntu 1804添加repository"></a>ubuntu 1804添加repository</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line">sudo apt install software-properties-common</span><br><span class="line">sudo add-apt-repository --yes --update ppa:ansible/ansible-2.8	（ 或 sudo apt-add-repository --yes --update ppa:ansible/ansible ）</span><br><span class="line">sudo apt install ansible</span><br><span class="line"></span><br><span class="line">repository站点地址</span><br><span class="line">https://launchpad.net/~ansible/+archive/ubuntu/ansible-2.8</span><br></pre></td></tr></table></figure>
+
 <h3 id="查看硬盘类型"><a href="#查看硬盘类型" class="headerlink" title="查看硬盘类型"></a>查看硬盘类型</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cat /sys/block/sda/queue/rotational</span><br><span class="line">0为ssd，1为hdd</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -538,7 +551,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

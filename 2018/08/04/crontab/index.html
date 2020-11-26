@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="课程地址：https://www.imooc.com/learn/1009 安装1yum install cronie crontabs -y 验证CROND服务验证crond服务和crontab工具（centos7) 检查crond服务是否安装及启动： 1yum list cronie &amp;amp;&amp;amp; systemctl status crond 检查crontab工具是否安装： 1yum">
+<meta name="description" content="课程地址：https://www.imooc.com/learn/1009 安装1yum install cronie crontabs -y  验证CROND服务验证crond服务和crontab工具（centos7) 检查crond服务是否安装及启动： 1yum list cronie &amp;amp;&amp;amp; systemctl status crond  检查crontab工具是否安装： 1y">
 <meta name="keywords" content="crontab">
 <meta property="og:type" content="article">
 <meta property="og:title" content="crontab">
 <meta property="og:url" content="http://yoursite.com/2018/08/04/crontab/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="课程地址：https://www.imooc.com/learn/1009 安装1yum install cronie crontabs -y 验证CROND服务验证crond服务和crontab工具（centos7) 检查crond服务是否安装及启动： 1yum list cronie &amp;amp;&amp;amp; systemctl status crond 检查crontab工具是否安装： 1yum">
+<meta property="og:description" content="课程地址：https://www.imooc.com/learn/1009 安装1yum install cronie crontabs -y  验证CROND服务验证crond服务和crontab工具（centos7) 检查crond服务是否安装及启动： 1yum list cronie &amp;amp;&amp;amp; systemctl status crond  检查crontab工具是否安装： 1y">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-03-22T08:16:36.058Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="crontab">
-<meta name="twitter:description" content="课程地址：https://www.imooc.com/learn/1009 安装1yum install cronie crontabs -y 验证CROND服务验证crond服务和crontab工具（centos7) 检查crond服务是否安装及启动： 1yum list cronie &amp;amp;&amp;amp; systemctl status crond 检查crontab工具是否安装： 1yum">
+<meta name="twitter:description" content="课程地址：https://www.imooc.com/learn/1009 安装1yum install cronie crontabs -y  验证CROND服务验证crond服务和crontab工具（centos7) 检查crond服务是否安装及启动： 1yum list cronie &amp;amp;&amp;amp; systemctl status crond  检查crontab工具是否安装： 1y">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -365,27 +365,39 @@
 </script>
         <p>课程地址：<a href="https://www.imooc.com/learn/1009" target="_blank" rel="noopener">https://www.imooc.com/learn/1009</a></p>
 <h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install cronie crontabs -y</span><br></pre></td></tr></table></figure>
+
 <h3 id="验证CROND服务"><a href="#验证CROND服务" class="headerlink" title="验证CROND服务"></a>验证CROND服务</h3><p>验证crond服务和crontab工具（centos7)</p>
 <p>检查crond服务是否安装及启动：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum list cronie &amp;&amp; systemctl status crond</span><br></pre></td></tr></table></figure>
+
 <p>检查crontab工具是否安装：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum list crontabs &amp;&amp; which crontab &amp;&amp; crontab -l</span><br></pre></td></tr></table></figure>
+
 <h3 id="CRONTAB架构"><a href="#CRONTAB架构" class="headerlink" title="CRONTAB架构"></a>CRONTAB架构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">   文件                              解析                              守护进程</span><br><span class="line">                                 crontab工具</span><br><span class="line">* * * * *                        ==========&gt;                            CROND</span><br><span class="line">my command</span><br><span class="line">按照格式编写定时任务                                            定时检查是否有任务需要执行</span><br></pre></td></tr></table></figure>
+
 <p>例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(1)编辑任务列表</span><br><span class="line">crontab -e</span><br><span class="line">(2)查看任务列表</span><br><span class="line">crontab -l</span><br><span class="line">(3)重启crond服务，查看crond服务状态</span><br><span class="line">systemctl restart crond</span><br><span class="line">systemctl status crond</span><br></pre></td></tr></table></figure>
+
 <h3 id="CRONTAB文件格式"><a href="#CRONTAB文件格式" class="headerlink" title="CRONTAB文件格式"></a>CRONTAB文件格式</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">*  *  *  *  *     my command</span><br><span class="line">分 时 日 月 周     要运行的命令</span><br><span class="line"></span><br><span class="line">分：范围0-59</span><br><span class="line">时：范围0-23</span><br><span class="line">日：范围1-31</span><br><span class="line">月：范围1-12</span><br><span class="line">周：范围0-6</span><br><span class="line">my command：范围命令或脚本</span><br><span class="line"></span><br><span class="line">*：取值范围内的数字，通常代表对应时间区间内所涵盖的所有数字</span><br><span class="line">/：代表每，通常与*组合。例如2/*在&quot;分&quot;这个占位符中代表每两分钟，5/*在&quot;时&quot;这个占位符代表每5个小时</span><br><span class="line">-：代表某个数字到某个数字之间的区间，2-10在&quot;分&quot;占位符中代表第2分钟到第10分钟</span><br><span class="line">,：分开几个离散的数字。2,10 代表第2分钟和第10分钟</span><br><span class="line"></span><br><span class="line">例子：</span><br><span class="line">	crontab -e</span><br><span class="line">	* * * * * echo -e &quot;Hello&quot; &gt; /root/crontabtest.output</span><br></pre></td></tr></table></figure>
+
 <h3 id="CRONTAB配置文件"><a href="#CRONTAB配置文件" class="headerlink" title="CRONTAB配置文件"></a>CRONTAB配置文件</h3><p>系统配置文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">############### /etc/crontab ###############</span><br><span class="line">SHELL=/bin/bash</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line">MAILTO=root</span><br><span class="line"></span><br><span class="line"># For details see man 4 crontabs</span><br><span class="line"></span><br><span class="line"># Example of job definition:</span><br><span class="line"># .---------------- minute (0 - 59)</span><br><span class="line"># |  .------------- hour (0 - 23)</span><br><span class="line"># |  |  .---------- day of month (1 - 31)</span><br><span class="line"># |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...</span><br><span class="line"># |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat</span><br><span class="line"># |  |  |  |  |</span><br><span class="line"># *  *  *  *  * user-name  command to be executed</span><br></pre></td></tr></table></figure>
+
 <p>系统用户crontab配置文件保存目录（crontab -e）</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">############### /var/spool/cron/ ###############</span><br><span class="line">文件以linux用户区分</span><br><span class="line">root：/var/spool/cron/root</span><br><span class="line">user01：/var/spool/cron/user01</span><br></pre></td></tr></table></figure>
+
 <h3 id="CRONTAB环境变量"><a href="#CRONTAB环境变量" class="headerlink" title="CRONTAB环境变量"></a>CRONTAB环境变量</h3><p>添加PATH到/etc/crontab</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">############### /etc/crontab ###############</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/jdk1.8.0_111/bin</span><br><span class="line"></span><br><span class="line">* * * * * root java -version 2&gt; /root/temp.out</span><br></pre></td></tr></table></figure>
+
 <p>在执行具体任务前引入系统/用户环境变量（推荐）</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">30 2 * * * source /etc/profile;sh /root/test.sh</span><br><span class="line">30 2 * * * source ~/.bash_profile;sh /root/test.sh</span><br><span class="line">systemctl restart crond</span><br></pre></td></tr></table></figure>
+
 <h3 id="CRONTAB日志"><a href="#CRONTAB日志" class="headerlink" title="CRONTAB日志"></a>CRONTAB日志</h3><p>Cron日志保存在系统目录/var/log/cron</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -n 2 /var/log/cron</span><br></pre></td></tr></table></figure>
+
 <h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><p>CRONTAB清理系统日志</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">查看当前目录所有文件大小</span><br><span class="line"># du -sh *</span><br><span class="line">* 1 * * * cat /dev/null &gt; /var/log/messages</span><br></pre></td></tr></table></figure>
+
 
       
     </div>
@@ -539,7 +551,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

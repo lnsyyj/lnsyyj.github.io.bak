@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/18/SHEC-ERASURE-CODE-PLUGIN/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/19/CEPH-VOLUME/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2018/05/18/SHEC-ERASURE-CODE-PLUGIN/" itemprop="url">SHEC ERASURE CODE PLUGIN</a></h1>
+                <a class="post-title-link" href="/2018/05/19/CEPH-VOLUME/" itemprop="url">CEPH-VOLUME</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-18T14:56:32+08:00">
-                2018-05-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-19T19:19:32+08:00">
+                2018-05-19
               </time>
             
 
@@ -358,32 +358,61 @@
       
         
           
-            <p>shec plugin封装了<a href="http://tracker.ceph.com/projects/ceph/wiki/Shingled_Erasure_Code_(SHEC" target="_blank" rel="noopener">multiple SHEC</a>)库。它允许ceph比Reed Solomon codes更有效地恢复数据。</p>
-<h2 id="CREATE-AN-SHEC-PROFILE"><a href="#CREATE-AN-SHEC-PROFILE" class="headerlink" title="CREATE AN SHEC PROFILE"></a>CREATE AN SHEC PROFILE</h2><p>创建一个新的shec erasure code profile：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ceph osd erasure-code-profile set &#123;name&#125; \</span><br><span class="line">     plugin=shec \</span><br><span class="line">     [k=&#123;data-chunks&#125;] \</span><br><span class="line">     [m=&#123;coding-chunks&#125;] \</span><br><span class="line">     [c=&#123;durability-estimator&#125;] \</span><br><span class="line">     [crush-root=&#123;root&#125;] \</span><br><span class="line">     [crush-failure-domain=&#123;bucket-type&#125;] \</span><br><span class="line">     [crush-device-class=&#123;device-class&#125;] \</span><br><span class="line">     [directory=&#123;directory&#125;] \</span><br><span class="line">     [--force]</span><br></pre></td></tr></table></figure>
-<p>其中：</p>
-<p>k={data-chunks}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	每个object都分为多个data-chunks parts，每个part存储在不同的OSD上。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	4</span><br></pre></td></tr></table></figure>
-<p>m={coding-chunks}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	计算每个object的coding chunks并将它们存储在不同的OSD上。coding chunks的数量也是在不丢失数据的情况下，允许损失OSD的数量。</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	3</span><br></pre></td></tr></table></figure>
-<p>c={durability-estimator}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Description:	校验chunk的数量，每个data chunk都包含在计算范围内。该数字被用作耐久性估算。例如，如果c = 2，则可以在不丢失数据的情况下down掉2个OSD。</span><br><span class="line">The number of parity chunks each of which includes each data chunk in its calculation range. The number is used as a durability estimator. For instance, if c=2, 2 OSDs can be down without losing data.</span><br><span class="line">Type:	Integer</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	2</span><br></pre></td></tr></table></figure>
-<p>crush-root={root}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	crush bucket名字用于CRUSH rule的first step。&quot;take&quot;为step的默认值。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	default</span><br></pre></td></tr></table></figure>
-<p>crush-failure-domain={bucket-type}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	确保不要有两个chunks位于相同故障域的bucket中。例如，如果故障域是host，则不会在同一主机上存储两个chunks。它用于创建CRUSH rule step，比如step chooseleaf host。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	host</span><br></pre></td></tr></table></figure>
-<p>crush-device-class={device-class}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	使用CRUSH map中的crush device class名称，限定存储到特定class devices（例如SSD或HDD）。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:</span><br></pre></td></tr></table></figure>
-<p>directory={directory}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Description:	设置加载erasure code plugin的目录名。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br><span class="line">Default:	/usr/lib/ceph/erasure-code</span><br></pre></td></tr></table></figure>
-<p>–force</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description:	用相同的名称覆盖已有的profile。</span><br><span class="line">Type:	String</span><br><span class="line">Required:	No.</span><br></pre></td></tr></table></figure>
-<h2 id="BRIEF-DESCRIPTION-OF-SHEC’S-LAYOUTS"><a href="#BRIEF-DESCRIPTION-OF-SHEC’S-LAYOUTS" class="headerlink" title="BRIEF DESCRIPTION OF SHEC’S LAYOUTS"></a>BRIEF DESCRIPTION OF SHEC’S LAYOUTS</h2><h3 id="SPACE-EFFICIENCY"><a href="#SPACE-EFFICIENCY" class="headerlink" title="SPACE EFFICIENCY"></a>SPACE EFFICIENCY</h3><p>Space efficiency是data chunks与object中所有chunks的比率，表示为k /（k + m）。为了提高space efficiency，您应该增加k或减少m。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">space efficiency of SHEC(4,3,2) = 4/(4+3) = 0.57</span><br><span class="line">SHEC(5,3,2) or SHEC(4,2,2) improves SHEC(4,3,2)&apos;s space efficiency</span><br></pre></td></tr></table></figure>
-<h3 id="DURABILITY"><a href="#DURABILITY" class="headerlink" title="DURABILITY"></a>DURABILITY</h3><p>SHEC（= c）的第三个参数是一个耐久性估算，它近似于在不丢失数据的情况下可以丢失OSD的数量。SHEC（4,3,2）的耐久性估算= 2</p>
-<h3 id="RECOVERY-EFFICIENCY"><a href="#RECOVERY-EFFICIENCY" class="headerlink" title="RECOVERY EFFICIENCY"></a>RECOVERY EFFICIENCY</h3><p>描述recovery efficiency的计算超出了本文件的范围，但至少在不增加c的情况下增加m可以提高恢复效率。（但是，在这种情况下，我们必须牺牲space efficiency。）</p>
-<p>SHEC（4,2,2）→SHEC（4,3,2）：提高了recovery efficiency</p>
-<h2 id="ERASURE-CODE-PROFILE-EXAMPLES"><a href="#ERASURE-CODE-PROFILE-EXAMPLES" class="headerlink" title="ERASURE CODE PROFILE EXAMPLES"></a>ERASURE CODE PROFILE EXAMPLES</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd erasure-code-profile set SHECprofile \</span><br><span class="line">     plugin=shec \</span><br><span class="line">     k=8 m=4 c=3 \</span><br><span class="line">     crush-failure-domain=host</span><br><span class="line">$ ceph osd pool create shecpool 256 256 erasure SHECprofile</span><br></pre></td></tr></table></figure>
+            <h1 id="CEPH-VOLUME"><a href="#CEPH-VOLUME" class="headerlink" title="CEPH-VOLUME"></a>CEPH-VOLUME</h1><p>使用pluggable（可插拔）工具将 OSDs 与 lvm 或physical disks等不同的device技术部署在一起（<a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/" target="_blank" rel="noopener">lvm</a>本身被视为plugin）, 并尝试采用predictable、robust的方法来preparing、activating和starting OSDs。</p>
+<p><a href="http://docs.ceph.com/docs/master/ceph-volume/intro/#ceph-volume-overview" target="_blank" rel="noopener">Overview</a>|<a href="http://docs.ceph.com/docs/master/dev/ceph-volume/plugins/#ceph-volume-plugins" target="_blank" rel="noopener">Plugin Guide</a></p>
+<h3 id="Command-Line-Subcommands"><a href="#Command-Line-Subcommands" class="headerlink" title="Command Line Subcommands"></a>Command Line Subcommands</h3><p>目前支持<code>lvm</code>，以及已经使用<code>ceph-disk</code>部署的普通磁盘（带有GPT分区）。</p>
+<ul>
+<li><p><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/#ceph-volume-lvm" target="_blank" rel="noopener">lvm</a></p>
+</li>
+<li><p><a href="http://docs.ceph.com/docs/master/ceph-volume/simple/#ceph-volume-simple" target="_blank" rel="noopener">simple</a></p>
+</li>
+</ul>
+<h3 id="Node-inventory"><a href="#Node-inventory" class="headerlink" title="Node inventory"></a>Node inventory</h3><p><a href="http://docs.ceph.com/docs/master/ceph-volume/inventory/#ceph-volume-inventory" target="_blank" rel="noopener">inventory</a>子命令提供有关节点物理磁盘inventory（清单）的信息和元数据。</p>
+<h1 id="MIGRATING"><a href="#MIGRATING" class="headerlink" title="MIGRATING"></a>MIGRATING</h1><p>从Ceph版本13.0.0开始，不推荐使用ceph-disk。弃用警告中的link会链接到此页面。强烈建议用户开始使用ceph-volume。有两种迁移途径：</p>
+<p>1、保留使用ceph-disk部署的OSD：<a href="http://docs.ceph.com/docs/master/ceph-volume/simple/#ceph-volume-simple" target="_blank" rel="noopener">simple</a> 命令在禁用ceph-disk触发的同时，提供了接管管理的方法。</p>
+<p>2、用ceph-volume重新部署现存的OSD：详细信息请参照 <a href="http://docs.ceph.com/docs/master/rados/operations/add-or-rm-osds/#rados-replacing-an-osd" target="_blank" rel="noopener">Replacing an OSD</a></p>
+<p>有关为何删除ceph-disk的详细信息，请参阅<a href="http://docs.ceph.com/docs/master/ceph-volume/intro/#ceph-disk-replaced" target="_blank" rel="noopener">Why was ceph-disk replaced?</a> 章节。</p>
+<h3 id="NEW-DEPLOYMENTS"><a href="#NEW-DEPLOYMENTS" class="headerlink" title="NEW DEPLOYMENTS"></a>NEW DEPLOYMENTS</h3><p>对于新的部署，推荐使用<a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/#ceph-volume-lvm" target="_blank" rel="noopener">lvm</a>，它可以使用任何logical volume作为data OSD 的输入, 也可以从device中设置minimal/naive logical volume。</p>
+<h3 id="EXISTING-OSDS"><a href="#EXISTING-OSDS" class="headerlink" title="EXISTING OSDS"></a>EXISTING OSDS</h3><p>如果群集已经具有ceph-disk提供的OSDs，则ceph-volume可以用<a href="http://docs.ceph.com/docs/master/ceph-volume/simple/#ceph-volume-simple" target="_blank" rel="noopener">simple</a>的方式接管。在data device或OSD directory上完成扫描，并且ceph-disk被完全禁用。完全支持加密。</p>
+<h1 id="LVM"><a href="#LVM" class="headerlink" title="LVM"></a>LVM</h1><p>实现此功能需要通过lvm子命令来部署OSDs：<code>ceph-volume lvm</code></p>
+<h2 id="Command-Line-Subcommands-1"><a href="#Command-Line-Subcommands-1" class="headerlink" title="Command Line Subcommands"></a>Command Line Subcommands</h2><h3 id="prepare"><a href="#prepare" class="headerlink" title="prepare"></a>prepare</h3><p><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/prepare/#ceph-volume-lvm-prepare" target="_blank" rel="noopener">prepare</a></p>
+<p>该子命令允许<a href="http://docs.ceph.com/docs/master/glossary/#term-filestore" target="_blank" rel="noopener">filestore</a>或<a href="http://docs.ceph.com/docs/master/glossary/#term-bluestore" target="_blank" rel="noopener">bluestore</a>设置。 建议在使用<code>ceph-volume lvm</code>之前预先配置逻辑卷。除添加额外元数据外，逻辑卷不会改变。</p>
+<p>为了帮助识别volumes，preparing的过程中该工具使用<a href="http://docs.ceph.com/docs/master/glossary/#term-lvm-tags" target="_blank" rel="noopener">LVM tags</a>分配一些元数据信息。</p>
+<p><a href="http://docs.ceph.com/docs/master/glossary/#term-lvm-tags" target="_blank" rel="noopener">LVM tags</a>使volume易于发现，帮助识别它们作为Ceph系统的一部分，扮演着什么角色（journal, filestore, bluestore, etc…）</p>
+<p>虽然最初支持<a href="http://docs.ceph.com/docs/master/glossary/#term-filestore" target="_blank" rel="noopener">filestore</a>（默认情况下支持），但可以使用以下命令指定：</p>
+<ul>
+<li><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/prepare/#ceph-volume-lvm-prepare-filestore" target="_blank" rel="noopener">–filestore</a></li>
+<li><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/prepare/#ceph-volume-lvm-prepare-bluestore" target="_blank" rel="noopener">–bluestore</a></li>
+</ul>
+<p><strong>FILESTORE</strong></p>
+<p>这是OSD backend，允许为<a href="http://docs.ceph.com/docs/master/glossary/#term-filestore" target="_blank" rel="noopener">filestore</a> objectstore OSD 准备逻辑卷。</p>
+<p>它可以使用逻辑卷作为OSD data和带分区的physical device或逻辑卷作为journal。除了遵循data和journal的最小大小要求外,这些卷不需要特殊准备。</p>
+<p>API调用如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-volume lvm prepare --filestore --data volume_group/lv_name --journal journal</span><br></pre></td></tr></table></figure>
+
+<p>启用<a href="http://docs.ceph.com/docs/mimic/ceph-volume/lvm/encryption/#ceph-volume-lvm-encryption" target="_blank" rel="noopener">encryption</a>（加密），需要使用–dmcrypt标志：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-volume lvm prepare --filestore --dmcrypt --data volume_group/lv_name --journal journal</span><br></pre></td></tr></table></figure>
+
+<p><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/activate/#ceph-volume-lvm-activate" target="_blank" rel="noopener">activate</a></p>
+<p><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/create/#ceph-volume-lvm-create" target="_blank" rel="noopener">create</a></p>
+<p><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/list/#ceph-volume-lvm-list" target="_blank" rel="noopener">list</a></p>
+<h3 id="Internal-functionality"><a href="#Internal-functionality" class="headerlink" title="Internal functionality"></a>Internal functionality</h3><p>lvm子命令的其他部分是internal的，不向用户公开，这些部分解释了如何协同工作，阐明了工具的工作流程。</p>
+<p><a href="http://docs.ceph.com/docs/master/ceph-volume/lvm/systemd/#ceph-volume-lvm-systemd" target="_blank" rel="noopener">Systemd Units</a> | <a href="http://docs.ceph.com/docs/master/dev/ceph-volume/lvm/#ceph-volume-lvm-api" target="_blank" rel="noopener">lvm</a></p>
+<h1 id="SIMPLE"><a href="#SIMPLE" class="headerlink" title="SIMPLE"></a>SIMPLE</h1><p>实现此功能需要通过simple子命令来管理OSD：<code>ceph-volume simple</code></p>
+<h3 id="Command-Line-Subcommands-2"><a href="#Command-Line-Subcommands-2" class="headerlink" title="Command Line Subcommands"></a>Command Line Subcommands</h3><ul>
+<li><a href="http://docs.ceph.com/docs/master/ceph-volume/simple/scan/#ceph-volume-simple-scan" target="_blank" rel="noopener">scan</a></li>
+<li><a href="http://docs.ceph.com/docs/master/ceph-volume/simple/activate/#ceph-volume-simple-activate" target="_blank" rel="noopener">activate</a></li>
+<li><a href="http://docs.ceph.com/docs/master/ceph-volume/simple/systemd/#ceph-volume-simple-systemd" target="_blank" rel="noopener">systemd</a></li>
+</ul>
+<p>通过接管管理，它会disable所有用于在startup时触发device的ceph-disk systemd units，依赖基本的（可定制的）JSON配置和systemd来启动OSD。</p>
+<p>此过程包括两个步骤：</p>
+<p>1、<a href="http://docs.ceph.com/docs/master/ceph-volume/simple/scan/#ceph-volume-simple-scan" target="_blank" rel="noopener">Scan</a>（扫描）正在运行的OSD或data device</p>
+<p>2、<a href="http://docs.ceph.com/docs/master/ceph-volume/simple/activate/#ceph-volume-simple-activate" target="_blank" rel="noopener">Activate</a>（激活）扫描的OSD</p>
+<p>扫描将推断出ceph-volume启动OSD所需的所有内容，因此当需要激活时，OSD可以正常启动而不会受到来自ceph-disk的干扰。</p>
+<p>作为激活过程的一部分，负责对udev事件作出反应的ceph-disk的systemd units链接到/dev/null，以便它们完全处于非活动状态。</p>
+<h1 id="备注"><a href="#备注" class="headerlink" title="备注"></a>备注</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">ceph-volume lvm（使用LVM和LVM-based技术，像dmcache去部署OSD）</span><br><span class="line">1、activate                 Discover and mount the LVM device associated with an OSD ID and start the Ceph OSD（Discover并mount与OSD ID关联的LVM设备，然后启动Ceph OSD）</span><br><span class="line">2、prepare                  Format an LVM device and associate it with an OSD（Format LVM device并将其与OSD关联）</span><br><span class="line">3、create                   Create a new OSD from an LVM device（从LVM device创建新的OSD）</span><br><span class="line">4、list                     list logical volumes and devices associated with Ceph（列出与Ceph相关的logical volumes和devices）</span><br><span class="line">5、batch                    Automatically size devices for multi-OSD provisioning with minimal interaction（自动调整devices大小，以最少的交互进行多OSD配置）</span><br><span class="line">6、trigger                  systemd helper to activate an OSD（systemd助手来激活OSD）</span><br><span class="line">7、zap                      Removes all data and filesystems from a logical volume or partition.（从logical volume或分区中删除所有数据和文件系统。）</span><br><span class="line"></span><br><span class="line">ceph-volume simple（使用ceph-volume管理已部署的OSD）</span><br><span class="line">1、trigger                  systemd helper to activate an OSD（systemd助手来激活OSD）</span><br><span class="line">2、activate                 Enable systemd units to mount configured devices and start a Ceph OSD（使systemd units可以mount已配置的devices，并启动Ceph OSD）</span><br><span class="line">3、scan                     Capture metadata from all running ceph-disk OSDs, OSD data partition or directory（从所有正在运行的ceph-disk OSDs，OSD数据分区或目录中捕获元数据）</span><br><span class="line"></span><br><span class="line">例如：</span><br><span class="line"># ceph-volume simple scan</span><br><span class="line">执行命令后，会生成类似/etc/ceph/osd/0-ab0a204a-42e3-4a47-ab4c-0888edf429cb.json文件，文件内容为：</span><br><span class="line">&#123;</span><br><span class="line">    &quot;active&quot;: &quot;ok&quot;, </span><br><span class="line">    &quot;block&quot;: &#123;</span><br><span class="line">        &quot;path&quot;: &quot;/dev/disk/by-partuuid/0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;, </span><br><span class="line">        &quot;uuid&quot;: &quot;0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;</span><br><span class="line">    &#125;, </span><br><span class="line">    &quot;block_uuid&quot;: &quot;0818811f-d70e-4ff0-91c9-58cd701c9a19&quot;, </span><br><span class="line">    &quot;bluefs&quot;: 1, </span><br><span class="line">    &quot;ceph_fsid&quot;: &quot;c4051efa-1997-43ef-8497-fb02bdf08233&quot;, </span><br><span class="line">    &quot;cluster_name&quot;: &quot;ceph&quot;, </span><br><span class="line">    &quot;data&quot;: &#123;</span><br><span class="line">        &quot;path&quot;: &quot;/dev/vdc1&quot;, </span><br><span class="line">        &quot;uuid&quot;: &quot;ab0a204a-42e3-4a47-ab4c-0888edf429cb&quot;</span><br><span class="line">    &#125;, </span><br><span class="line">    &quot;fsid&quot;: &quot;ab0a204a-42e3-4a47-ab4c-0888edf429cb&quot;, </span><br><span class="line">    &quot;keyring&quot;: &quot;AQB1FLFdXVHVARAARTKkxT1xgrDNU/QECUqdxA==&quot;, </span><br><span class="line">    &quot;kv_backend&quot;: &quot;rocksdb&quot;, </span><br><span class="line">    &quot;magic&quot;: &quot;ceph osd volume v026&quot;, </span><br><span class="line">    &quot;mkfs_done&quot;: &quot;yes&quot;, </span><br><span class="line">    &quot;ready&quot;: &quot;ready&quot;, </span><br><span class="line">    &quot;systemd&quot;: &quot;&quot;, </span><br><span class="line">    &quot;type&quot;: &quot;bluestore&quot;, </span><br><span class="line">    &quot;whoami&quot;: 0</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># ceph-volume simple activate --all</span><br><span class="line">--&gt; activating OSD specified in /etc/ceph/osd/1-fe327306-54a4-4362-870d-92d28cf65e42.json</span><br><span class="line">Running command: ln -snf /dev/vdc2 /var/lib/ceph/osd/ceph-1/block</span><br><span class="line">Running command: chown -R ceph:ceph /dev/vdc2</span><br><span class="line">Running command: systemctl enable ceph-volume@simple-1-fe327306-54a4-4362-870d-92d28cf65e42</span><br><span class="line">Running command: ln -sf /dev/null /etc/systemd/system/ceph-disk@.service</span><br><span class="line">--&gt; All ceph-disk systemd units have been disabled to prevent OSDs getting triggered by UDEV events</span><br><span class="line">Running command: systemctl enable --runtime ceph-osd@1</span><br><span class="line">Running command: systemctl start ceph-osd@1</span><br><span class="line">--&gt; Successfully activated OSD 1 with FSID fe327306-54a4-4362-870d-92d28cf65e42</span><br><span class="line"></span><br><span class="line">ceph-volume inventory（获取此节点可用的disk清单）</span><br><span class="line">例如：</span><br><span class="line">ceph-volume inventory</span><br><span class="line">Device Path               Size         rotates available Model name</span><br><span class="line">/dev/vdb                  64.00 MB     True    True</span><br><span class="line">/dev/vdc                  50.00 GB     True    True</span><br><span class="line">/dev/vda                  100.00 GB    True    False</span><br></pre></td></tr></table></figure>
+
+
           
         
       
@@ -427,7 +456,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/82/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/82/">82</a><span class="page-number current">83</span><a class="page-number" href="/page/84/">84</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/84/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/82/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/82/">82</a><span class="page-number current">83</span><a class="page-number" href="/page/84/">84</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/84/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -473,7 +502,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

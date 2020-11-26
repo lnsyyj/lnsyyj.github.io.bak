@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/21/Ceph-DEVICE-MANAGEMENT/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/21/Ceph-DISKPREDICTION-MODULE/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/21/Ceph-DEVICE-MANAGEMENT/" itemprop="url">Ceph DEVICE MANAGEMENT</a></h1>
+                <a class="post-title-link" href="/2019/10/21/Ceph-DISKPREDICTION-MODULE/" itemprop="url">Ceph DISKPREDICTION MODULE</a></h1>
         
 
         <div class="post-meta">
@@ -318,7 +318,7 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-21T14:18:11+08:00">
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-21T14:41:49+08:00">
                 2019-10-21
               </time>
             
@@ -358,52 +358,421 @@
       
         
           
-            <h3 id="DEVICE-MANAGEMENT"><a href="#DEVICE-MANAGEMENT" class="headerlink" title="DEVICE MANAGEMENT"></a>DEVICE MANAGEMENT</h3><p>Ceph跟踪哪个daemons消耗了哪些hardware storage devices（例如HDD，SSD），并收集有关这些devices的运行状况指标，以提供预测和/或自动响应硬件故障的工具。</p>
-<h1 id="DEVICE-TRACKING"><a href="#DEVICE-TRACKING" class="headerlink" title="DEVICE TRACKING"></a>DEVICE TRACKING</h1><p>您可以查询哪些存储设备正在使用：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ceph device ls</span><br><span class="line"></span><br><span class="line">DEVICE               HOST:DEV                       DAEMONS LIFE EXPECTANCY </span><br><span class="line">0d2a946c-413f-43f4-b community-ceph-2.novalocal:vdc osd.0</span><br><span class="line">451e48d6-913e-4f93-a community-ceph-1.novalocal:vdd osd.5</span><br><span class="line">935b6018-1dfe-4cf9-8 community-ceph-1.novalocal:vdc osd.2</span><br><span class="line">abe09d21-d950-47b0-9 community-ceph-2.novalocal:vdd osd.3</span><br><span class="line">bf37729e-9d83-48e9-9 community-ceph-3.novalocal:vdc osd.1</span><br><span class="line">d48dcf29-fe58-4e3e-a community-ceph-3.novalocal:vdd osd.4</span><br></pre></td></tr></table></figure>
-<p>您还可以按daemon或host列出devices：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ceph device ls-by-daemon &lt;daemon&gt;</span><br><span class="line">ceph device ls-by-host &lt;host&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device ls-by-daemon osd.0</span><br><span class="line">DEVICE               HOST:DEV                       EXPECTED FAILURE </span><br><span class="line">0d2a946c-413f-43f4-b community-ceph-2.novalocal:vdc                  </span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device ls-by-host community-ceph-2.novalocal</span><br><span class="line">DEVICE               DEV DAEMONS EXPECTED FAILURE </span><br><span class="line">0d2a946c-413f-43f4-b vdc osd.0                    </span><br><span class="line">abe09d21-d950-47b0-9 vdd osd.3</span><br></pre></td></tr></table></figure>
-<p>对于任何单个设备，您可以通过以下方式查询有关其位置以及如何使用它的信息：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ceph device info &lt;devid&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device info 0d2a946c-413f-43f4-b</span><br><span class="line">device 0d2a946c-413f-43f4-b</span><br><span class="line">attachment community-ceph-2.novalocal:vdc</span><br><span class="line">daemons osd.0</span><br></pre></td></tr></table></figure>
-<h1 id="ENABLING-MONITORING"><a href="#ENABLING-MONITORING" class="headerlink" title="ENABLING MONITORING"></a>ENABLING MONITORING</h1><p>Ceph还可以监视与您的设备关联的健康指标。 例如，SATA硬盘实现了一个称为SMART的标准，该标准提供了有关设备使用情况和运行状况的内部指标，例如开机小时数，电源循环次数或不可恢复的读取错误。 其他设备类型（例如SAS和NVMe）实现了一组相似的指标（通过略有不同的标准）。 Ceph可以通过smartctl工具收集所有这些信息。</p>
-<p>您可以通过以下方式启用或禁用运行状况监视：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device monitoring on</span><br></pre></td></tr></table></figure>
+            <h3 id="DISKPREDICTION-MODULE"><a href="#DISKPREDICTION-MODULE" class="headerlink" title="DISKPREDICTION MODULE"></a>DISKPREDICTION MODULE</h3><p>磁盘预测模块支持两种模式：cloud mode和local mode。 在cloud mode下，磁盘和Ceph操作状态信息是从Ceph群集中收集的，并通过Internet发送到基于云的DiskPrediction服务器。 DiskPrediction服务器分析数据，并提供Ceph群集的性能和磁盘运行状况的分析和预测结果。</p>
+<p>local mode不需要任何外部服务器即可进行数据分析和输出结果。 在local mode下，磁盘<em>diskprediction</em> module将内部predictor module用于磁盘预测服务，然后将磁盘预测结果返回给Ceph系统。</p>
+<p>Local predictor: 70% 的准确性</p>
+<p>Cloud predictor for free: 95% 的准确性</p>
+<h1 id="ENABLING"><a href="#ENABLING" class="headerlink" title="ENABLING"></a>ENABLING</h1><p>运行以下命令以在Ceph环境中启用磁盘预测模块：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ceph mgr module enable diskprediction_cloud</span><br><span class="line">ceph mgr module enable diskprediction_local</span><br></pre></td></tr></table></figure>
+
+<p>选择预测模式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode local</span><br></pre></td></tr></table></figure>
+
 <p>或</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device monitoring off</span><br></pre></td></tr></table></figure>
-<h1 id="SCRAPING"><a href="#SCRAPING" class="headerlink" title="SCRAPING"></a>SCRAPING</h1><p>如果启用了监视，则将定期自动scraped指标。 该间隔可以配置为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set mgr mgr/devicehealth/scrape_frequency &lt;seconds&gt;</span><br></pre></td></tr></table></figure>
-<p>默认值为每24小时scrape一次。</p>
-<p>您可以使用以下方法手动触发所有设备的scrape：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device scrape-health-metrics</span><br></pre></td></tr></table></figure>
-<p>单个设备可以用以下方式scraped：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device scrape-health-metrics &lt;device-id&gt;</span><br></pre></td></tr></table></figure>
-<p>或单个daemon的设备可以通过以下方式进行scraped：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device scrape-daemon-health-metrics &lt;who&gt;</span><br></pre></td></tr></table></figure>
-<p>可以使用以下命令检索设备的存储健康指标（可选地，用于特定时间戳）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device get-health-metrics &lt;devid&gt; [sample-timestamp]</span><br></pre></td></tr></table></figure>
-<h1 id="FAILURE-PREDICTION"><a href="#FAILURE-PREDICTION" class="headerlink" title="FAILURE PREDICTION"></a>FAILURE PREDICTION</h1><p>Ceph可以根据其收集的健康指标预测预期寿命和设备故障。 共有三种模式：</p>
-<ul>
-<li>none: 禁用设备故障预测。</li>
-<li>local: 使用来自ceph-mgr daemon的预训练预测模型</li>
-<li>cloud: 使用ProphetStor运行的外部云服务共享设备运行状况和性能指标，并使用其免费服务或付费服务进行更准确的预测</li>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode cloud</span><br></pre></td></tr></table></figure>
+
+<p>要禁用预测，请执行以下操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode none</span><br></pre></td></tr></table></figure>
+
+<h1 id="CONNECTION-SETTINGS"><a href="#CONNECTION-SETTINGS" class="headerlink" title="CONNECTION SETTINGS"></a>CONNECTION SETTINGS</h1><p>connection settings用于Ceph和DiskPrediction服务器之间的连接。</p>
+<h3 id="LOCAL-MODE"><a href="#LOCAL-MODE" class="headerlink" title="LOCAL MODE"></a>LOCAL MODE</h3><p>diskprediction module利用Ceph设备运行状况检查来收集磁盘运行状况指标，并使用内部predictor module来生成磁盘故障预测并返回Ceph。 因此，在local mode下不需要连接设置。 local predictor module至少需要六个设备健康状况数据集才能实施预测。</p>
+<p>运行以下命令以使用本地预测变量预测设备的预期寿命。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph device predict-life-expectancy &lt;device id&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device predict-life-expectancy 0d2a946c-413f-43f4-b</span><br><span class="line">unknown</span><br></pre></td></tr></table></figure>
+
+<h3 id="CLOUD-MODE"><a href="#CLOUD-MODE" class="headerlink" title="CLOUD MODE"></a>CLOUD MODE</h3><p>在cloud mode下，需要用户注册。 用户必须在<a href="https://www.diskprophet.com/#/上注册其帐户，以接收以下DiskPrediction服务器信息以进行连接设置。" target="_blank" rel="noopener">https://www.diskprophet.com/#/上注册其帐户，以接收以下DiskPrediction服务器信息以进行连接设置。</a></p>
+<p>Certificate file path: 确认用户注册后，系统将发送一封确认电子邮件，其中包括证书文件下载链接。 下载证书文件并将其保存到Ceph系统。 运行以下命令来验证文件。 如果没有证书文件验证，则无法完成连接设置。</p>
+<p>DiskPrediction server: DiskPrediction服务器名称。 如果需要，它可以是IP地址。</p>
+<p>Connection account: 用于在Ceph和DiskPrediction服务器之间建立连接的帐户名</p>
+<p>Connection password: 用于在Ceph和DiskPrediction服务器之间建立连接的密码</p>
+<p>运行以下命令以完成连接设置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device set-cloud-prediction-config &lt;diskprediction_server&gt; &lt;connection_account&gt; &lt;connection_password&gt; &lt;certificate file path&gt;</span><br></pre></td></tr></table></figure>
+
+<p>您可以使用以下命令显示连接设置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device show-prediction-config</span><br></pre></td></tr></table></figure>
+
+<p>其他可选配置设置如下：</p>
+<p>diskprediction_upload_metrics_interval: 指示定期将Ceph性能指标发送到DiskPrediction服务器的频率。 默认值为10分钟。</p>
+<p>diskprediction_upload_smart_interval: 指示定期将Ceph物理设备信息发送到DiskPrediction服务器的频率。 默认值为12小时。</p>
+<p>diskprediction_retrieve_prediction_interval: 指示Ceph有时会定期从DiskPrediction服务器检索物理设备预测数据。 默认值为12小时。</p>
+<h1 id="DISKPREDICTION-DATA"><a href="#DISKPREDICTION-DATA" class="headerlink" title="DISKPREDICTION DATA"></a>DISKPREDICTION DATA</h1><p>diskprediction module主动向/从DiskPrediction服务器发送/检索以下数据。</p>
+<h3 id="METRICS-DATA"><a href="#METRICS-DATA" class="headerlink" title="METRICS DATA"></a>METRICS DATA</h3><ul>
+<li>Ceph cluster status</li>
 </ul>
-<p>预测模式可以配置为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode &lt;mode&gt;</span><br></pre></td></tr></table></figure>
-<p>预测通常在后台定期进行，因此填充预期寿命值可能需要一些时间。 您可以从以下输出中看到所有设备的预期寿命：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device ls</span><br></pre></td></tr></table></figure>
-<p>您还可以使用以下方法查询特定设备的metadata：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device info &lt;devid&gt;</span><br></pre></td></tr></table></figure>
-<p>您可以使用以下命令显式地强制预测设备的预期寿命：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device predict-life-expectancy &lt;devid&gt;</span><br></pre></td></tr></table></figure>
-<p>如果您未使用Ceph的内部设备故障预测，但是拥有一些有关设备故障的外部信息源，则可以通过以下方式告知Ceph设备的预期寿命：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device set-life-expectancy &lt;devid&gt; &lt;from&gt; [&lt;to&gt;]</span><br></pre></td></tr></table></figure>
-<p>预期寿命以时间间隔表示，因此不确定性可以以宽间隔的形式表示。 间隔结束也可以不指定。</p>
-<h1 id="HEALTH-ALERTS"><a href="#HEALTH-ALERTS" class="headerlink" title="HEALTH ALERTS"></a>HEALTH ALERTS</h1><p>mgr/devicehealth/warn_threshold控制在生成运行状况警告之前，预期的设备故障必须多长时间。</p>
-<p>可以使用以下方法检查所有设备的存储预期寿命，并生成任何适当的健康警报：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device check-health</span><br></pre></td></tr></table></figure>
-<h1 id="AUTOMATIC-MITIGATION"><a href="#AUTOMATIC-MITIGATION" class="headerlink" title="AUTOMATIC MITIGATION"></a>AUTOMATIC MITIGATION</h1><p>如果启用了mgr/devicehealth/self_heal选项（默认情况下），则对于预计将很快发现故障的设备，模块将通过将设备标记为“out”来自动将数据迁移到这些设备之外。</p>
-<p>mgr/devicehealth/mark_out_threshold控制在我们将osd自动标记为“out”之前，预期的设备故障必须多长时间。</p>
-<h3 id="原文："><a href="#原文：" class="headerlink" title="原文："></a>原文：</h3><h3 id="https-docs-ceph-com-docs-master-rados-operations-devices-devices"><a href="#https-docs-ceph-com-docs-master-rados-operations-devices-devices" class="headerlink" title="https://docs.ceph.com/docs/master/rados/operations/devices/#devices"></a><a href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices" target="_blank" rel="noopener">https://docs.ceph.com/docs/master/rados/operations/devices/#devices</a></h3>
+<table>
+<thead>
+<tr>
+<th align="left">key</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">cluster_health</td>
+<td align="left">Ceph health check status</td>
+</tr>
+<tr>
+<td align="left">num_mon</td>
+<td align="left">Number of monitor node</td>
+</tr>
+<tr>
+<td align="left">num_mon_quorum</td>
+<td align="left">Number of monitors in quorum</td>
+</tr>
+<tr>
+<td align="left">num_osd</td>
+<td align="left">Total number of OSD</td>
+</tr>
+<tr>
+<td align="left">num_osd_up</td>
+<td align="left">Number of OSDs that are up</td>
+</tr>
+<tr>
+<td align="left">num_osd_in</td>
+<td align="left">Number of OSDs that are in cluster</td>
+</tr>
+<tr>
+<td align="left">osd_epoch</td>
+<td align="left">Current epoch of OSD map</td>
+</tr>
+<tr>
+<td align="left">osd_bytes</td>
+<td align="left">Total capacity of cluster in bytes</td>
+</tr>
+<tr>
+<td align="left">osd_bytes_used</td>
+<td align="left">Number of used bytes on cluster</td>
+</tr>
+<tr>
+<td align="left">osd_bytes_avail</td>
+<td align="left">Number of available bytes on cluster</td>
+</tr>
+<tr>
+<td align="left">num_pool</td>
+<td align="left">Number of pools</td>
+</tr>
+<tr>
+<td align="left">num_pg</td>
+<td align="left">Total number of placement groups</td>
+</tr>
+<tr>
+<td align="left">num_pg_active_clean</td>
+<td align="left">Number of placement groups in active+clean state</td>
+</tr>
+<tr>
+<td align="left">num_pg_active</td>
+<td align="left">Number of placement groups in active state</td>
+</tr>
+<tr>
+<td align="left">num_pg_peering</td>
+<td align="left">Number of placement groups in peering state</td>
+</tr>
+<tr>
+<td align="left">num_object</td>
+<td align="left">Total number of objects on cluster</td>
+</tr>
+<tr>
+<td align="left">num_object_degraded</td>
+<td align="left">Number of degraded (missing replicas) objects</td>
+</tr>
+<tr>
+<td align="left">num_object_misplaced</td>
+<td align="left">Number of misplaced (wrong location in the cluster) objects</td>
+</tr>
+<tr>
+<td align="left">num_object_unfound</td>
+<td align="left">Number of unfound objects</td>
+</tr>
+<tr>
+<td align="left">num_bytes</td>
+<td align="left">Total number of bytes of all objects</td>
+</tr>
+<tr>
+<td align="left">num_mds_up</td>
+<td align="left">Number of MDSs that are up</td>
+</tr>
+<tr>
+<td align="left">num_mds_in</td>
+<td align="left">Number of MDS that are in cluster</td>
+</tr>
+<tr>
+<td align="left">num_mds_failed</td>
+<td align="left">Number of failed MDS</td>
+</tr>
+<tr>
+<td align="left">mds_epoch</td>
+<td align="left">Current epoch of MDS map</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Ceph mon/osd performance counts  </li>
+</ul>
+<p>Mon:</p>
+<table>
+<thead>
+<tr>
+<th align="left">key</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">num_sessions</td>
+<td align="left">Current number of opened monitor sessions</td>
+</tr>
+<tr>
+<td align="left">session_add</td>
+<td align="left">Number of created monitor sessions</td>
+</tr>
+<tr>
+<td align="left">session_rm</td>
+<td align="left">Number of remove_session calls in monitor</td>
+</tr>
+<tr>
+<td align="left">session_trim</td>
+<td align="left">Number of trimed monitor sessions</td>
+</tr>
+<tr>
+<td align="left">num_elections</td>
+<td align="left">Number of elections monitor took part in</td>
+</tr>
+<tr>
+<td align="left">election_call</td>
+<td align="left">Number of elections started by monitor</td>
+</tr>
+<tr>
+<td align="left">election_win</td>
+<td align="left">Number of elections won by monitor</td>
+</tr>
+<tr>
+<td align="left">election_lose</td>
+<td align="left">Number of elections lost by monitor</td>
+</tr>
+</tbody></table>
+<p>Osd:</p>
+<table>
+<thead>
+<tr>
+<th align="left">key</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">op_wip</td>
+<td align="left">Replication operations currently being processed (primary)</td>
+</tr>
+<tr>
+<td align="left">op_in_bytes</td>
+<td align="left">Client operations total write size</td>
+</tr>
+<tr>
+<td align="left">op_r</td>
+<td align="left">Client read operations</td>
+</tr>
+<tr>
+<td align="left">op_out_bytes</td>
+<td align="left">Client operations total read size</td>
+</tr>
+<tr>
+<td align="left">op_w</td>
+<td align="left">Client write operations</td>
+</tr>
+<tr>
+<td align="left">op_latency</td>
+<td align="left">Latency of client operations (including queue time)</td>
+</tr>
+<tr>
+<td align="left">op_process_latency</td>
+<td align="left">Latency of client operations (excluding queue time)</td>
+</tr>
+<tr>
+<td align="left">op_r_latency</td>
+<td align="left">Latency of read operation (including queue time)</td>
+</tr>
+<tr>
+<td align="left">op_r_process_latency</td>
+<td align="left">Latency of read operation (excluding queue time)</td>
+</tr>
+<tr>
+<td align="left">op_w_in_bytes</td>
+<td align="left">Client data written</td>
+</tr>
+<tr>
+<td align="left">op_w_latency</td>
+<td align="left">Latency of write operation (including queue time)</td>
+</tr>
+<tr>
+<td align="left">op_w_process_latency</td>
+<td align="left">Latency of write operation (excluding queue time)</td>
+</tr>
+<tr>
+<td align="left">op_rw</td>
+<td align="left">Client read-modify-write operations</td>
+</tr>
+<tr>
+<td align="left">op_rw_in_bytes</td>
+<td align="left">Client read-modify-write operations write in</td>
+</tr>
+<tr>
+<td align="left">op_rw_out_bytes</td>
+<td align="left">Client read-modify-write operations read out</td>
+</tr>
+<tr>
+<td align="left">op_rw_latency</td>
+<td align="left">Latency of read-modify-write operation (including queue time)</td>
+</tr>
+<tr>
+<td align="left">op_rw_process_latency</td>
+<td align="left">Latency of read-modify-write operation (excluding queue time)</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Ceph pool statistics</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">key</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">bytes_used</td>
+<td align="left">Per pool bytes used</td>
+</tr>
+<tr>
+<td align="left">max_avail</td>
+<td align="left">Max available number of bytes in the pool</td>
+</tr>
+<tr>
+<td align="left">objects</td>
+<td align="left">Number of objects in the pool</td>
+</tr>
+<tr>
+<td align="left">wr_bytes</td>
+<td align="left">Number of bytes written in the pool</td>
+</tr>
+<tr>
+<td align="left">dirty</td>
+<td align="left">Number of bytes dirty in the pool</td>
+</tr>
+<tr>
+<td align="left">rd_bytes</td>
+<td align="left">Number of bytes read in the pool</td>
+</tr>
+<tr>
+<td align="left">stored_raw</td>
+<td align="left">Bytes used in pool including copies made</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Ceph physical device metadata</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="left">key</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">disk_domain_id</td>
+<td align="left">Physical device identify id</td>
+</tr>
+<tr>
+<td align="left">disk_name</td>
+<td align="left">Device attachment name</td>
+</tr>
+<tr>
+<td align="left">disk_wwn</td>
+<td align="left">Device wwn</td>
+</tr>
+<tr>
+<td align="left">model</td>
+<td align="left">Device model name</td>
+</tr>
+<tr>
+<td align="left">serial_number</td>
+<td align="left">Device serial number</td>
+</tr>
+<tr>
+<td align="left">size</td>
+<td align="left">Device size</td>
+</tr>
+<tr>
+<td align="left">vendor</td>
+<td align="left">Device vendor name</td>
+</tr>
+</tbody></table>
+<ul>
+<li>Ceph each objects correlation information</li>
+<li>The module agent information</li>
+<li>The module agent cluster information</li>
+<li>The module agent host information</li>
+</ul>
+<h3 id="SMART-DATA"><a href="#SMART-DATA" class="headerlink" title="SMART DATA"></a>SMART DATA</h3><ul>
+<li>Ceph physical device SMART data (provided by Ceph <em>devicehealth</em> module)</li>
+</ul>
+<h3 id="PREDICTION-DATA"><a href="#PREDICTION-DATA" class="headerlink" title="PREDICTION DATA"></a>PREDICTION DATA</h3><ul>
+<li>Ceph physical device prediction data</li>
+</ul>
+<h1 id="RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）"><a href="#RECEIVING-PREDICTED-HEALTH-STATUS-FROM-A-CEPH-OSD-DISK-DRIVE（从CEPH-OSD磁盘驱动器中接收预期的健康状况）" class="headerlink" title="RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）"></a>RECEIVING PREDICTED HEALTH STATUS FROM A CEPH OSD DISK DRIVE（从CEPH OSD磁盘驱动器中接收预期的健康状况）</h1><p>您可以使用以下命令从Ceph OSD磁盘驱动器接收预测的健康状态。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device get-predicted-status &lt;device id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>get-predicted-status命令返回：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;near_failure&quot;: &quot;Good&quot;,</span><br><span class="line">    &quot;disk_wwn&quot;: &quot;5000011111111111&quot;,</span><br><span class="line">    &quot;serial_number&quot;: &quot;111111111&quot;,</span><br><span class="line">    &quot;predicted&quot;: &quot;2018-05-30 18:33:12&quot;,</span><br><span class="line">    &quot;attachment&quot;: &quot;sdb&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th align="left">Attribute</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">near_failure</td>
+<td align="left">The disk failure prediction state: Good/Warning/Bad/Unknown</td>
+</tr>
+<tr>
+<td align="left">disk_wwn</td>
+<td align="left">Disk WWN number</td>
+</tr>
+<tr>
+<td align="left">serial_number</td>
+<td align="left">Disk serial number</td>
+</tr>
+<tr>
+<td align="left">predicted</td>
+<td align="left">Predicted date</td>
+</tr>
+<tr>
+<td align="left">attachment</td>
+<td align="left">device name on the local system</td>
+</tr>
+</tbody></table>
+<p>磁盘故障预测状态的near_failure属性在下表中指示磁盘预期寿命。</p>
+<table>
+<thead>
+<tr>
+<th align="left">near_failure</th>
+<th align="left">Life expectancy (weeks)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Good</td>
+<td align="left">&gt; 6 weeks</td>
+</tr>
+<tr>
+<td align="left">Warning</td>
+<td align="left">2 weeks ~ 6 weeks</td>
+</tr>
+<tr>
+<td align="left">Bad</td>
+<td align="left">&lt; 2 weeks</td>
+</tr>
+</tbody></table>
+<h1 id="DEBUGGING"><a href="#DEBUGGING" class="headerlink" title="DEBUGGING"></a>DEBUGGING</h1><p>如果要调试DiskPrediction module映射到Ceph日志记录级别，请使用以下命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[mgr]</span><br><span class="line"></span><br><span class="line">    debug mgr = 20</span><br></pre></td></tr></table></figure>
+
+<p>将日志记录设置为管理器调试时，模块将打印出带有前缀mgr [diskprediction]的日志记录消息，以便于过滤。</p>
+
           
         
       
@@ -447,7 +816,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/14/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/14/">14</a><span class="page-number current">15</span><a class="page-number" href="/page/16/">16</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/16/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -493,7 +862,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

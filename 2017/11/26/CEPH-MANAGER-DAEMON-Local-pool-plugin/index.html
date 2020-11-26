@@ -366,8 +366,7 @@
         <p>localpool插件可以自动创建本地化为整个集群子集的RADOS pool。例如，默认情况下，它将为集群中的每个不同rack创建一个pool。对于某些希望在本地以及整个集群内分布一些数据的部署可能非常有用。<br>（个人理解这里的本地有可能是不同RULE下的pool，不同RULE下是否同名pool没有验证是否允许）</p>
 <p><strong>ENABLING</strong></p>
 <p>localpool模块启用：</p>
-<pre><code>ceph mgr module enable localpool
-</code></pre><p><strong>CONFIGURING</strong></p>
+<pre><code>ceph mgr module enable localpool</code></pre><p><strong>CONFIGURING</strong></p>
 <p>localpool模块可以支持以下选项：</p>
 <ul>
 <li>subtree（default: rack）: 为哪个CRUSH subtree type模块创建一个池</li>
@@ -389,8 +388,7 @@
 </ul>
 <p>通过config-key接口设置这些选项。例如，设置复制2副本，64PG</p>
 <pre><code>ceph config-key set mgr/localpool/num_rep 2
-ceph config-key set mgr/localpool/pg_num 64
-</code></pre>
+ceph config-key set mgr/localpool/pg_num 64</code></pre>
       
     </div>
     
@@ -534,7 +532,7 @@ ceph config-key set mgr/localpool/pg_num 64
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

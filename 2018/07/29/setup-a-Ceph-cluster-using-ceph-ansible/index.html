@@ -373,17 +373,23 @@
 </ul>
 <h3 id="Ansible-Setup"><a href="#Ansible-Setup" class="headerlink" title="Ansible Setup"></a>Ansible Setup</h3><p>首先，克隆ceph-ansible repo。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/ceph/ceph-ansible.git</span><br><span class="line">cd ceph-ansible</span><br><span class="line">git checkout a41eddf6f0d840580bc842fa59751defef10fa69</span><br></pre></td></tr></table></figure>
+
 <p>接下来，在repo的基础上添加一个inventory文件。使用以下内容作为指南，将示例IP替换为您自己的计算机IP。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[mons]</span><br><span class="line">10.0.0.1</span><br><span class="line">10.0.0.2</span><br><span class="line">10.0.0.3</span><br><span class="line"></span><br><span class="line">[osds]</span><br><span class="line">10.0.0.4</span><br><span class="line">10.0.0.5</span><br><span class="line">10.0.0.6</span><br><span class="line">10.0.0.7</span><br><span class="line"></span><br><span class="line">[clients]</span><br><span class="line">10.0.0.8</span><br></pre></td></tr></table></figure>
+
 <p>我们需要至少3个MON（cluster state daemons）4个OSD（object storage daemons）和1个client（to mount the storage）。</p>
 <p>接下来，我们需要复制samples。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cp site.yml.sample site.yml</span><br><span class="line">cp group_vars/all.sample group_vars/all</span><br><span class="line">cp group_vars/mons.sample group_vars/mons</span><br><span class="line">cp group_vars/osds.sample group_vars/osds</span><br></pre></td></tr></table></figure>
+
 <p>现在，我们需要修改group_vars/all中的一些变量：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ceph_origin: &apos;upstream&apos; </span><br><span class="line">ceph_stable: true</span><br><span class="line"></span><br><span class="line">monitor_interface: eth0</span><br><span class="line">public_network: 172.20.0.0/16</span><br><span class="line"></span><br><span class="line">journal_size: 5120</span><br></pre></td></tr></table></figure>
+
 <p>在groups_vars/osd中：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">osd_directory: true</span><br><span class="line">osd_directories:</span><br><span class="line">  - /var/lib/ceph/osd/mydir1</span><br></pre></td></tr></table></figure>
+
 <h3 id="Running-ceph-ansible-playbook"><a href="#Running-ceph-ansible-playbook" class="headerlink" title="Running ceph-ansible playbook"></a>Running ceph-ansible playbook</h3><p>创建inventory文件并修改变量后：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ansible-playbook site.yml -vvvv -i inventory -u centos</span><br></pre></td></tr></table></figure>
+
 <p>完成后，您应该有一个正常运行的Ceph集群。</p>
 <h3 id="Interacting-with-Ceph"><a href="#Interacting-with-Ceph" class="headerlink" title="Interacting with Ceph"></a>Interacting with Ceph</h3>
       
@@ -538,7 +544,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

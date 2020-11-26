@@ -369,24 +369,30 @@
         <p>为了承受OSD丢失，一个Ceph pool与一个类型相关联（大多数情况下每个磁盘有一个OSD）。当创建pool时，默认选择replicate，这意味着每个object都被复制到多个磁盘上。可以使用Erasure Code pool类型替代replicate，以节省空间。</p>
 <h2 id="CREATING-A-SAMPLE-ERASURE-CODED-POOL"><a href="#CREATING-A-SAMPLE-ERASURE-CODED-POOL" class="headerlink" title="CREATING A SAMPLE ERASURE CODED POOL"></a>CREATING A SAMPLE ERASURE CODED POOL</h2><p>最简单的erasure coded pool相当于RAID5，并且至少需要三台主机：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ceph osd pool create ecpool 12 12 erasure</span><br><span class="line">pool 'ecpool' created</span><br><span class="line"><span class="meta">$</span> echo ABCDEFGHI | rados --pool ecpool put NYAN -</span><br><span class="line"><span class="meta">$</span> rados --pool ecpool get NYAN -</span><br><span class="line">ABCDEFGHI</span><br></pre></td></tr></table></figure>
+
 <p>请注意，pool 中的12表示placement groups的数量。</p>
 <h2 id="ERASURE-CODE-PROFILES"><a href="#ERASURE-CODE-PROFILES" class="headerlink" title="ERASURE CODE PROFILES"></a>ERASURE CODE PROFILES</h2><p>默认的erasure code profile会承受丢失1个OSD。它相当于一个大小为2的replicated pool，但需要1.5TB而不是2TB来存储1TB的数据。默认profile显示：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ceph osd erasure-code-profile get default</span><br><span class="line">k=2</span><br><span class="line">m=1</span><br><span class="line">plugin=jerasure</span><br><span class="line">crush-failure-domain=host</span><br><span class="line">technique=reed_sol_van</span><br></pre></td></tr></table></figure>
+
 <p>选择正确的profile非常重要，因为在创建pool后无法对其进行修改：需要创建具有不同profile的新pool，并将先前pool中的所有objects都移动到新的pool中。</p>
 <p>profile最重要的参数是K，M和crush-failure-domain，因为它们定义了存储开销和数据持久性。例如，期望在系统架构中必须承受两个racks间的损失，并且控制额外增加40％存储开销，则可以定义以下profile：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ceph osd erasure-code-profile set myprofile \</span><br><span class="line">   k=3 \</span><br><span class="line">   m=2 \</span><br><span class="line">   crush-failure-domain=rack</span><br><span class="line"><span class="meta">$</span> ceph osd pool create ecpool 12 12 erasure myprofile</span><br><span class="line"><span class="meta">$</span> echo ABCDEFGHI | rados --pool ecpool put NYAN -</span><br><span class="line"><span class="meta">$</span> rados --pool ecpool get NYAN -</span><br><span class="line">ABCDEFGHI</span><br></pre></td></tr></table></figure>
+
 <p>NYAN object将被分成三部分（K = 3），并创建两个附加chunks（M = 2）。M的值定义了可以同时丢失多少OSD而不损失任何数据。crush-failure-domain = rack将创建一个CRUSH rule，以确保没有两个chunks存储在同一个rack中。</p>
 <p><img src="http://docs.ceph.com/docs/master/_images/ditaa-96fe8c3c73e5e54cf27fa8a4d64ed08d17679ba3.png" alt></p>
 <p>更多信息可以在<a href="http://docs.ceph.com/docs/master/rados/operations/erasure-code-profile/" target="_blank" rel="noopener">erasure code profiles documentation</a>中找到。</p>
 <h2 id="ERASURE-CODING-WITH-OVERWRITES"><a href="#ERASURE-CODING-WITH-OVERWRITES" class="headerlink" title="ERASURE CODING WITH OVERWRITES"></a>ERASURE CODING WITH OVERWRITES</h2><p>默认情况下，erasure coded pools仅适用于像RGW那样，完整object writes和appends的场景。Luminous版本，可以为每个pool设置启用erasure coded pool的partial writes。 这让RBD和CephFS可以将他们的数据存储在erasure coded pool中：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph osd pool set ec_pool allow_ec_overwrites true</span><br></pre></td></tr></table></figure>
+
 <p>这只能对bluestore OSD上的pool启用，因为bluestore的checksumming用于在deep-scrub过程中检查bitrot或其他corruption。除了不安全之外，使用filestore进行ec overwrites，相对于bluestore性能低。</p>
 <p>Erasure coded pools不支持omap（ObjectMap），因此要将它们与RBD和CephFS一起使用，必须明确指示它们将data存储在ec pool中，将metadata存储在replicated pool中。对于RBD，这意味着在创建image时，需要使用–data-pool指定erasure coded pool：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rbd create --size 1G --data-pool ec_pool replicated_pool/image_name</span><br></pre></td></tr></table></figure>
+
 <p>对于CephFS，在创建file system时或者通过<a href="http://docs.ceph.com/docs/master/cephfs/file-layouts/" target="_blank" rel="noopener">file layouts</a>设定一个erasure coded pool作为默认的data pool。</p>
 <h2 id="ERASURE-CODED-POOL-AND-CACHE-TIERING"><a href="#ERASURE-CODED-POOL-AND-CACHE-TIERING" class="headerlink" title="ERASURE CODED POOL AND CACHE TIERING"></a>ERASURE CODED POOL AND CACHE TIERING</h2><p>Erasure coded pools需要比replicated pools更多的资源，并且缺少一些功能，如omap。为了克服这些限制，可以在erasure coded pool之前设置一个<a href="http://docs.ceph.com/docs/master/rados/operations/cache-tiering/" target="_blank" rel="noopener">cache tier</a>。</p>
 <p>例如，hot-storage pool由fast storage设备组成：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span> ceph osd tier add ecpool hot-storage</span><br><span class="line"><span class="meta">$</span> ceph osd tier cache-mode hot-storage writeback</span><br><span class="line"><span class="meta">$</span> ceph osd tier set-overlay ecpool hot-storage</span><br></pre></td></tr></table></figure>
+
 <p>hot-storage pool作为ecpool的tier，将数据以writeback模式回写至ecpool，所以每次write和read这个ecpool的时候，实际使用的是hot-storage。</p>
 <p>更多信息可以在<a href="http://docs.ceph.com/docs/master/rados/operations/cache-tiering/" target="_blank" rel="noopener">cache tiering documentation</a>中找到。</p>
 <h2 id="GLOSSARY"><a href="#GLOSSARY" class="headerlink" title="GLOSSARY"></a>GLOSSARY</h2><p>chunk</p>
@@ -560,7 +566,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

@@ -87,18 +87,18 @@
 
 
 
-<meta name="description" content="Go命令Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。 动机Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。 起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。 Go的惯例该go命令要求代码遵循几个关键的惯例：12">
+<meta name="description" content="Go命令Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。 动机Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。 起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。 Go的惯例该go命令要求代码遵循几个关键的惯例： 1">
 <meta name="keywords" content="Golang">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Go命令">
 <meta property="og:url" content="http://yoursite.com/2018/04/07/Go命令/index.html">
 <meta property="og:site_name" content="Jiang&#39;s Blog">
-<meta property="og:description" content="Go命令Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。 动机Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。 起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。 Go的惯例该go命令要求代码遵循几个关键的惯例：12">
+<meta property="og:description" content="Go命令Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。 动机Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。 起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。 Go的惯例该go命令要求代码遵循几个关键的惯例： 1">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2020-03-22T08:16:35.994Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Go命令">
-<meta name="twitter:description" content="Go命令Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。 动机Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。 起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。 Go的惯例该go命令要求代码遵循几个关键的惯例：12">
+<meta name="twitter:description" content="Go命令Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。 动机Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。 起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。 Go的惯例该go命令要求代码遵循几个关键的惯例： 1">
 
 
 <script type="text/javascript" id="hexo.configurations">
@@ -366,16 +366,23 @@
         <h1 id="Go命令"><a href="#Go命令" class="headerlink" title="Go命令"></a>Go命令</h1><p>Go发行版包含了一个名为go的命令，实现Go包和命令的自动下载，编译，安装和测试。</p>
 <h2 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h2><p>Go从开始就明确目标：能够仅使用源代码本身的信息来构建Go代码，而不需要编写makefile或Makefile。</p>
 <p>起初，在没有Go编译器的时候，为了达到自动化构建的目的，Go单独使用一个程序生成makefile。新的go命令的目的使我们回到这个理想。</p>
-<h2 id="Go的惯例"><a href="#Go的惯例" class="headerlink" title="Go的惯例"></a>Go的惯例</h2><p>该go命令要求代码遵循几个关键的惯例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1、导入路径源自源码的URL。对于Bitbucket、GitHub、Google Code和Launchpad来说， 其代码仓库的根目录由该仓库的主URL确定，无需 http:// 前缀。 子目录名附加在该路径之后。</span><br><span class="line">例如https://github.com/golang/example这个项目，仓库根目录的导入路径为“github.com/golang/example”。 stringutil 包存储在子目录中，因此它的导入路径为“github.com/golang/example/stringutil”。</span><br><span class="line">2、本地文件系统中存储源码的位置源自导入路径。特别地，首选路径为 $GOPATH/src/&lt;导入路径&gt;。若 $GOPATH 未设置， go命令会回到标准Go包存储源码的地方，即 $GOROOT/src/pkg/&lt;导入路径&gt;。 若 $GOPATH 设置了多个路径，go命令就会尝试这些目录的每一个 &lt;目录&gt;/src/&lt;导入路径&gt;。</span><br><span class="line">3、源码树中的每个目录都对应于单个包。通过将一个目录限定为单个包， 我们无需先指定目录，再从该目录中指定包来创建混合的导入路径了。此外， 大部分文件管理工具和用户界面，都是将目录作为基本工作单元的。 将基本的Go单元—包—同化为文件系统的结构，也就意味着文件系统工具成了Go包的工具。 复制、移动或删除一个包就对应于复制、移动或删除一个目录。</span><br><span class="line">4、包只通过源码中的信息构建。这会让它更容易适应构建环境和条件的改变。 例如，若我们允许额外的配置（如编译器标志或命令行选项等），那么每当构建工具被更改后， 相应的配置也需要更新；它天生还会绑定至特定的工具链。</span><br></pre></td></tr></table></figure></p>
-<h2 id="go-命令基础"><a href="#go-命令基础" class="headerlink" title="go 命令基础"></a>go 命令基础</h2><p>首先配置GOPATH，进入此目录后，我们就可以添加一些源码了。假设我们想要使用codesearch项目中的索引包， 以及一个左倾红黑树包。我们可以用“go get”子命令安装二者：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go get code.google.com/p/codesearch/index</span><br><span class="line">$ go get github.com/petar/GoLLRB/llrb</span><br></pre></td></tr></table></figure></p>
+<h2 id="Go的惯例"><a href="#Go的惯例" class="headerlink" title="Go的惯例"></a>Go的惯例</h2><p>该go命令要求代码遵循几个关键的惯例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1、导入路径源自源码的URL。对于Bitbucket、GitHub、Google Code和Launchpad来说， 其代码仓库的根目录由该仓库的主URL确定，无需 http:// 前缀。 子目录名附加在该路径之后。</span><br><span class="line">例如https://github.com/golang/example这个项目，仓库根目录的导入路径为“github.com/golang/example”。 stringutil 包存储在子目录中，因此它的导入路径为“github.com/golang/example/stringutil”。</span><br><span class="line">2、本地文件系统中存储源码的位置源自导入路径。特别地，首选路径为 $GOPATH/src/&lt;导入路径&gt;。若 $GOPATH 未设置， go命令会回到标准Go包存储源码的地方，即 $GOROOT/src/pkg/&lt;导入路径&gt;。 若 $GOPATH 设置了多个路径，go命令就会尝试这些目录的每一个 &lt;目录&gt;/src/&lt;导入路径&gt;。</span><br><span class="line">3、源码树中的每个目录都对应于单个包。通过将一个目录限定为单个包， 我们无需先指定目录，再从该目录中指定包来创建混合的导入路径了。此外， 大部分文件管理工具和用户界面，都是将目录作为基本工作单元的。 将基本的Go单元—包—同化为文件系统的结构，也就意味着文件系统工具成了Go包的工具。 复制、移动或删除一个包就对应于复制、移动或删除一个目录。</span><br><span class="line">4、包只通过源码中的信息构建。这会让它更容易适应构建环境和条件的改变。 例如，若我们允许额外的配置（如编译器标志或命令行选项等），那么每当构建工具被更改后， 相应的配置也需要更新；它天生还会绑定至特定的工具链。</span><br></pre></td></tr></table></figure>
+
+<h2 id="go-命令基础"><a href="#go-命令基础" class="headerlink" title="go 命令基础"></a>go 命令基础</h2><p>首先配置GOPATH，进入此目录后，我们就可以添加一些源码了。假设我们想要使用codesearch项目中的索引包， 以及一个左倾红黑树包。我们可以用“go get”子命令安装二者：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ go get code.google.com/p/codesearch/index</span><br><span class="line">$ go get github.com/petar/GoLLRB/llrb</span><br></pre></td></tr></table></figure>
+
 <p>这两个包现在已被下载并安装到我们的 $GOPATH 目录中了。该目录树现在包含了 src/code.google.com/p/codesearch/index/ 和 src/github.com/petar/GoLLRB/llrb/ 这两个目录，以及那些库和依赖的已编译包 （在 pkg/ 中)</p>
 <p>“go list”子命令会列出其对应实参的导入路径，而模式”./…” 意为从当前目录（”./“）开始，查找该目录下的所有包（”…”）：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yujiangdeMBP-13:go yujiang$ go list ./...</span><br><span class="line">github.com/prometheus/prometheus/cmd/prometheus</span><br><span class="line">github.com/prometheus/prometheus/cmd/promtool</span><br></pre></td></tr></table></figure>
+
 <p>我们也可以测试这些包:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go test ./...</span><br></pre></td></tr></table></figure>
+
 <p>“go install”子命令会将包的最新副本安装到pkg目录中。由于 go 命令会分析依赖关系，因此，除非该包导入的其它包已过期，否则 “go install” 也会递归地根据依赖关系安装它们。</p>
 <h3 id="go-get"><a href="#go-get" class="headerlink" title="go get"></a>go get</h3><p>可以根据要求和实际情况从互联网上下载或更新指定的代码包及其依赖包，并对它们进行编译和安装。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@centos7 ~]# go help get</span><br><span class="line">usage: go get [-d] [-f] [-fix] [-insecure] [-t] [-u] [-v] [build flags] [packages]</span><br></pre></td></tr></table></figure>
+
 <p>-d标志指示在下载软件包后停止，不安装软件包。</p>
 <p>-f标志仅在设置-u时有效，该标记会让命令程序忽略掉对已下载代码包的导入路径的检查。如果下载并安装的代码包所属的项目是你从别人那里Fork过来的，那么这样做就尤为重要了。</p>
 <p>-fix标志指示命令程序在下载代码包后先执行修正动作，而后再进行编译和安装。</p>
@@ -546,7 +553,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

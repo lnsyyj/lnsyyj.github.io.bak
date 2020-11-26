@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/16/Ceph版本升级新特性/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/21/Ceph-DEVICE-MANAGEMENT/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/10/16/Ceph版本升级新特性/" itemprop="url">Ceph版本升级新特性</a></h1>
+                <a class="post-title-link" href="/2019/10/21/Ceph-DEVICE-MANAGEMENT/" itemprop="url">Ceph DEVICE MANAGEMENT</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-16T22:13:29+08:00">
-                2019-10-16
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-21T14:18:11+08:00">
+                2019-10-21
               </time>
             
 
@@ -358,128 +358,68 @@
       
         
           
-            <h1 id="V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC"><a href="#V14-2-0-NAUTILUS-MAJOR-CHANGES-FROM-MIMIC" class="headerlink" title="V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC"></a>V14.2.0 NAUTILUS MAJOR CHANGES FROM MIMIC</h1><p>参考：</p>
-<p>【1】<a href="https://docs.ceph.com/docs/master/releases/nautilus/" target="_blank" rel="noopener">https://docs.ceph.com/docs/master/releases/nautilus/</a></p>
-<p>【2】<a href="https://blog.csdn.net/Z_Stand/article/details/89739908" target="_blank" rel="noopener">https://blog.csdn.net/Z_Stand/article/details/89739908</a></p>
-<p>这是Ceph Nautilus的第一个稳定版本。</p>
-<ul>
-<li><p>Dashboard</p>
-<p><a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">Ceph Dashboard</a>增加了许多新功能：</p>
-<ul>
-<li>Support for multiple users / roles</li>
-<li>SSO (SAMLv2) for user authentication</li>
-<li>Auditing support（审计支持）</li>
-<li>New landing page, showing more metrics and health info</li>
-<li>I18N support（国际化）</li>
-<li>REST API documentation with Swagger API</li>
-<li>Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful 风格的 Web 服务。总体目标是使客户端和文件系统作为服务器以同样的速度来更新。文件的方法，参数和模型紧密集成到服务器端的代码，允许API来始终保持同步。作者：天马行空LQ<br>  链接：<a href="https://www.jianshu.com/p/66a14ea07622" target="_blank" rel="noopener">https://www.jianshu.com/p/66a14ea07622</a><br>来源：简书<br>  著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
-</ul>
-<p>Ceph management新功能：</p>
-<ul>
-<li>OSD management (mark as down/out, change OSD settings, recovery profiles)</li>
-<li>Cluster config settings editor</li>
-<li>Ceph Pool management (create/modify/delete)</li>
-<li><a href="https://www.oschina.net/news/2609" target="_blank" rel="noopener">ECP</a> management</li>
-<li>RBD mirroring configuration</li>
-<li>Embedded Grafana Dashboards (derived from Ceph Metrics)</li>
-<li>CRUSH map viewer</li>
-<li>NFS Ganesha management</li>
-<li>iSCSI target management (via <a href="https://docs.ceph.com/docs/master/rbd/iscsi-overview/#ceph-iscsi" target="_blank" rel="noopener">Ceph iSCSI Gateway</a>)</li>
-<li>RBD QoS configuration</li>
-<li>Ceph Manager (ceph-mgr) module management</li>
-<li>Prometheus alert Management</li>
-</ul>
-</li>
-</ul>
-<p>而且，Ceph Dashboard现在被拆分到ceph-mgr-dashboard的package。 如果您的package management software在安装ceph-mgr时失败，则可能需要单独安装ceph-mgr-dashboard。</p>
-<ul>
-<li>RADOS<ul>
-<li>现在可以随时减少每个pool的placement groups (PGs)数，并且可以根据群集利用率或管理员提示<a href="https://docs.ceph.com/docs/master/rados/operations/placement-groups/#pg-autoscaler" target="_blank" rel="noopener">自动调整PG数</a>。</li>
-<li>新的<a href="https://docs.ceph.com/docs/master/rados/configuration/msgr2/#msgr2" target="_blank" rel="noopener">v2 wire protocol</a>支持线路加密</li>
-<li>群集可以跟踪OSD和Monitor daemons消耗的物理<a href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices" target="_blank" rel="noopener">存储设备</a>以及运行状况指标（即SMART），并且群集可以通过预先训练的预测模型或者基于云预测服务来<a href="https://docs.ceph.com/docs/master/mgr/diskprediction/#diskprediction" target="_blank" rel="noopener">报告预测的HDD或SSD故障</a>。</li>
-<li>可通过ceph osd numa-status命令轻松监视OSD daemons的NUMA节点，并通过osd_numa_node config选项进行配置。</li>
-<li>现在，当使用BlueStore OSD时，空间利用率将按object data，omap data和internal metadata，pool以及压缩前和压缩后的大小进行细分。</li>
-<li>在执行recovery和backfill时，OSD可以更有效地选择重要的PG和objects优先处理。</li>
-<li>在设备出现问题以后，像recovery这种长期运行在后台的进程，可以使用ceph status命令查看进度。</li>
-<li>增加了一个实验性的（耦合层） <a href="https://www.usenix.org/conference/fast18/presentation/vajha" target="_blank" rel="noopener">Coupled-Layer “Clay” erasure code</a> plugin，该plugin可减少大多数recovery操作所需的网络带宽和IO。</li>
-</ul>
-</li>
-<li>RGW<ul>
-<li>S3 lifecycle可以在storage classes与tiering层之间转换</li>
-<li>Beast取代了civetweb成为默认的web frontend，从而提高了整体性能。</li>
-<li>支持新的publish/subscribe基础架构，允许RGW将events推送至serverless frameworks如knative或data pipelies如Kafka。</li>
-<li>新增一系列身份验证功能，使用OAuth2和OpenID::connect的STS联合以及OPA（开放策略代理）身份验证委派原型。</li>
-<li>新的archive zone federation功能可将所有objects（包括历史记录）完全保留在一个单独的zone中。</li>
-</ul>
-</li>
-<li><p>CephFS</p>
-<ul>
-<li>对于具有large caches和large RAM并长期运行的客户端，MDS的稳定性已大大提高。Cache trimming（调整）和client capability recall现在受到限制，以防止MDS过载。</li>
-<li>现在可以在Rook管理的群集环境中通过NFS-Ganesha导出CephFS。Ceph负责管理集群并确保高可用性和可伸缩性。 <a href="https://ceph.com/community/deploying-a-cephnfs-server-cluster-with-rook/" target="_blank" rel="noopener">入门演示</a>。 预计在未来Nautilus的次要版本中实现此功能的更多自动化。</li>
-<li>MDS mds_standby_for_*，mon_force_standby_active和mds_standby_replay配置选项已过时。 相反，操作者现在可以在CephFS文件系统上<a href="https://docs.ceph.com/docs/master/cephfs/standby/#mds-standby-replay" target="_blank" rel="noopener">设置新的</a>allow_standby_replay标志。 该设置会使文件系统由standbys变为standby-replay，并且任何可用的rank都会生效。（一个 rank 可看作是一个元数据分片）</li>
-<li>MDS支持客户端释放缓存的同时释放自己的存储端缓存，这个过程可由MDS admin socket命令 <code>cache drop</code>来完成</li>
-<li>现在可以检查MDS中正在进行的scrub的进度。 此外，scrub可能会暂停或中止。 有关更多信息，请参见<a href="https://docs.ceph.com/docs/master/cephfs/scrub/#mds-scrub" target="_blank" rel="noopener">scrub文档</a>。</li>
-<li>通过<code>ceph volume</code> command-line-interface提供了一个用于创建volumes的新interface。</li>
-<li>新的<a href="https://docs.ceph.com/docs/master/cephfs/cephfs-shell/" target="_blank" rel="noopener">cephfs-shell工具</a>可用于处理CephFS文件系统而无需mounting。</li>
-<li>为了简洁，清楚和有用，已重新格式化了来自ceph status与CephFS相关的输出。</li>
-<li>Lazy IO已进行了改进。客户端可以使用ceph_open C/C++ API的新CEPH_O_LAZY flag将其打开或通过配置选项client_force_lazyio将其打开。（LazyIO放松了POSIX语义。 即使文件由多个客户端上的多个应用程序打开，也允许缓冲的读/写操作。 应用程序负责自己管理缓存的一致性。自Nautilus发行以来，Libcephfs支持LazyIO。）</li>
-<li>现在可以通过ceph fs fail命令快速关闭CephFS文件系统。有关更多信息，请参见 <a href="https://docs.ceph.com/docs/master/cephfs/administration/#cephfs-administration" target="_blank" rel="noopener">the administration page</a>。</li>
-</ul>
-</li>
-<li><p>RBD</p>
-<ul>
-<li>Images可以在尽量短的停机时间内迁移，以帮助在pool之间移动images或移动到新的layouts。</li>
-<li>新的rbd perf image iotop和rbd perf image iostat命令为所有RBD images提供了类似于iotop和iostat的IO监视器。</li>
-<li>现在，ceph-mgr Prometheus exporter新增一个用于所有RBD images的IO监视器。</li>
-<li>支持pool中的单独image namespaces，以便进行租户隔离。</li>
-</ul>
-</li>
-<li>Misc<ul>
-<li>Ceph 拥有一组新的<a href="https://docs.ceph.com/docs/master/mgr/orchestrator_cli/#orchestrator-cli-module" target="_blank" rel="noopener">orchestrator modules</a>，可直接与外部orchestrators像ceph-ansible, DeepSea, Rook, or simply ssh通过一致的CLI interface(and, eventually, Dashboard) 进行交互。</li>
-</ul>
-</li>
-</ul>
-<h1 id="V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS"><a href="#V13-2-0-MIMIC-MAJOR-CHANGES-FROM-LUMINOUS" class="headerlink" title="V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS"></a>V13.2.0 MIMIC MAJOR CHANGES FROM LUMINOUS</h1><ul>
-<li>Dashboard<ul>
-<li>Ceph Luminous中引入的（只读）Ceph manager dashboard已由<a href="https://openattic.org/" target="_blank" rel="noopener">openATTIC</a> Ceph management tool新实现取代，提供了具有<a href="https://docs.ceph.com/docs/master/mgr/dashboard/#mgr-dashboard" target="_blank" rel="noopener">许多其他管理功能</a>。</li>
-</ul>
-</li>
-<li>RADOS<ul>
-<li>现在，配置选项可以由monitor集中存储和管理。</li>
-<li>进行recovery或rebalancing操作时，monitor daemon占用的disk space大大减少。</li>
-<li>当OSD从最近的故障中恢复时，异步恢复功能可减少请求的tail latency（少量响应的延迟高于均值，我们把这些响应称为尾延迟）。</li>
-<li>scrub时OSD冲突请求抢占tail latency减少。</li>
-</ul>
-</li>
-<li><p>RGW</p>
-<ul>
-<li>RGW可以将zone （或subset of buckets）复制到外部云存储服务（例如S3）。</li>
-<li>RGW在versioned buckets功能上支持S3 multi-factor authentication API。<ul>
-<li>AWS Multi-Factor Authentication（MFA）它在用户名和密码的基础上增加了一层额外的保护。启用MFA后，当用户登录AWS网站时，系统将提示他们输入用户名和密码以及来自其AWS MFA设备的身份验证代码。这些因素综合在一起，为您的AWS账户设置和资源提供了更高的安全性。</li>
-</ul>
-</li>
-<li>版本控制是在相同的存储桶中保留对象的多个变量的方法。对于 Amazon S3 桶中存储的每个对象，您可以使用版本控制功能来保存、检索和还原它们的各个版本。使用版本控制能够轻松从用户意外操作和应用程序故障中恢复数据。</li>
-<li>Beast frontend不再进行实验，被认为是稳定的并可以使用。</li>
-</ul>
-</li>
-<li><p>CephFS</p>
-<ul>
-<li>Snapshots与多个MDS daemons结合使用时，现在稳定。</li>
-</ul>
-</li>
-<li><p>RBD</p>
-<ul>
-<li>Image clones不再需要明确的protect和unprotect步骤。</li>
-<li>可以将Images deep-copied（包括与parent image和associated snapshots的任何克隆链接）到新pool或修改data layouts。</li>
-</ul>
-</li>
-<li><p>Misc</p>
-<ul>
-<li>由于在Stretch中缺少GCC 8，我们已删除了Mimic的Debian构建。我们希望Debian的构建将在2019年初发布Buster后回归，并希望在Buster可用后构建最终的Luminous发行版（以及以后的Mimic point发行版）。</li>
-</ul>
-</li>
-</ul>
+            <h3 id="DEVICE-MANAGEMENT"><a href="#DEVICE-MANAGEMENT" class="headerlink" title="DEVICE MANAGEMENT"></a>DEVICE MANAGEMENT</h3><p>Ceph跟踪哪个daemons消耗了哪些hardware storage devices（例如HDD，SSD），并收集有关这些devices的运行状况指标，以提供预测和/或自动响应硬件故障的工具。</p>
+<h1 id="DEVICE-TRACKING"><a href="#DEVICE-TRACKING" class="headerlink" title="DEVICE TRACKING"></a>DEVICE TRACKING</h1><p>您可以查询哪些存储设备正在使用：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ceph device ls</span><br><span class="line"></span><br><span class="line">DEVICE               HOST:DEV                       DAEMONS LIFE EXPECTANCY </span><br><span class="line">0d2a946c-413f-43f4-b community-ceph-2.novalocal:vdc osd.0</span><br><span class="line">451e48d6-913e-4f93-a community-ceph-1.novalocal:vdd osd.5</span><br><span class="line">935b6018-1dfe-4cf9-8 community-ceph-1.novalocal:vdc osd.2</span><br><span class="line">abe09d21-d950-47b0-9 community-ceph-2.novalocal:vdd osd.3</span><br><span class="line">bf37729e-9d83-48e9-9 community-ceph-3.novalocal:vdc osd.1</span><br><span class="line">d48dcf29-fe58-4e3e-a community-ceph-3.novalocal:vdd osd.4</span><br></pre></td></tr></table></figure>
 
+<p>您还可以按daemon或host列出devices：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ceph device ls-by-daemon &lt;daemon&gt;</span><br><span class="line">ceph device ls-by-host &lt;host&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device ls-by-daemon osd.0</span><br><span class="line">DEVICE               HOST:DEV                       EXPECTED FAILURE </span><br><span class="line">0d2a946c-413f-43f4-b community-ceph-2.novalocal:vdc                  </span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device ls-by-host community-ceph-2.novalocal</span><br><span class="line">DEVICE               DEV DAEMONS EXPECTED FAILURE </span><br><span class="line">0d2a946c-413f-43f4-b vdc osd.0                    </span><br><span class="line">abe09d21-d950-47b0-9 vdd osd.3</span><br></pre></td></tr></table></figure>
+
+<p>对于任何单个设备，您可以通过以下方式查询有关其位置以及如何使用它的信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ceph device info &lt;devid&gt;</span><br><span class="line"></span><br><span class="line">[root@community-ceph-1 ~]# ceph device info 0d2a946c-413f-43f4-b</span><br><span class="line">device 0d2a946c-413f-43f4-b</span><br><span class="line">attachment community-ceph-2.novalocal:vdc</span><br><span class="line">daemons osd.0</span><br></pre></td></tr></table></figure>
+
+<h1 id="ENABLING-MONITORING"><a href="#ENABLING-MONITORING" class="headerlink" title="ENABLING MONITORING"></a>ENABLING MONITORING</h1><p>Ceph还可以监视与您的设备关联的健康指标。 例如，SATA硬盘实现了一个称为SMART的标准，该标准提供了有关设备使用情况和运行状况的内部指标，例如开机小时数，电源循环次数或不可恢复的读取错误。 其他设备类型（例如SAS和NVMe）实现了一组相似的指标（通过略有不同的标准）。 Ceph可以通过smartctl工具收集所有这些信息。</p>
+<p>您可以通过以下方式启用或禁用运行状况监视：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device monitoring on</span><br></pre></td></tr></table></figure>
+
+<p>或</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device monitoring off</span><br></pre></td></tr></table></figure>
+
+<h1 id="SCRAPING"><a href="#SCRAPING" class="headerlink" title="SCRAPING"></a>SCRAPING</h1><p>如果启用了监视，则将定期自动scraped指标。 该间隔可以配置为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set mgr mgr/devicehealth/scrape_frequency &lt;seconds&gt;</span><br></pre></td></tr></table></figure>
+
+<p>默认值为每24小时scrape一次。</p>
+<p>您可以使用以下方法手动触发所有设备的scrape：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device scrape-health-metrics</span><br></pre></td></tr></table></figure>
+
+<p>单个设备可以用以下方式scraped：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device scrape-health-metrics &lt;device-id&gt;</span><br></pre></td></tr></table></figure>
+
+<p>或单个daemon的设备可以通过以下方式进行scraped：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device scrape-daemon-health-metrics &lt;who&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可以使用以下命令检索设备的存储健康指标（可选地，用于特定时间戳）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device get-health-metrics &lt;devid&gt; [sample-timestamp]</span><br></pre></td></tr></table></figure>
+
+<h1 id="FAILURE-PREDICTION"><a href="#FAILURE-PREDICTION" class="headerlink" title="FAILURE PREDICTION"></a>FAILURE PREDICTION</h1><p>Ceph可以根据其收集的健康指标预测预期寿命和设备故障。 共有三种模式：</p>
+<ul>
+<li>none: 禁用设备故障预测。</li>
+<li>local: 使用来自ceph-mgr daemon的预训练预测模型</li>
+<li>cloud: 使用ProphetStor运行的外部云服务共享设备运行状况和性能指标，并使用其免费服务或付费服务进行更准确的预测</li>
+</ul>
+<p>预测模式可以配置为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph config set global device_failure_prediction_mode &lt;mode&gt;</span><br></pre></td></tr></table></figure>
+
+<p>预测通常在后台定期进行，因此填充预期寿命值可能需要一些时间。 您可以从以下输出中看到所有设备的预期寿命：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device ls</span><br></pre></td></tr></table></figure>
+
+<p>您还可以使用以下方法查询特定设备的metadata：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device info &lt;devid&gt;</span><br></pre></td></tr></table></figure>
+
+<p>您可以使用以下命令显式地强制预测设备的预期寿命：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device predict-life-expectancy &lt;devid&gt;</span><br></pre></td></tr></table></figure>
+
+<p>如果您未使用Ceph的内部设备故障预测，但是拥有一些有关设备故障的外部信息源，则可以通过以下方式告知Ceph设备的预期寿命：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device set-life-expectancy &lt;devid&gt; &lt;from&gt; [&lt;to&gt;]</span><br></pre></td></tr></table></figure>
+
+<p>预期寿命以时间间隔表示，因此不确定性可以以宽间隔的形式表示。 间隔结束也可以不指定。</p>
+<h1 id="HEALTH-ALERTS"><a href="#HEALTH-ALERTS" class="headerlink" title="HEALTH ALERTS"></a>HEALTH ALERTS</h1><p>mgr/devicehealth/warn_threshold控制在生成运行状况警告之前，预期的设备故障必须多长时间。</p>
+<p>可以使用以下方法检查所有设备的存储预期寿命，并生成任何适当的健康警报：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph device check-health</span><br></pre></td></tr></table></figure>
+
+<h1 id="AUTOMATIC-MITIGATION"><a href="#AUTOMATIC-MITIGATION" class="headerlink" title="AUTOMATIC MITIGATION"></a>AUTOMATIC MITIGATION</h1><p>如果启用了mgr/devicehealth/self_heal选项（默认情况下），则对于预计将很快发现故障的设备，模块将通过将设备标记为“out”来自动将数据迁移到这些设备之外。</p>
+<p>mgr/devicehealth/mark_out_threshold控制在我们将osd自动标记为“out”之前，预期的设备故障必须多长时间。</p>
+<h3 id="原文："><a href="#原文：" class="headerlink" title="原文："></a>原文：</h3><h3 id="https-docs-ceph-com-docs-master-rados-operations-devices-devices"><a href="#https-docs-ceph-com-docs-master-rados-operations-devices-devices" class="headerlink" title="https://docs.ceph.com/docs/master/rados/operations/devices/#devices"></a><a href="https://docs.ceph.com/docs/master/rados/operations/devices/#devices" target="_blank" rel="noopener">https://docs.ceph.com/docs/master/rados/operations/devices/#devices</a></h3>
           
         
       
@@ -523,7 +463,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/15/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/15/">15</a><span class="page-number current">16</span><a class="page-number" href="/page/17/">17</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/17/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -569,7 +509,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

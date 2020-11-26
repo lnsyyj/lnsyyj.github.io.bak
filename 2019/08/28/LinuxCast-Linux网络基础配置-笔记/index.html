@@ -378,6 +378,7 @@
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[root@aio1 ~]# ifconfig ens33</span><br><span class="line">ens33: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 9000</span><br><span class="line">        inet 192.168.46.200  netmask 255.255.255.0  broadcast 192.168.46.255</span><br><span class="line">        inet6 fe80::b3f5:7411:df98:1d00  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">        ether 00:0c:29:1d:7b:de  txqueuelen 1000  (Ethernet)</span><br><span class="line">        RX packets 16673  bytes 23150661 (22.0 MiB)</span><br><span class="line">        RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">        TX packets 2645  bytes 223690 (218.4 KiB)</span><br><span class="line">        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">RX packets 接收包数量</span><br><span class="line">TX packets 发送包数量</span><br></pre></td></tr></table></figure>
+
 <h1 id="网络相关配置文件"><a href="#网络相关配置文件" class="headerlink" title="网络相关配置文件"></a>网络相关配置文件</h1><ul>
 <li><p>网卡配置文件</p>
 <p>/etc/sysconfig/network-scripts/ifcfg-ens8f0</p>
@@ -401,8 +402,10 @@
 </li>
 <li><p>测试DNS解析</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y bind-utils</span><br></pre></td></tr></table></figure>
+
 <p>host <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">域名到IP地址的解析</span><br><span class="line">[root@dev ~]# host www.baidu.com</span><br><span class="line">www.baidu.com is an alias for www.a.shifen.com.</span><br><span class="line">www.a.shifen.com has address 61.135.169.125</span><br><span class="line">www.a.shifen.com has address 61.135.169.121</span><br></pre></td></tr></table></figure>
+
 <p>dig <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
 </li>
 <li><p>显示路由表</p>
@@ -411,10 +414,12 @@
 </li>
 <li><p>追踪到达目标地址的网络路径</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y traceroute</span><br></pre></td></tr></table></figure>
+
 <p>traceroute <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
 </li>
 <li><p>使用mtr进行网络质量测试（结合了traceroute和ping）</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y mtr</span><br></pre></td></tr></table></figure>
+
 <p>mtr <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a></p>
 </li>
 </ul>
@@ -424,6 +429,7 @@
 </li>
 <li><p>永久性修改主机名</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">/etc/sysconfig/network</span><br><span class="line"></span><br><span class="line">HOSTNAME=train.linuxcast.net</span><br></pre></td></tr></table></figure>
+
 </li>
 </ul>
 <h1 id="故障排查"><a href="#故障排查" class="headerlink" title="故障排查"></a>故障排查</h1><p>网络故障排查遵循从底层到高层、从自身到外部的流程进行</p>
@@ -596,7 +602,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

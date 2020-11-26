@@ -373,8 +373,7 @@
 <th>OS</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>arp</td>
 <td>来自<code>/proc/net/arp</code>的ARP统计信息</td>
 <td>Linux</td>
@@ -544,10 +543,10 @@
 <td><a href="http://open-zfs.org/" target="_blank" rel="noopener">ZFS</a>性能统计数据</td>
 <td><a href="http://zfsonlinux.org/" target="_blank" rel="noopener">Linux</a>, Solaris</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <h3 id="默认情况下禁用"><a href="#默认情况下禁用" class="headerlink" title="默认情况下禁用"></a>默认情况下禁用</h3><p>由于内核配置和安全设置，默认情况下，所有Linux系统上的perf收集器可能无法正常工作。 要允许访问，请设置以下sysctl参数：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl -w kernel.perf_event_paranoid=X</span><br></pre></td></tr></table></figure>
+
 <p>2 仅允许用户空间度量（自Linux 4.6起默认）。</p>
 <p>1 允许内核和用户度量（在Linux 4.6之前默认）。</p>
 <p>0 允许访问特定CPU的数据，但不允许访问raw tracepoint samples。</p>
@@ -561,8 +560,7 @@
 <th>OS</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>buddyinfo</td>
 <td>/proc/buddyinfo报告的内存碎片统计信息</td>
 <td>Linux</td>
@@ -647,17 +645,19 @@
 <td>基于perf的指标（警告：指标取决于内核配置和设置）</td>
 <td>Linux</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 <h3 id="Textfile-Collector"><a href="#Textfile-Collector" class="headerlink" title="Textfile Collector"></a>Textfile Collector</h3><p>textfile collector类似于<a href="https://github.com/prometheus/pushgateway" target="_blank" rel="noopener">Pushgateway</a>因为它允许从批处理job导出统计信息。它还可用于导出静态指标，例如计算机具有的role。Pushgateway应该用于服务级别指标。textfile模式用于绑定计算机的度量标准。</p>
 <p>要使用它，请在Node exporter上设置<code>--collector.textfile.directory</code>标志。collector将使用文本格式解析该目录中与glob <code>*.prom</code>匹配的所有文件。 注意：不支持时间戳。</p>
 <p>以原子方式推送cron job的完成时间：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo my_batch_job_completion_time $(date +%s) &gt; /path/to/directory/my_batch_job.prom.$$</span><br><span class="line">mv /path/to/directory/my_batch_job.prom.$$ /path/to/directory/my_batch_job.prom</span><br></pre></td></tr></table></figure>
+
 <p>使用标签静态设置计算机的roles：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &apos;role&#123;role=&quot;application_server&quot;&#125; 1&apos; &gt; /path/to/directory/role.prom.$$</span><br><span class="line">mv /path/to/directory/role.prom.$$ /path/to/directory/role.prom</span><br></pre></td></tr></table></figure>
+
 <h3 id="Filtering-enabled-collectors"><a href="#Filtering-enabled-collectors" class="headerlink" title="Filtering enabled collectors"></a>Filtering enabled collectors</h3><p>默认情况下，<code>node_exporter</code>将从启用的collector中公开所有指标。 这是收集指标以避免在比较不同系列的指标时出错的建议方法。</p>
 <p>高级使用<code>node_exporter</code>可以传递一个可选的收集器列表来过滤指标。 <code>collect[]</code>参数可以多次使用。 在Prometheus配置中，您可以在<a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#%3Cscrape_config%3E" target="_blank" rel="noopener">scrape config</a></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">params:</span><br><span class="line">  collect[]:</span><br><span class="line">    - foo</span><br><span class="line">    - bar</span><br></pre></td></tr></table></figure>
+
 <p>这对于让不同的Prometheus服务器从节点收集特定指标非常有用。</p>
 <h2 id="部分监控项见下表"><a href="#部分监控项见下表" class="headerlink" title="部分监控项见下表"></a>部分监控项见下表</h2><table>
 <thead>
@@ -667,8 +667,7 @@
 <th>English   explanation</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>node_arp_entries</td>
 <td>device的ARP表项</td>
 <td>#   HELP node_arp_entries ARP entries by device</td>
@@ -1733,8 +1732,7 @@
 <td>文件系统释放的extent数</td>
 <td>#   HELP node_xfs_extent_allocation_extents_freed_total Number of extents freed   for a filesystem.</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 
       
     </div>
@@ -1888,7 +1886,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

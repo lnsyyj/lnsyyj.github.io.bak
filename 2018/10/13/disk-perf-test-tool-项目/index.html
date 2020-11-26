@@ -407,12 +407,15 @@
 </ul>
 <h2 id="Wally-motivation（Wally动机）"><a href="#Wally-motivation（Wally动机）" class="headerlink" title="Wally motivation（Wally动机）"></a>Wally motivation（Wally动机）</h2><p>主要测试问题和wally如何为您修复</p>
 <h2 id="Howto-install-wally"><a href="#Howto-install-wally" class="headerlink" title="Howto install wally"></a>Howto install wally</h2><h3 id="Container"><a href="#Container" class="headerlink" title="Container"></a>Container</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/Mirantis/disk_perf_test_tool.git</span><br><span class="line">docker build -t &lt;username&gt;/wally .</span><br></pre></td></tr></table></figure>
+
 <h3 id="Local-installation"><a href="#Local-installation" class="headerlink" title="Local installation"></a>Local installation</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt install g++ ....</span><br><span class="line">pip install XXX python -m wally prepare &lt;&lt; download fio, compile</span><br><span class="line">可根据Dockerfile查看安装过程</span><br></pre></td></tr></table></figure>
+
 <h2 id="Howto-run-a-test"><a href="#Howto-run-a-test" class="headerlink" title="Howto run a test"></a>Howto run a test</h2><p>要运行测试，您需要准备集群和配置文件。<br>如何运行wally：直接使用容器</p>
 <h2 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h2><ul>
 <li><code>SSHURI</code> - 格式为 <code>[user[:passwd]@]host[:port][:key_file]</code>的字符串，其中：</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">user - str，用户名，默认为当前用户</span><br><span class="line">passwd - str，ssh密码，如果提供了key_file_rr或使用了默认密钥，则可以省略ssh密码</span><br><span class="line">host - str，唯一必填字段。主机名或IP地址</span><br><span class="line">port - int，要连接的ssh服务器端口，默认为22</span><br><span class="line">key_file - str, ssh私有密钥文件（private）的路径。默认~/.ssh/id_rsa by default. 如果端口被省略, 但提供了key_file - 它必须与host分开两列。</span><br><span class="line"></span><br><span class="line">不能同时使用passwd和key_file。</span><br><span class="line">例如：</span><br><span class="line">11.12.23.10:37 - 使用ip 和 ssh 端口, 当前用户和 ~/.ssh/id_rsa key</span><br><span class="line">ceph-1 - 仅使用主机名，默认端口，当前用户和 ~/.ssh/id_rsa key</span><br><span class="line">ceph-12::~/.ssh/keyfile - 使用当前用户和 ~/.ssh/keyfile key</span><br><span class="line">root@master - 以root身份登录并使用 ~/.ssh/id_rsa key</span><br><span class="line">root@127.0.0.1:44 - 以root身份登录，使用44端口 和 ~/.ssh/id_rsa key</span><br><span class="line">user@10.20.20.30::/tmp/keyfile - 以root身份登录 和 /tmp/keyfile key</span><br><span class="line">root:rootpassword@10.20.30.40 - 以root身份登录并使用rootpassword作为ssh密码</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li><p><code>[XXX]</code> - XXX类型列表</p>
 </li>
@@ -465,8 +468,10 @@
 </ul>
 <p>如果OSD和Monitor节点在 ceph 中通过内部 ip 地址注册，这在您运行wally的节点是不可见。这允许将non-routable的IP地址映射到可routable的IP地址。例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ip_remap:</span><br><span class="line">    10.8.0.4: 172.16.164.71</span><br><span class="line">    10.8.0.3: 172.16.164.72</span><br><span class="line">    10.8.0.2: 172.16.164.73</span><br></pre></td></tr></table></figure>
+
 <p>例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ceph:</span><br><span class="line">    root_node: ceph-client</span><br><span class="line">    cluster: ceph    # &lt;&lt; optional</span><br><span class="line">    ip_remap:        # &lt;&lt; optional</span><br><span class="line">        10.8.0.4: 172.16.164.71</span><br><span class="line">        10.8.0.3: 172.16.164.72</span><br><span class="line">        10.8.0.2: 172.16.164.73</span><br></pre></td></tr></table></figure>
+
 <h2 id="Section-openstack"><a href="#Section-openstack" class="headerlink" title="Section openstack"></a>Section openstack</h2><p>提供openstack设置，用于发现OS群集和spawn/find测试vm。</p>
 <ul>
 <li><code>skip_preparation</code>: bool</li>
@@ -478,11 +483,14 @@
 <p>指定源[openstack connection settings]。</p>
 <p><code>openrc: ENV</code> - 从环境变量中获取OS credentials。你需要在wally开始之前导出openrc设置，就像这样</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ source openrc</span><br><span class="line">$ RUN_WALLY</span><br></pre></td></tr></table></figure>
+
 <p>或</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ env OS_USER=.. OS_PROJECT=..  RUN_WALLY</span><br></pre></td></tr></table></figure>
+
 <p><code>openrc: str</code> - 使用openrc文件，位于提供的路径以获取OS connection settings。例如：openrc: /tmp/my_cluster_openrc</p>
 <p><code>openrc: {str: str}</code> - 直接在配置文件中提供connection settings。例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">openrc:</span><br><span class="line">    OS_USERNAME: USER</span><br><span class="line">    OS_PASSWORD: PASSWD</span><br><span class="line">    OS_TENANT_NAME: KEY_FILE</span><br><span class="line">    OS_AUTH_URL: URL</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li><p><code>insecure</code>: bool - 在openrc section中提供，覆盖OS_INSECURE设置。</p>
 </li>
@@ -490,12 +498,14 @@
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">vms:</span><br><span class="line">    - wally@wally_vm</span><br><span class="line">    - root:rootpasswd@test_vm</span><br></pre></td></tr></table></figure>
+
 <p>这将找到所有名为wally_vm*和test_vm的vm，并尝试使用提供的credentials重用它们进行测试。请注意，默认情况下，vm wally使用openstack ssh key，而不是~/.ssh/id_rsa。有关详细信息，请参阅Openstack vm config部分。</p>
 <ul>
 <li>VM spawning选项。此选项控制要为测试生成的新vm的数量以及要使用的配置文件。所有衍生的vm将自动获得testnode角色并将用于测试。wally尝试使用anti-affinity组在所有计算节点上均匀地生成vm。</li>
 </ul>
 <p><code>count</code>: str 或 int. 控制生成多少个vm，可能的值：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">=X，其中X是int - 根据需要产生尽可能多的vm，以使总测试节点计数不小于X。例如 - 如果你已经有1个明确的测试节点，通过节点提供，并且在之前的测试运行中找到了2个vm并且你设置了count: =4，那么wally将产生一个额外的vm。</span><br><span class="line"></span><br><span class="line">X，其中X是integer整数。 正好生成X新vm。</span><br><span class="line"></span><br><span class="line">xX，其中X是integer整数。 每个compute产生X个vm。例如：copunt: x3 - 每个compute产生3个vm。</span><br></pre></td></tr></table></figure>
+
 <p><code>cfg_name</code>: str，vm config。默认情况下，只有wally_1024配置可用。此配置使用来自<code>https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img</code>的image作为vm镜像，1GiB的RAM，2个vCPU和100GiB卷。 有关详细信息，请参阅Openstack vm config。</p>
 <p><code>network_zone_name</code>: str。 内部ip v4的Network pool。 通常是net04</p>
 <p><code>flt_ip_pool</code>: str。 用于浮动ip v4的Network pool。 通常是net04_ext</p>
@@ -525,6 +535,7 @@
 </ul>
 <p>例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- fio:</span><br><span class="line">    load: ceph</span><br><span class="line">    params:</span><br><span class="line">        FILENAME: /dev/vdb</span><br><span class="line">        FILESIZE: 100G</span><br></pre></td></tr></table></figure>
+
 <h3 id="Key-test-profile-str"><a href="#Key-test-profile-str" class="headerlink" title="Key test_profile: str"></a>Key test_profile: str</h3><p>此section允许使用一些预定义的设置集来生成VM和运行测试。config-examples/default.yaml文件中列出了可用的profiles及其设置。下一个profiles默认可用：</p>
 <ul>
 <li><code>openstack_ceph</code> - 每个compute产生1个VM，并针对/dev/vdb运行ceph fio profile </li>
@@ -533,21 +544,25 @@
 </ul>
 <p>例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">discover: openstack,ceph</span><br><span class="line">run_sensors: true</span><br><span class="line">results_storage: /var/wally_results</span><br><span class="line"></span><br><span class="line">ceph:</span><br><span class="line">    root_node: localhost</span><br><span class="line"></span><br><span class="line">openstack:</span><br><span class="line">    openrc: ENV  # take creds from environment variable</span><br><span class="line"></span><br><span class="line">test_profile: openstack_ceph</span><br></pre></td></tr></table></figure>
+
 <h2 id="Howto-test"><a href="#Howto-test" class="headerlink" title="Howto test"></a>Howto test</h2><h3 id="Local-block-device"><a href="#Local-block-device" class="headerlink" title="Local block device"></a>Local block device</h3><p>使用config-examples/local_block_device.yml作为模板。将{STORAGE_FOLDER}替换为存放结果的文件夹的路径。确保wally具有对此文件夹的read/write访问权限，或者可以创建它。您可以直接测试device，也可以测试已mount device上的文件。将{STORAGE_DEV_OR_FILE_NAME}替换为正确的路径。在大多数情况下，wally可以正确检测file或block device大小，但通常最好直接设置{STORAGE_OR_FILE_SIZE}。使用的文件越大，对结果的影响越小，将导致不同的缓存，但也会填充更长的时间。</p>
 <p>测试sdb device的示例：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">run_sensors: false</span><br><span class="line">results_storage: /var/wally</span><br><span class="line"></span><br><span class="line">nodes:</span><br><span class="line">    localhost: testnode</span><br><span class="line"></span><br><span class="line">tests:</span><br><span class="line">  - fio:</span><br><span class="line">      load: hdd</span><br><span class="line">      params:</span><br><span class="line">          FILENAME: /dev/sdb</span><br><span class="line">          FILESIZE: 100G</span><br></pre></td></tr></table></figure>
+
 <p>mount到/opt文件夹的device测试示例：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">run_sensors: false</span><br><span class="line">results_storage: /var/wally</span><br><span class="line"></span><br><span class="line">nodes:</span><br><span class="line">    localhost: testnode</span><br><span class="line"></span><br><span class="line">tests:</span><br><span class="line">  - fio:</span><br><span class="line">      load: hdd</span><br><span class="line">      params:</span><br><span class="line">          FILENAME: /opt/some_test_file.bin</span><br><span class="line">          FILESIZE: 100G</span><br></pre></td></tr></table></figure>
+
 <p>请注意，测试完成后，wally不会删除文件。</p>
 <h3 id="Ceph-without-openstack-or-other-NAS-SAN"><a href="#Ceph-without-openstack-or-other-NAS-SAN" class="headerlink" title="Ceph without openstack, or other NAS/SAN"></a>Ceph without openstack, or other NAS/SAN</h3><p>wally仅支持rbd/cephfs测试，不支持object协议，例如rados和RGW。Cephfs测试不需要任何特殊准备，除了将其mounte在测试节点上，详情请参阅ceph fs quick start。</p>
 <p>Ceph线性read/write通常受网络限制。例如，如果您在群集中使用10个SATA drives作为storage drives，则聚合线性读取速度可达到~1Gibps或8Gibps，这接近10Gib网络限制。因此，除非你有一个足够带宽的网络测试节点，否则通常最好在多个测试节点并行测试ceph集群。</p>
-<p>Ceph在低QD时通常性能较低，因为在这种模式下，您一次只能使用一个OSD。与此同时，ceph可以扩展到比hdd/ssd drives大得多的QD值，因为在这种情况下，您可以在所有OSD daemons中扩展IO请求。您需要最多(16 <em> OSD_count) QD用于4k随机读取和大约(12 </em> OSD_COUNT / REPLICATION_FACTOR)QD用于4k随机写入以摸清群集限制。对于其他blocks块和modes模式，您可能需要不同的设置。如果您使用默认的ceph配置文件，则无需关心此操作。</p>
+<p>Ceph在低QD时通常性能较低，因为在这种模式下，您一次只能使用一个OSD。与此同时，ceph可以扩展到比hdd/ssd drives大得多的QD值，因为在这种情况下，您可以在所有OSD daemons中扩展IO请求。您需要最多(16 * OSD_count) QD用于4k随机读取和大约(12 * OSD_COUNT / REPLICATION_FACTOR)QD用于4k随机写入以摸清群集限制。对于其他blocks块和modes模式，您可能需要不同的设置。如果您使用默认的ceph配置文件，则无需关心此操作。</p>
 <p>有三种测试RBD的方法 - direct，通过使用[krbd]和虚拟机将其mount到节点，由rbd driver提供的volume，内置到qemu。对于最后一个，参考Ceph with openstack section或文档。</p>
 <h3 id="Using-testnode-mounted-rbd-device"><a href="#Using-testnode-mounted-rbd-device" class="headerlink" title="Using testnode mounted rbd device"></a>Using testnode mounted rbd device</h3><p>首先您需要一个pool作为rbd的target。您可以使用默认rbd pool，也可以创建自己的pool。pool需要有很多PG才能有很好的表现。保守估计是(100 * OSD_COUNT / REPLICATION_FACTOR)。创建后ceph可能会警告“too many PG”，这个消息可以安全地被忽略。ceph文档：PLACEMENT GROUPS。</p>
 <ul>
 <li>创建一个pool（有关详细信息，请参阅ceph pools documentation）</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ceph osd pool create &#123;pool-name&#125; &#123;pg-num&#125;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li><p>等到创建完成，所有PG变为active+clean。</p>
 </li>
@@ -555,10 +570,12 @@
 </li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rbd create &#123;vol-name&#125; --size &#123;size&#125; --pool &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>通过kernel rbd device挂载rbd。这是一个棘手的部分。Kernels通常具有旧版本的rbd driver，并且不支持最新的rbd features。这将导致在mount rbd期间出错。首先尝试挂载rbd device：</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ rbd map &#123;vol-name&#125; --pool &#123;pool-name&#125;</span><br></pre></td></tr></table></figure>
+
 <p>如果失败 - 您需要运行rbd info –pool {pool-name} {vol-name}，并通过rbd feature disable –pool {pool-name} {vol-name} {feature name}禁用features。然后尝试再次mount。</p>
 <ul>
 <li>wally需要对rbd device进行read/write访问。</li>
@@ -567,6 +584,7 @@
 <h3 id="Ceph-with-openstack"><a href="#Ceph-with-openstack" class="headerlink" title="Ceph with openstack"></a>Ceph with openstack</h3><p>最简单的方法是使用预定义的openstack_ceph profile。它为每个计算节点生成一个VM，并在所有计算节点上运行ceph测试suite。</p>
 <p>例如：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">include: default.yaml</span><br><span class="line">discover: openstack,ceph</span><br><span class="line">run_sensors: true</span><br><span class="line">results_storage: /var/wally_results</span><br><span class="line"></span><br><span class="line">ceph:</span><br><span class="line">    root_node: localhost</span><br><span class="line"></span><br><span class="line">openstack:</span><br><span class="line">    openrc: ENV  # take creds from environment variable</span><br><span class="line"></span><br><span class="line">test_profile: openstack_ceph</span><br></pre></td></tr></table></figure>
+
 <h3 id="Cinder-lvm-volumes"><a href="#Cinder-lvm-volumes" class="headerlink" title="Cinder lvm volumes"></a>Cinder lvm volumes</h3><p>none</p>
 <h2 id="Howto"><a href="#Howto" class="headerlink" title="Howto"></a>Howto</h2><ul>
 <li>Use you fio binary</li>
@@ -574,34 +592,38 @@
 <p>您需要下载fio源代码，在测试节点上编译它以进行linux distribution，使用bz2进行压缩，命名为<code>fio_{DISTRNAME}_{ARCH}.bz2</code>并放入<code>fio_binaries</code>目录。ARCH是目标系统上<code>arch</code>命令的输出。<code>DISTRNAME</code>应与<code>lsb_release -c -s</code>输出相同。</p>
 <p>以下是从master编译最新文件的典型步骤：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ git clone </span><br><span class="line">$ cd fio</span><br><span class="line">$ ./configure --build-static </span><br><span class="line">$ make -jXXX  # Replace XXX with you CPU core count to decrease compilation time</span><br><span class="line">$ bzip2 fio</span><br><span class="line">$ mv fio.bz2 WALLY_FOLDER/fio_binaries/fio_DISTRO_ARCH.bz2</span><br></pre></td></tr></table></figure>
+
 <h2 id="Storage-structure"><a href="#Storage-structure" class="headerlink" title="Storage structure"></a>Storage structure</h2><p>wally保存所有输入configurations，所有收集的数据和测试结果保存到results_storage设置目录的单个子文件夹下。所有文件都是csv(results/sensor files)，yaml/js用于配置non-numeric信息，png/svg用于images和联结原始文本文件，如日志和一些输出。</p>
 <p>以下是每个文件包含的内容：</p>
 <ul>
-<li>cli - txt，wally cli in semi-raw formal</li>
-<li>config.yaml - yaml，完整的最终config，从原始的wally config构建，处理所有替换和cli参数传递。</li>
-<li>log - txt，wally执行日志。包含某个测试的所有wally运行log，包括restarts和报告生成。</li>
-<li>result_code - yaml，此文件夹上带有’test’子命令的最后一次执行的退出代码。</li>
-<li>run_interval - yaml，此文件夹上带有’test’子命令的最后一次执行的[begin_time, end_time]列表。</li>
-<li>meta - folder，用于统计计算的cached值。</li>
+<li><p>cli - txt，wally cli in semi-raw formal</p>
+</li>
+<li><p>config.yaml - yaml，完整的最终config，从原始的wally config构建，处理所有替换和cli参数传递。</p>
+</li>
+<li><p>log - txt，wally执行日志。包含某个测试的所有wally运行log，包括restarts和报告生成。</p>
+</li>
+<li><p>result_code - yaml，此文件夹上带有’test’子命令的最后一次执行的退出代码。</p>
+</li>
+<li><p>run_interval - yaml，此文件夹上带有’test’子命令的最后一次执行的[begin_time, end_time]列表。</p>
+</li>
+<li><p>meta - folder，用于统计计算的cached值。</p>
+</li>
 <li><p>nodes - folder，有关测试集群的信息。</p>
 <pre><code>all.yml - yaml，除节点参数外的所有节点的信息
 
-nodes/parameters.js - js，节点参数。参数是单独存储的，因为它们可能是非常多的ceph节点，并且在python中解析的js文件比yaml快得多。
-</code></pre></li>
+nodes/parameters.js - js，节点参数。参数是单独存储的，因为它们可能是非常多的ceph节点，并且在python中解析的js文件比yaml快得多。</code></pre></li>
 <li><p>report - folder，html/css文件报告和所有图表。可以复制到其他地方。</p>
 <pre><code>index.html - 报告开始页面。
 
 main.css - css文件报告。
 
-XXX/YYY.png or .svg - 图表文件报告。
-</code></pre></li>
+XXX/YYY.png or .svg - 图表文件报告。</code></pre></li>
 <li><p>results - 所有fio结果的文件夹</p>
 <pre><code>fio_{SUITE_NAME}_{IDX1}.yml - yaml，每个已执行suite的完整配置。
 
 fio_{SUITE_NAME}_{IDX1}.{JOB_SHORT_DESCR}_{IDX2} - 包含suite中每个job所有数据的文件夹
 
-       {NODE_IP}:{NODE_SSH_PORT}.fio.{TS}.(csv|json) - fio输出文件。TS是解析时间序列（timeseries）名称 - bw或lat或stdout用于输出。
-</code></pre></li>
+       {NODE_IP}:{NODE_SSH_PORT}.fio.{TS}.(csv|json) - fio输出文件。TS是解析时间序列（timeseries）名称 - bw或lat或stdout用于输出。</code></pre></li>
 </ul>
 <p>​              info.yml - 社区的原作者没有写完</p>
 
@@ -757,7 +779,7 @@ fio_{SUITE_NAME}_{IDX1}.{JOB_SHORT_DESCR}_{IDX2} - 包含suite中每个job所有
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>

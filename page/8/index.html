@@ -287,7 +287,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/15/QEMU-AND-BLOCK-DEVICES/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/16/Ceph-数据recovery流量控制/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jiang Yu">
@@ -306,7 +306,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/11/15/QEMU-AND-BLOCK-DEVICES/" itemprop="url">QEMU AND BLOCK DEVICES</a></h1>
+                <a class="post-title-link" href="/2019/11/16/Ceph-数据recovery流量控制/" itemprop="url">Ceph 数据recovery流量控制</a></h1>
         
 
         <div class="post-meta">
@@ -318,8 +318,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-15T10:42:46+08:00">
-                2019-11-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-11-16T12:34:16+08:00">
+                2019-11-16
               </time>
             
 
@@ -358,54 +358,37 @@
       
         
           
-            <p>最常见的Ceph Block Device用例是向虚拟机提供block device images。例如，用户可以创建”golden” image。 然后，对image做snapshot。最后，用户clone snapshot（通常多次）。 有关详细信息，请参见 <a href="https://docs.ceph.com/docs/hammer/rbd/rbd-snapshot/" target="_blank" rel="noopener">Snapshots</a>。snapshot的clone具有copy-on-write能力，意味着Ceph可以快速将block device images配置给虚拟机，因为客户端不必在每次启动新虚拟机时都下载整个映像。</p>
-<p><img src="https://docs.ceph.com/docs/hammer/_images/ditaa-4733472b605d45db3caa492c9fa5900204396a2b.png" alt></p>
-<p>Ceph Block Devices可以与QEMU虚拟机集成。 有关QEMU的详细信息，请参阅<a href="http://wiki.qemu.org/Main_Page" target="_blank" rel="noopener">QEMU Open Source Processor Emulator</a>。 有关QEMU文档，请参见<a href="http://wiki.qemu.org/Manual" target="_blank" rel="noopener">QEMU Manual</a>。 有关安装的详细信息，请参见 <a href="https://docs.ceph.com/docs/hammer/install" target="_blank" rel="noopener">Installation</a>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">重要说明要将Ceph Block Devices与QEMU一起使用，你必须能够访问正在运行的Ceph的集群。</span><br></pre></td></tr></table></figure>
-<h1 id="USAGE（用法）"><a href="#USAGE（用法）" class="headerlink" title="USAGE（用法）"></a>USAGE（用法）</h1><p>QEMU命令行要求您指定pool名称和image名称。 您也可以指定snapshot名称。</p>
-<p>QEMU将假设Ceph configuration文件位于默认位置（例如，<code>/etc/ceph/$cluster.conf</code>），并且您以默认的<code>client.admin</code> user身份执行命令，除非您明确指定另一个Ceph configuration文件路径或另一个user。指定user时，QEMU使用<code>ID</code>而不是完整的<code>TYPE:ID</code>。有关详细信息，请参见<a href="https://docs.ceph.com/docs/hammer/rados/operations/user-management#user" target="_blank" rel="noopener">User Management - User</a>。请勿在user ID的开头添加客户端类型（即，<code>client</code>），否则您将收到验证错误。您应该具有admin user的key，或者使用<code>:id={user}</code>选项指定的另一个user的key，存储在默认路径中的keyring文件中。（即，/etc/ceph或具有适当文件所有权和权限的本地目录）用法如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img &#123;command&#125; [options] rbd:&#123;pool-name&#125;/&#123;image-name&#125;[@snapshot-name][:option1=value1][:option2=value2...]</span><br></pre></td></tr></table></figure>
-<p>例如，指定id和conf选项如下所示：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img &#123;command&#125; [options] rbd:glance-pool/maipo:id=glance:conf=/etc/ceph/ceph.conf</span><br></pre></td></tr></table></figure>
-<p>提示：包含<code>:</code>, <code>@</code>, 或 <code>=</code>可以使用\开头的字符进行转义。</p>
-<h1 id="CREATING-IMAGES-WITH-QEMU（使用QEMU创建IMAGES）"><a href="#CREATING-IMAGES-WITH-QEMU（使用QEMU创建IMAGES）" class="headerlink" title="CREATING IMAGES WITH QEMU（使用QEMU创建IMAGES）"></a>CREATING IMAGES WITH QEMU（使用QEMU创建IMAGES）</h1><p>可以从QEMU创建block device image。 必须指定rbd，pool名称和要创建的image名称。 还必须指定image的size。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -f raw rbd:&#123;pool-name&#125;/&#123;image-name&#125; &#123;size&#125;</span><br></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -f raw rbd:data/foo 10G</span><br></pre></td></tr></table></figure>
-<p>重要说明：raw data format（原始数据格式）实际上是与RBD一起使用的唯一明智格式选项。从技术上讲，您可以使用其他QEMU支持的格式（例如qcow2或vmdk），但是这样做会增加额外的开销，并且在启用缓存（请参阅下文）时，对于虚拟机实时迁移也将使该卷不安全。</p>
-<h1 id="RESIZING-IMAGES-WITH-QEMU（使用QEMU调整IMAGES大小）"><a href="#RESIZING-IMAGES-WITH-QEMU（使用QEMU调整IMAGES大小）" class="headerlink" title="RESIZING IMAGES WITH QEMU（使用QEMU调整IMAGES大小）"></a>RESIZING IMAGES WITH QEMU（使用QEMU调整IMAGES大小）</h1><p>您可以从QEMU调整block device image的大小。 您必须指定rbd，pool名称以及要调整大小的image名称。 您还必须指定image的size。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img resize rbd:&#123;pool-name&#125;/&#123;image-name&#125; &#123;size&#125;</span><br></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img resize rbd:data/foo 10G</span><br></pre></td></tr></table></figure>
-<h1 id="RETRIEVING-IMAGE-INFO-WITH-QEMU（使用QEMU检索IMAGE信息）"><a href="#RETRIEVING-IMAGE-INFO-WITH-QEMU（使用QEMU检索IMAGE信息）" class="headerlink" title="RETRIEVING IMAGE INFO WITH QEMU（使用QEMU检索IMAGE信息）"></a>RETRIEVING IMAGE INFO WITH QEMU（使用QEMU检索IMAGE信息）</h1><p>您可以从QEMU中检索block device image信息。 您必须指定rbd，pool名称和image名称。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img info rbd:&#123;pool-name&#125;/&#123;image-name&#125;</span><br></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img info rbd:data/foo</span><br></pre></td></tr></table></figure>
-<h1 id="RUNNING-QEMU-WITH-RBD（运行QEMU与RBD）"><a href="#RUNNING-QEMU-WITH-RBD（运行QEMU与RBD）" class="headerlink" title="RUNNING QEMU WITH RBD（运行QEMU与RBD）"></a>RUNNING QEMU WITH RBD（运行QEMU与RBD）</h1><p>QEMU可以将block device从host传递到guest，但是从QEMU 0.15开始，无需将image映射为host上的block device。相反，QEMU可以直接通过librbd作为virtual block device访问image。这样会更好，因为它避免了额外的context（上下文）切换，并且可以利用<a href="https://docs.ceph.com/docs/hammer/rbd/rbd-config-ref/#rbd-cache-config-settings" target="_blank" rel="noopener">RBD caching</a>。</p>
-<p>您可以使用qemu-img将现有的virtual machine images转换为Ceph block device images。例如，如果您有一个qcow2 image，则可以运行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img convert -f qcow2 -O raw debian_squeeze.qcow2 rbd:data/squeeze</span><br></pre></td></tr></table></figure>
-<p>要运行从该image启动的virtual machine，可以运行：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format=raw,file=rbd:data/squeeze</span><br></pre></td></tr></table></figure>
-<p><a href="https://docs.ceph.com/docs/hammer/rbd/rbd-config-ref/#rbd-cache-config-settings" target="_blank" rel="noopener">RBD caching</a>可以明显提高性能。 从QEMU 1.2开始，QEMU的cache选项控制<code>librbd</code> caching：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format=rbd,file=rbd:data/squeeze,cache=writeback</span><br></pre></td></tr></table></figure>
-<p>如果您使用的是较旧版本的QEMU，则可以将librbd cache configuration设置为”file”参数的一部分（如任何Ceph配置选项一样）：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format=raw,file=rbd:data/squeeze:rbd_cache=true,cache=writeback</span><br></pre></td></tr></table></figure>
-<p>重要说明：如果设置rbd_cache=true，则必须设置cache=writeback。如果不使用cache=writeback，则QEMU不会将刷新请求发送到librbd，如果QEMU在此配置中异常退出，则 rbd 顶部的文件系统可能会损坏。</p>
-<h1 id="ENABLING-DISCARD-TRIM（启用DISCARD-TRIM）"><a href="#ENABLING-DISCARD-TRIM（启用DISCARD-TRIM）" class="headerlink" title="ENABLING DISCARD/TRIM（启用DISCARD/TRIM）"></a>ENABLING DISCARD/TRIM（启用DISCARD/TRIM）</h1><p>从Ceph 0.46版和QEMU 1.1版开始，Ceph Block Devices支持discard（丢弃）操作。这意味着guest可以发送TRIM请求，让Ceph block device回收未使用的空间。在客户机中mount <code>ext4</code>或<code>XFS</code>时，通过<code>discard</code>选项启用它。</p>
-<p>为了使此功能可供guest使用，必须为block device显式启用它。 为此，必须指定与drive关联的<code>dispatch_granularity</code>：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">qemu -m 1024 -drive format=raw,file=rbd:data/squeeze,id=drive1,if=none \</span><br><span class="line">     -device driver=ide-hd,drive=drive1,discard_granularity=512</span><br></pre></td></tr></table></figure>
-<p>请注意，这使用了IDE driver。 virtio driver不支持discard。</p>
-<p>如果使用libvirt，请使用<code>virsh edit</code>编辑domain的配置文件，以包含<code>xmlns:qemu</code>值。然后，添加<code>qemu:commandline</code> block作为该domain的子级。以下示例为如何将<code>qemu id=</code>设置到两个不同的devices，并且discard_granularity值不同。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;domain type=&apos;kvm&apos; xmlns:qemu=&apos;http://libvirt.org/schemas/domain/qemu/1.0&apos;&gt;</span><br><span class="line">        &lt;qemu:commandline&gt;</span><br><span class="line">                &lt;qemu:arg value=&apos;-set&apos;/&gt;</span><br><span class="line">                &lt;qemu:arg value=&apos;block.scsi0-0-0.discard_granularity=4096&apos;/&gt;</span><br><span class="line">                &lt;qemu:arg value=&apos;-set&apos;/&gt;</span><br><span class="line">                &lt;qemu:arg value=&apos;block.scsi0-0-1.discard_granularity=65536&apos;/&gt;</span><br><span class="line">        &lt;/qemu:commandline&gt;</span><br><span class="line">&lt;/domain&gt;</span><br></pre></td></tr></table></figure>
-<h1 id="QEMU-CACHE-OPTIONS（QEMU缓存选项）"><a href="#QEMU-CACHE-OPTIONS（QEMU缓存选项）" class="headerlink" title="QEMU CACHE OPTIONS（QEMU缓存选项）"></a>QEMU CACHE OPTIONS（QEMU缓存选项）</h1><p>QEMU的cache选项与以下Ceph <a href="https://docs.ceph.com/docs/master/rbd/rbd-config-ref/" target="_blank" rel="noopener">RBD Cache</a>设置相对应。</p>
-<p>Writeback:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rbd_cache = true</span><br></pre></td></tr></table></figure>
-<p>Writethrough:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rbd_cache = true</span><br><span class="line">rbd_cache_max_dirty = 0</span><br></pre></td></tr></table></figure>
-<p>None:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rbd_cache = false</span><br></pre></td></tr></table></figure>
-<p>QEMU的cache设置会覆盖Ceph的cache设置（包括在Ceph配置文件中设置）。</p>
-<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph ~]# qemu-img create -f raw rbd:rbd/yujiang 10G</span><br><span class="line">Formatting &apos;rbd:rbd/yujiang&apos;, fmt=raw size=10737418240 cluster_size=0 </span><br><span class="line">[root@ceph ~]# rbd info yujiang</span><br><span class="line">rbd image &apos;yujiang&apos;:</span><br><span class="line">	size 10GiB in 2560 objects</span><br><span class="line">	order 22 (4MiB objects)</span><br><span class="line">	block_name_prefix: rbd_data.25dbd6b8b4567</span><br><span class="line">	format: 2</span><br><span class="line">	features: layering, exclusive-lock, object-map, fast-diff, deep-flatten</span><br><span class="line">	flags: </span><br><span class="line">	create_timestamp: Fri Nov 15 15:15:20 2019</span><br><span class="line"></span><br><span class="line">[root@ceph ~]# qemu-img resize rbd:rbd/yujiang 20G</span><br><span class="line">Image resized.</span><br><span class="line">[root@ceph ~]# rbd info yujiang</span><br><span class="line">rbd image &apos;yujiang&apos;:</span><br><span class="line">	size 20GiB in 5120 objects</span><br><span class="line">	order 22 (4MiB objects)</span><br><span class="line">	block_name_prefix: rbd_data.25dbd6b8b4567</span><br><span class="line">	format: 2</span><br><span class="line">	features: layering, exclusive-lock, object-map, fast-diff, deep-flatten</span><br><span class="line">	flags: </span><br><span class="line">	create_timestamp: Fri Nov 15 15:15:20 2019</span><br><span class="line"></span><br><span class="line">[root@ceph ~]# qemu-img info rbd:rbd/yujiang</span><br><span class="line">image: rbd:rbd/yujiang</span><br><span class="line">file format: raw</span><br><span class="line">virtual size: 20G (21474836480 bytes)</span><br><span class="line">disk size: unavailable</span><br></pre></td></tr></table></figure>
+            <p>ceph在扩容或缩容期间会有数据rebalance。如何控制在rebalance时，尽量降低对client IO的影响？调研如下：</p>
+<h1 id="首先，在什么情况下ceph会出现数据rebalance？"><a href="#首先，在什么情况下ceph会出现数据rebalance？" class="headerlink" title="首先，在什么情况下ceph会出现数据rebalance？"></a>首先，在什么情况下ceph会出现数据rebalance？</h1><p>本质上，用户数据写入ceph时，会被切分成大小相等的object，这些object由PG承载，分布到不同的OSD上（每个OSD一般会对应一块硬盘）。数据的迁移会以PG为单位进行，所以当PG发生变化时，就会有数据rebalance。</p>
+<h3 id="那么在什么时候PG会变化呢？"><a href="#那么在什么时候PG会变化呢？" class="headerlink" title="那么在什么时候PG会变化呢？"></a>那么在什么时候PG会变化呢？</h3><p>从用户使用角度讲一般有如下几种场景：</p>
+<ul>
+<li>添加/删除OSD</li>
+<li>重新调整pool的PG数</li>
+</ul>
+<h3 id="Client-IO优先"><a href="#Client-IO优先" class="headerlink" title="Client IO优先"></a>Client IO优先</h3><p>降低recovery的I/O优先级</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_op_priority </span><br><span class="line">    &quot;osd_recovery_op_priority&quot;: &quot;3&quot;,</span><br><span class="line"></span><br><span class="line">使用默认值</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_client_op_priority </span><br><span class="line">    &quot;osd_client_op_priority&quot;: &quot;63&quot;,</span><br></pre></td></tr></table></figure>
+
+<p>降低recovery的I/O带宽及backfill带宽</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_max_active</span><br><span class="line">    &quot;osd_recovery_max_active&quot;: &quot;1&quot;,</span><br><span class="line"></span><br><span class="line">调整后</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_sleep</span><br><span class="line">    &quot;osd_recovery_sleep&quot;: &quot;0.200000&quot;,</span><br></pre></td></tr></table></figure>
+
+<p>调整相关命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[root@ceph ~]# ceph daemon osd.2 config set osd_recovery_op_priority 3</span><br><span class="line">&#123;</span><br><span class="line">    &quot;success&quot;: &quot;osd_recovery_op_priority = &apos;3&apos; (not observed, change may require restart) &quot;</span><br><span class="line">&#125;</span><br><span class="line">[root@ceph ~]# ceph daemon osd.2 config show | grep osd_recovery_op_priority </span><br><span class="line">    &quot;osd_recovery_op_priority&quot;: &quot;3&quot;,</span><br><span class="line"></span><br><span class="line">获取osd ID</span><br><span class="line">[root@ceph ~]# ll /var/run/ceph/ | grep osd | awk &apos;&#123;print $9&#125;&apos; | sed &apos;s/ceph-\(.*\).asok/\1/&apos;</span><br><span class="line">osd.13</span><br><span class="line">osd.2</span><br><span class="line">osd.5</span><br><span class="line">osd.8</span><br></pre></td></tr></table></figure>
+
+<h3 id="添加OSD时"><a href="#添加OSD时" class="headerlink" title="添加OSD时"></a>添加OSD时</h3><p>1、BACK FILLING</p>
+<p>当新的OSD加入群集时，CRUSH将把placement groups从群集中的OSD重新分配给新添加的OSD。强制新OSD立即接受重新分配的placement groups会给新OSD带来过多的负担。用placement groups backfilling OSD在后台运行。backfilling完成后，新的OSD将在准备就绪后开始处理请求。</p>
+<p>在backfilling操作期间，您可能会看到以下几种状态之一：</p>
+<ul>
+<li>backfill_wait：表示backfilling操作尚未完成，但尚未进行</li>
+<li>backfilling：表示正在进行backfilling操作</li>
+<li>backfill_toofull：表示已请求backfill操作，但由于存储容量不足而无法完成</li>
+</ul>
+<p>如果无法重新backfilled placement group，则可以认为该placement group considered incomplete（不完整）</p>
+<p>backfill_toofull状态可能是瞬态的。随着PG的移动，空间可能变得可用。 backfill_toofull与backfill_wait类似，因为一旦条件发生变化，backfill就可以继续进行。</p>
+<p>Ceph提供了许多设置来管理将placement groups重新分配给OSD（尤其是新OSD）相关的负载峰值。默认情况下，osd_max_backfill设置OSD之间最大并发backfill数为1。backfill full ratio可以使OSD拒绝接受backfill请求（默认为90％），使用ceph osd set-backfillfull-ratio命令进行更改。如果OSD拒绝backfill请求，则osd backfill retry interval使OSD可以重试该请求（默认为30秒后）。OSD还可以设置osd backfill scan min和osd backfill scan max以管理扫描间隔（默认为64和512）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Option(&quot;osd_max_backfills&quot;, Option::TYPE_UINT, Option::LEVEL_ADVANCED)</span><br><span class="line">.set_default(1)</span><br><span class="line">.set_description(&quot;Maximum number of concurrent local and remote backfills or recoveries per OSD &quot;)</span><br><span class="line">.set_long_description(&quot;There can be osd_max_backfills local reservations AND the same remote reservations per OSD. So a value of 1 lets this OSD participate as 1 PG primary in recovery and 1 shard of another recovering PG.&quot;),</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>【1】<a href="https://blog.csdn.net/Linux_kiss/article/details/82857117" target="_blank" rel="noopener">https://blog.csdn.net/Linux_kiss/article/details/82857117</a></p>
+<p>【2】<a href="http://www.zphj1987.com/2017/08/10/Ceph-recover-speed-control/" target="_blank" rel="noopener">http://www.zphj1987.com/2017/08/10/Ceph-recover-speed-control/</a></p>
 
           
         
@@ -450,7 +433,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/109/">109</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/page/7/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><span class="page-number current">8</span><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/110/">110</a><a class="extend next" rel="next" href="/page/9/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -496,7 +479,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">109</span>
+                  <span class="site-state-item-count">110</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
